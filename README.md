@@ -16,5 +16,5 @@ Excelシートに入力したデータをデータベースに投入するツー
 > Copyright (c) 2011-2015 igeta
 
 * **ライセンス :** The MIT License (MIT)
-* **ライセンス全文 :** [licenses/vbac.txt](licenses/vbac.txt)
+* **ライセンス全文 :** [licenses/Ariawase.txt](licenses/Ariawase.txt)
 
