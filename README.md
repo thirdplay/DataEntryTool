@@ -9,7 +9,7 @@ Excelシートに入力したデータをデータベースに投入するツー
 
 以下のライブラリを使用して開発を行っています。
 
-#### [vbac](https://github.com/vbaidiot/Ariawase)
+#### [Ariawase](https://github.com/vbaidiot/Ariawase)
 
 > The MIT License (MIT)
 > 
