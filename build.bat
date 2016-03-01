@@ -1,10 +1,11 @@
 @echo off
 cd %~dp0
 
-@rem ƒeƒ“ƒvƒŒ[ƒgƒtƒ@ƒCƒ‹‚ğbinƒfƒBƒŒƒNƒgƒŠ‚ÉƒRƒs[‚·‚é
+@rem ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‚’binãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
+if not exist bin mkdir bin
 cd src
 for /d %%A in (*.xlsm) do copy %%A\template.xlsm ..\bin\%%A >nul
 cd ..
 
-@rem Œ‹‡ˆ—Às
+@rem çµåˆå‡¦ç†å®Ÿè¡Œ
 cscript //nologo vbac.wsf combine
