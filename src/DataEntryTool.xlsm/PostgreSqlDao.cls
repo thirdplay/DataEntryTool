@@ -18,9 +18,18 @@ Implements IDataEntryDao
 
 
 '====================================================================================================
+' 定数
+'====================================================================================================
+' カラム情報取得クエリ
+Private Const cstColumnInfoGetQuery As String = _
+    "SELECT isc.ordinal_position, isc.column_name, COALESCE(pd.description, '') AS comment, isc.data_type AS data_type, CASE isc.data_type WHEN 'character' THEN TO_CHAR(isc.character_maximum_length, 'FM99999999') WHEN 'character varying' THEN TO_CHAR(isc.character_maximum_length, 'FM99999999') WHEN 'numeric' THEN TO_CHAR(isc.numeric_precision, 'FM99999999') || ',' || TO_CHAR(isc.numeric_scale, 'FM99999999') ELSE '' END AS data_length, CASE isc.is_nullable WHEN 'NO' THEN '1' ELSE '0' END AS is_nullable, CASE WHEN pkc.column_name IS NOT NULL THEN '1' ELSE '0' END AS is_primary_key FROM information_schema.columns isc INNER JOIN pg_stat_all_tables psat ON( psat.schemaname = isc.table_schema AND psat.relname = isc.table_name ) INNER JOIN pg_attribute pa ON( pa.attrelid = psat.relid AND pa.attname = isc.column_name ) LEFT JOIN pg_description pd ON( pd.objoid = psat.relid AND pd.objsubid != 0 and pd.objsubid = pa.attnum ) LEFT JOIN ( SELECT tc.table_catalog, tc.table_schema, tc.table_name, " & _
+    "ccu.column_name FROM information_schema.table_constraints tc INNER JOIN information_schema.constraint_column_usage ccu ON( ccu.table_catalog = tc.table_catalog AND ccu.table_schema = tc.table_schema AND ccu.table_name = tc.table_name AND ccu.constraint_name = tc.constraint_name  ) WHERE tc.constraint_type = 'PRIMARY KEY' ) pkc ON ( pkc.table_catalog = isc.table_catalog AND pkc.table_schema = isc.table_schema AND pkc.table_name = isc.table_name AND pkc.column_name = isc.column_name ) WHERE isc.table_name='${tableName}' ORDER BY isc.ordinal_position"
+
+
+'====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Dim mCononect As Object     ' 接続オブジェクト
+Dim mConnect As Object      ' 接続オブジェクト
 
 
 '====================================================================================================
@@ -41,21 +50,21 @@ End Sub
 '====================================================================================================
 ' DB接続
 '----------------------------------------------------------------------------------------------------
-' IN : dbInfo データベース情報
+' IN : setting データベース情報
 '====================================================================================================
-Public Sub IDataEntryDao_Connect(dbInfo As DatabaseInfo)
+Public Sub IDataEntryDao_Connect(setting As Setting)
 On Error GoTo ErrHandler
-    Set mCononect = CreateObject("ADODB.Connection")
+    Set mConnect = CreateObject("ADODB.Connection")
 
-    mCononect.Open "Driver={PostgreSQL Unicode};" _
-        & "SERVER=" & dbInfo.ServerName & ";" _
-        & "DATABASE=" & dbInfo.DatabaseName & ";" _
-        & "UID=" & dbInfo.UserId & ";" _
-        & "PWD=" & dbInfo.Password & ";" _
-        & "PORT=" & dbInfo.Port & ";"
+    mConnect.Open "Driver={PostgreSQL Unicode};" _
+        & "SERVER=" & setting.ServerName & ";" _
+        & "DATABASE=" & setting.DatabaseName & ";" _
+        & "UID=" & setting.UserId & ";" _
+        & "PWD=" & setting.Password & ";" _
+        & "PORT=" & setting.Port & ";"
     Exit Sub
 ErrHandler:
-    Set mCononect = Nothing
+    Set mConnect = Nothing
     Err.Raise Err.Number, Err.Source, "DB接続失敗" & vbNewLine & Err.Description, Err.HelpFile, Err.HelpContext
     Exit Sub
 End Sub
@@ -65,9 +74,9 @@ End Sub
 ' DB切断
 '====================================================================================================
 Public Sub IDataEntryDao_Disconnect()
-    If Not mCononect Is Nothing Then
-        mCononect.Close
-        Set mCononect = Nothing
+    If Not mConnect Is Nothing Then
+        mConnect.Close
+        Set mConnect = Nothing
     End If
 End Sub
 
@@ -97,47 +106,38 @@ End Sub
 
 
 '====================================================================================================
-' 指定されたテーブルのカラム定義を取得します。
+' 指定されたテーブルのカラム情報リストを取得します。
 '----------------------------------------------------------------------------------------------------
 ' IN : tableName テーブル名
 ' OUT: カラム情報リスト
 '====================================================================================================
-'Public Function GetTableInfo(tableName As String)
-'select
-'UCC.COMMENTS as LOGICAL_NAME
-',UTC.COLUMN_NAME as PHYSICS_NAME
-',UTC.DATA_TYPE
-',case UTC.DATA_TYPE
-'  when 'CHAR' then TO_CHAR(UTC.DATA_LENGTH)
-'  when 'VARCHAR2' then TO_CHAR(UTC.DATA_LENGTH)
-'  when 'NUMBER' then UTC.DATA_PRECISION || ',' || UTC.DATA_SCALE
-'  else ''
-'end as DATA_LENGTH
-',DECODE(UTC.NULLABLE,'N','0','1') as IS_NULLABLE
-',DECODE(PKC.TABLE_NAME, NULL, '0', '1') as IS_PRIMARY_KEY
-'from USER_TAB_COLUMNS UTC
-'  left join USER_COL_COMMENTS UCC on(
-'    UCC.TABLE_NAME = UTC.TABLE_NAME
-'    and UCC.COLUMN_NAME = UTC.COLUMN_NAME
-'  )
-'  left join (
-'    select
-'      CC.TABLE_NAME
-'      ,CC.COLUMN_NAME
-'    from USER_CONS_COLUMNS CC
-'      inner join USER_CONSTRAINTS CONS on(
-'        CONS.CONSTRAINT_NAME = CC.CONSTRAINT_NAME
-'        and CONS.CONSTRAINT_TYPE = 'P'
-'      )
-'  ) PKC on (
-'    PKC.TABLE_NAME = UTC.TABLE_NAME
-'    and PKC.COLUMN_NAME = UTC.COLUMN_NAME
-'  )
-'where UTC.TABLE_NAME='RCAT_M_USER'
-'order by UTC.COLUMN_ID
-'
-'    Set GetTableInfo = Nothing
-'End Sub
+Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collection
+    Dim recordSet As Object
+    Dim query As String
+    Dim ci As ColumnInfo
+    Dim list As Collection
+    Set list = New Collection
+
+    query = Replace(cstColumnInfoGetQuery, "${tableName}", tableName)
+    Set recordSet = mConnect.Execute(query)
+    Do Until recordSet.EOF
+        Set ci = New ColumnInfo
+        With ci
+            .OrdinalPosition = recordSet("ordinal_position")
+            .ColumnName = recordSet("column_name")
+            .Comment = recordSet("comment")
+            .DataType = recordSet("data_type")
+            .DataLength = recordSet("data_length")
+            .IsNullable = recordSet("is_nullable")
+            .IsPrimaryKey = recordSet("is_primary_key")
+        End With
+        Call list.Add(ci)
+        recordSet.MoveNext
+    Loop
+    Set recordSet = Nothing
+
+    Set IDataEntryDao_GetColumnInfoList = list
+End Function
 
 
 '====================================================================================================

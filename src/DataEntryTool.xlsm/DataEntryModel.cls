@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "TableDefinitionModel"
+Attribute VB_Name = "DataEntryModel"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,14 +11,14 @@ Option Explicit
 
 '====================================================================================================
 '
-' テーブル定義モデル
+' データ投入モデル
 '
 '====================================================================================================
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDatabaseInfo As DatabaseInfo      ' データベース情報
+Private mSetting As Setting     ' データベース情報
 
 
 '====================================================================================================
@@ -32,15 +32,15 @@ End Sub
 ' デストラクタ
 '====================================================================================================
 Private Sub Class_Terminate()
-    Set mDatabaseInfo = Nothing
+    Set mSetting = Nothing
 End Sub
 
 
 '====================================================================================================
-' データベース情報の設定
+' 設定の設定
 '====================================================================================================
-Public Property Let DatabaseInfo(DatabaseInfo As DatabaseInfo)
-    Set mDatabaseInfo = DatabaseInfo
+Public Property Let Setting(setting As Setting)
+    Set mSetting = setting
 End Property
 
 
@@ -48,32 +48,34 @@ End Property
 ' テーブル名一覧のテーブル情報をDBから取得し、返却します
 '----------------------------------------------------------------------------------------------------
 ' IN : tableNames テーブル名リスト
+' OUT: テーブル情報リスト
 '====================================================================================================
-Public Function GetTableInfoList(tableNames As Collection)
-On Error GoTo ErrHandler
-    Dim tableName As String
-    'Dim tableInfoList As Collection
+Public Function GetTableInfoList(tableNames As Collection) As Collection
+On Error GoTo Finally
+    Dim i As Long
     Dim dao As IDataEntryDao
+    Dim ti AS TableInfo
+    Dim tiList As Collection
 
-    Set dao = New PostgreSqlDao
-    Call dao.Connect(mDatabaseInfo)
-    'For Each tableName In tableNames
-    '    'tableInfoList.add(dao.GetColumnInfoList(tableName))
-    'Next
+    Set tiList = New Collection
+    Set dao = DaoFactory.Create(mSetting.DatabaseType)
+
+    Call dao.Connect(mSetting)
+    For i = 1 To tableNames.Count
+        Set ti = New TableInfo
+        ti.ColumnInfoList = dao.GetColumnInfoList(tableNames(i))
+        ti.TableName = tableNames(i)
+        Call tiList.Add(ti)
+    Next
     Call dao.Disconnect
 
+    Set GetTableInfoList = tiList
+Finally:
     Set dao = Nothing
-    Set GetTableInfoList = Nothing 'tableInfoList
-    Exit Function
-ErrHandler:
-    Set dao = Nothing
-    Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
-    Exit Function
+    Set ti = Nothing
+    Set tiList = Nothing
+    If Err.Number <> 0 Then
+        Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
+    End If
 End Function
-'ColumnName
-'DataType
-'DataLength
 
-'DataPrecision
-'DataScale
-'Nullable

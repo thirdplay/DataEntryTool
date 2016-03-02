@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "DatabaseInfo"
+Attribute VB_Name = "DataEntryControl"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,18 +11,15 @@ Option Explicit
 
 '====================================================================================================
 '
-' データベース情報
+' データ投入コントロール
 '
 '====================================================================================================
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mServerName As String       ' サーバ名
-Private mPort As String             ' ポート
-Private mDatabaseName As String     ' データベース名
-Private mUserId As String           ' ユーザID
-Private mPassword As String         ' パスワード
+Private mView As DataEntryView          ' データ投入ビュー
+Private mModel As DataEntryModel        ' データ投入モデル
 
 
 '====================================================================================================
@@ -36,60 +33,52 @@ End Sub
 ' デストラクタ
 '====================================================================================================
 Private Sub Class_Terminate()
+    Set mView = Nothing
+    Set mModel = Nothing
 End Sub
 
 
 '====================================================================================================
-' サーバ名の取得/設定
+' ビューの設定
 '====================================================================================================
-Public Property Get ServerName() As String
-    ServerName = mServerName
-End Property
-Public Property Let ServerName(ServerName As String)
-    mServerName = ServerName
+Public Property Let View(View As DataEntryView)
+    Set mView = View
 End Property
 
 
 '====================================================================================================
-' ポートの取得/設定
+' モデルの設定
 '====================================================================================================
-Public Property Get Port() As String
-    Port = mPort
-End Property
-Public Property Let Port(Port As String)
-    mPort = Port
+Public Property Let Model(Model As DataEntryModel)
+    Set mModel = Model
 End Property
 
 
 '====================================================================================================
-' データベース名の取得/設定
+' テーブル定義再作成
 '====================================================================================================
-Public Property Get DatabaseName() As String
-    DatabaseName = mDatabaseName
-End Property
-Public Property Let DatabaseName(DatabaseName As String)
-    mDatabaseName = DatabaseName
-End Property
+Public Sub RecreateTableDefinition()
+On Error GoTo Finally
+    Dim setting As Setting
+    Dim tableNames As Collection
+    Dim tableInfoList As Collection
+    
+    ' 設定とテーブル名一覧の取得
+    Set setting = mView.GetSetting
+    Set tableNames = mView.GetTableNameList
 
+    ' テーブル名一覧を元に、Modelからテーブル情報一覧を取得
+    mModel.Setting = setting
+    Set tableInfoList = mModel.GetTableInfoList(tableNames)
 
-'====================================================================================================
-' ユーザIDの取得/設定
-'====================================================================================================
-Public Property Get UserId() As String
-    UserId = mUserId
-End Property
-Public Property Let UserId(UserId As String)
-    mUserId = UserId
-End Property
-
-
-'====================================================================================================
-' パスワードの取得/設定
-'====================================================================================================
-Public Property Get Password() As String
-    Password = mPassword
-End Property
-Public Property Let Password(Password As String)
-    mPassword = Password
-End Property
+    ' テーブル情報一覧を元に、テーブル定義シートを再作成する
+    Call mView.RecreateTableDefinition(tableInfoList)
+Finally:
+    Set setting = Nothing
+    Set tableNames = Nothing
+    Set tableInfoList = Nothing
+    If Err.Number <> 0 Then
+        Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
+    End If
+End Sub
 

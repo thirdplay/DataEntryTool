@@ -20,7 +20,7 @@ Implements IDataEntryDao
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Dim mCononect As Object     ' 接続オブジェクト
+Dim mConnect As Object      ' 接続オブジェクト
 
 
 '====================================================================================================
@@ -41,19 +41,19 @@ End Sub
 '====================================================================================================
 ' DB接続
 '----------------------------------------------------------------------------------------------------
-' IN : databaseInfo データベース情報
+' IN : setting 設定
 '====================================================================================================
-Public Sub IDataEntryDao_Connect(DatabaseInfo As DatabaseInfo)
+Public Sub IDataEntryDao_Connect(setting As Setting)
 On Error GoTo ErrHandler
-    Set mCononect = CreateObject("ADODB.Connection")
+    Set mConnect = CreateObject("ADODB.Connection")
 
-    mCononect.Open "Driver={Microsoft ODBC for Oracle};" _
-        & "Server=" & DatabaseInfo.ServerName & ";" _
-        & "UID=" & DatabaseInfo.UserId & ";" _
-        & "PWD=" & DatabaseInfo.Password & ";"
+    mConnect.Open "Driver={Microsoft ODBC for Oracle};" _
+        & "Server=" & setting.ServerName & ";" _
+        & "UID=" & setting.UserId & ";" _
+        & "PWD=" & setting.Password & ";"
     Exit Sub
 ErrHandler:
-    Set mCononect = Nothing
+    Set mConnect = Nothing
     Err.Raise Err.Number, Err.Source, "DB接続失敗" & vbNewLine & Err.Description, Err.HelpFile, Err.HelpContext
     Exit Sub
 End Sub
@@ -63,9 +63,9 @@ End Sub
 ' DB切断
 '====================================================================================================
 Public Sub IDataEntryDao_Disconnect()
-    If Not mCononect Is Nothing Then
-        mCononect.Close
-        Set mCononect = Nothing
+    If Not mConnect Is Nothing Then
+        mConnect.Close
+        Set mConnect = Nothing
     End If
 End Sub
 
@@ -95,15 +95,17 @@ End Sub
 
 
 '====================================================================================================
-' 指定されたテーブルのカラム定義を取得します。
+' 指定されたテーブルのカラム情報リストを取得します。
 '----------------------------------------------------------------------------------------------------
 ' IN : tableName テーブル名
 ' OUT: カラム情報リスト
 '====================================================================================================
-'Public Function GetTableInfo(tableName As String)
+Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collection
+    Set IDataEntryDao_GetColumnInfoList = Nothing
+End Function
 'select
-'UCC.COMMENTS as LOGICAL_NAME
-',UTC.COLUMN_NAME as PHYSICS_NAME
+'UTC.COLUMN_NAME
+',UCC.COMMENTS as COMMENT
 ',UTC.DATA_TYPE
 ',case UTC.DATA_TYPE
 '  when 'CHAR' then TO_CHAR(UTC.DATA_LENGTH)
