@@ -60,6 +60,7 @@ End Property
 Public Sub Execute()
     Dim dbInfo As DatabaseInfo
     Dim tableNames As Collection
+    Dim tableInfoList As Collection
     
     ' DB情報の取得
     Set dbInfo = mView.GetDatabaseInfo
@@ -67,7 +68,8 @@ Public Sub Execute()
     Set tableNames = mView.GetTableNameList
 
     ' テーブル名一覧を元に、Modelからテーブル情報一覧を取得
-    'Set tableInfoList = mModel.GetTableInfoList(dbInfo)
+    mModel.DatabaseInfo = dbInfo
+    Set tableInfoList = mModel.GetTableInfoList(tableNames)
 
     ' 3. テーブル情報一覧を元に、テーブルシートを再作成
     'Call mView.RecreateTableDefinition tableInfoList
