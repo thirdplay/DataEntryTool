@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "OracleDao"
+Attribute VB_Name = "DataEntryPostgreSqlDao"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,10 +11,19 @@ Option Explicit
 
 '====================================================================================================
 '
-' OracleDao
+' PostgreSqlDao
 '
 '====================================================================================================
 Implements IDataEntryDao
+
+
+'====================================================================================================
+' 定数
+'====================================================================================================
+' カラム情報取得クエリ
+Private Const cstColumnInfoGetQuery As String = _
+    "SELECT isc.ordinal_position AS column_id, isc.column_name, COALESCE(pd.description, '') AS comments, isc.data_type AS data_type, CASE isc.data_type WHEN 'character' THEN TO_CHAR(isc.character_maximum_length, 'FM99999999') WHEN 'character varying' THEN TO_CHAR(isc.character_maximum_length, 'FM99999999') WHEN 'numeric' THEN TO_CHAR(isc.numeric_precision, 'FM99999999') || ',' || TO_CHAR(isc.numeric_scale, 'FM99999999') ELSE '' END AS data_length, CASE isc.is_nullable WHEN 'NO' THEN '1' ELSE '0' END AS is_nullable, CASE WHEN pkc.column_name IS NOT NULL THEN '1' ELSE '0' END AS is_primary_key FROM information_schema.columns isc INNER JOIN pg_stat_all_tables psat ON( psat.schemaname = isc.table_schema AND psat.relname = isc.table_name ) INNER JOIN pg_attribute pa ON( pa.attrelid = psat.relid AND pa.attname = isc.column_name ) LEFT JOIN pg_description pd ON( pd.objoid = psat.relid AND pd.objsubid != 0 and pd.objsubid = pa.attnum ) LEFT JOIN ( SELECT tc.table_catalog, tc.table_schema, tc.table_name, " & _
+    "ccu.column_name FROM information_schema.table_constraints tc INNER JOIN information_schema.constraint_column_usage ccu ON( ccu.table_catalog = tc.table_catalog AND ccu.table_schema = tc.table_schema AND ccu.table_name = tc.table_name AND ccu.constraint_name = tc.constraint_name  ) WHERE tc.constraint_type = 'PRIMARY KEY' ) pkc ON ( pkc.table_catalog = isc.table_catalog AND pkc.table_schema = isc.table_schema AND pkc.table_name = isc.table_name AND pkc.column_name = isc.column_name ) WHERE isc.table_name='${tableName}' ORDER BY isc.ordinal_position"
 
 
 '====================================================================================================
@@ -41,16 +50,18 @@ End Sub
 '====================================================================================================
 ' DB接続
 '----------------------------------------------------------------------------------------------------
-' IN : setting 設定
+' IN : setting データベース情報
 '====================================================================================================
 Public Sub IDataEntryDao_Connect(setting As Setting)
 On Error GoTo ErrHandler
     Set mConnect = CreateObject("ADODB.Connection")
 
-    mConnect.Open "Driver={Microsoft ODBC for Oracle};" _
-        & "Server=" & setting.ServerName & ";" _
+    mConnect.Open "Driver={PostgreSQL Unicode};" _
+        & "SERVER=" & setting.ServerName & ";" _
+        & "DATABASE=" & setting.DatabaseName & ";" _
         & "UID=" & setting.UserId & ";" _
-        & "PWD=" & setting.Password & ";"
+        & "PWD=" & setting.Password & ";" _
+        & "PORT=" & setting.Port & ";"
     Exit Sub
 ErrHandler:
     Set mConnect = Nothing
@@ -74,7 +85,7 @@ End Sub
 ' トランザクション開始
 '====================================================================================================
 Public Sub IDataEntryDao_BeginTrans()
-    MsgBox "Oracle:BeginTrans"
+    MsgBox "PostgreSql:BeginTrans"
 End Sub
 
 
@@ -82,7 +93,7 @@ End Sub
 ' コミット
 '====================================================================================================
 Public Sub IDataEntryDao_CommitTrans()
-    MsgBox "Oracle:CommitTrans"
+    MsgBox "PostgreSql:CommitTrans"
 End Sub
 
 
@@ -90,7 +101,7 @@ End Sub
 ' ロールバック
 '====================================================================================================
 Public Sub IDataEntryDao_RollbackTrans()
-    MsgBox "Oracle:RollbackTrans"
+    MsgBox "PostgreSql:RollbackTrans"
 End Sub
 
 
@@ -101,43 +112,32 @@ End Sub
 ' OUT: カラム情報リスト
 '====================================================================================================
 Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collection
-    Set IDataEntryDao_GetColumnInfoList = Nothing
+    Dim recordSet As Object
+    Dim query As String
+    Dim ci As ColumnInfo
+    Dim list As Collection
+    Set list = New Collection
+
+    query = Replace(cstColumnInfoGetQuery, "${tableName}", tableName)
+    Set recordSet = mConnect.Execute(query)
+    Do Until recordSet.EOF
+        Set ci = New ColumnInfo
+        With ci
+            .ColumnId = recordSet("column_id")
+            .ColumnName = recordSet("column_name")
+            .Comments = recordSet("comments")
+            .DataType = recordSet("data_type")
+            .DataLength = recordSet("data_length")
+            .IsNullable = recordSet("is_nullable")
+            .IsPrimaryKey = recordSet("is_primary_key")
+        End With
+        Call list.Add(ci)
+        recordSet.MoveNext
+    Loop
+    Set recordSet = Nothing
+
+    Set IDataEntryDao_GetColumnInfoList = list
 End Function
-'select
-'UTC.COLUMN_NAME
-',UCC.COMMENTS as COMMENT
-',UTC.DATA_TYPE
-',case UTC.DATA_TYPE
-'  when 'CHAR' then TO_CHAR(UTC.DATA_LENGTH)
-'  when 'VARCHAR2' then TO_CHAR(UTC.DATA_LENGTH)
-'  when 'NUMBER' then UTC.DATA_PRECISION || ',' || UTC.DATA_SCALE
-'  else ''
-'end as DATA_LENGTH
-',DECODE(UTC.NULLABLE,'N','0','1') as IS_NULLABLE
-',DECODE(PKC.TABLE_NAME, NULL, '0', '1') as IS_PRIMARY_KEY
-'from USER_TAB_COLUMNS UTC
-'  left join USER_COL_COMMENTS UCC on(
-'    UCC.TABLE_NAME = UTC.TABLE_NAME
-'    and UCC.COLUMN_NAME = UTC.COLUMN_NAME
-'  )
-'  left join (
-'    select
-'      CC.TABLE_NAME
-'      ,CC.COLUMN_NAME
-'    from USER_CONS_COLUMNS CC
-'      inner join USER_CONSTRAINTS CONS on(
-'        CONS.CONSTRAINT_NAME = CC.CONSTRAINT_NAME
-'        and CONS.CONSTRAINT_TYPE = 'P'
-'      )
-'  ) PKC on (
-'    PKC.TABLE_NAME = UTC.TABLE_NAME
-'    and PKC.COLUMN_NAME = UTC.COLUMN_NAME
-'  )
-'where UTC.TABLE_NAME='RCAT_M_USER'
-'order by UTC.COLUMN_ID
-'
-'    Set GetTableInfo = Nothing
-'End Sub
 
 
 '====================================================================================================

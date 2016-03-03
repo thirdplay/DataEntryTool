@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "PostgreSqlDao"
+Attribute VB_Name = "DataEntryOracleDao"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,7 +11,7 @@ Option Explicit
 
 '====================================================================================================
 '
-' PostgreSqlDao
+' OracleDao
 '
 '====================================================================================================
 Implements IDataEntryDao
@@ -21,9 +21,7 @@ Implements IDataEntryDao
 ' 定数
 '====================================================================================================
 ' カラム情報取得クエリ
-Private Const cstColumnInfoGetQuery As String = _
-    "SELECT isc.ordinal_position, isc.column_name, COALESCE(pd.description, '') AS comment, isc.data_type AS data_type, CASE isc.data_type WHEN 'character' THEN TO_CHAR(isc.character_maximum_length, 'FM99999999') WHEN 'character varying' THEN TO_CHAR(isc.character_maximum_length, 'FM99999999') WHEN 'numeric' THEN TO_CHAR(isc.numeric_precision, 'FM99999999') || ',' || TO_CHAR(isc.numeric_scale, 'FM99999999') ELSE '' END AS data_length, CASE isc.is_nullable WHEN 'NO' THEN '1' ELSE '0' END AS is_nullable, CASE WHEN pkc.column_name IS NOT NULL THEN '1' ELSE '0' END AS is_primary_key FROM information_schema.columns isc INNER JOIN pg_stat_all_tables psat ON( psat.schemaname = isc.table_schema AND psat.relname = isc.table_name ) INNER JOIN pg_attribute pa ON( pa.attrelid = psat.relid AND pa.attname = isc.column_name ) LEFT JOIN pg_description pd ON( pd.objoid = psat.relid AND pd.objsubid != 0 and pd.objsubid = pa.attnum ) LEFT JOIN ( SELECT tc.table_catalog, tc.table_schema, tc.table_name, " & _
-    "ccu.column_name FROM information_schema.table_constraints tc INNER JOIN information_schema.constraint_column_usage ccu ON( ccu.table_catalog = tc.table_catalog AND ccu.table_schema = tc.table_schema AND ccu.table_name = tc.table_name AND ccu.constraint_name = tc.constraint_name  ) WHERE tc.constraint_type = 'PRIMARY KEY' ) pkc ON ( pkc.table_catalog = isc.table_catalog AND pkc.table_schema = isc.table_schema AND pkc.table_name = isc.table_name AND pkc.column_name = isc.column_name ) WHERE isc.table_name='${tableName}' ORDER BY isc.ordinal_position"
+Private Const cstColumnInfoGetQuery As String = "SELECT utc.column_id, utc.column_name, ucc.comments, utc.data_type, CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length, DECODE(utc.nullable,'N','0','1') AS is_nullable, DECODE(pkc.table_name, NULL, '0', '1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name, cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name='${tableName}' ORDER BY utc.column_id"
 
 
 '====================================================================================================
@@ -50,19 +48,19 @@ End Sub
 '====================================================================================================
 ' DB接続
 '----------------------------------------------------------------------------------------------------
-' IN : setting データベース情報
+' IN : setting 設定
 '====================================================================================================
 Public Sub IDataEntryDao_Connect(setting As Setting)
 On Error GoTo ErrHandler
-    Set mConnect = CreateObject("ADODB.Connection")
+    If mConnect Is Nothing Then
+        Set mConnect = CreateObject("ADODB.Connection")
 
-    mConnect.Open "Driver={PostgreSQL Unicode};" _
-        & "SERVER=" & setting.ServerName & ";" _
-        & "DATABASE=" & setting.DatabaseName & ";" _
-        & "UID=" & setting.UserId & ";" _
-        & "PWD=" & setting.Password & ";" _
-        & "PORT=" & setting.Port & ";"
-    Exit Sub
+        mConnect.Open "Driver={Microsoft ODBC for Oracle};" _
+            & "Server=" & setting.ServerName & ";" _
+            & "UID=" & setting.UserId & ";" _
+            & "PWD=" & setting.Password & ";"
+        Exit Sub
+    End If
 ErrHandler:
     Set mConnect = Nothing
     Err.Raise Err.Number, Err.Source, "DB接続失敗" & vbNewLine & Err.Description, Err.HelpFile, Err.HelpContext
@@ -85,7 +83,7 @@ End Sub
 ' トランザクション開始
 '====================================================================================================
 Public Sub IDataEntryDao_BeginTrans()
-    MsgBox "PostgreSql:BeginTrans"
+    MsgBox "Oracle:BeginTrans"
 End Sub
 
 
@@ -93,7 +91,7 @@ End Sub
 ' コミット
 '====================================================================================================
 Public Sub IDataEntryDao_CommitTrans()
-    MsgBox "PostgreSql:CommitTrans"
+    MsgBox "Oracle:CommitTrans"
 End Sub
 
 
@@ -101,7 +99,7 @@ End Sub
 ' ロールバック
 '====================================================================================================
 Public Sub IDataEntryDao_RollbackTrans()
-    MsgBox "PostgreSql:RollbackTrans"
+    MsgBox "Oracle:RollbackTrans"
 End Sub
 
 
@@ -123,9 +121,9 @@ Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collecti
     Do Until recordSet.EOF
         Set ci = New ColumnInfo
         With ci
-            .OrdinalPosition = recordSet("ordinal_position")
+            .ColumnId = recordSet("column_id")
             .ColumnName = recordSet("column_name")
-            .Comment = recordSet("comment")
+            .Comments = recordSet("comments")
             .DataType = recordSet("data_type")
             .DataLength = recordSet("data_length")
             .IsNullable = recordSet("is_nullable")
@@ -134,8 +132,6 @@ Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collecti
         Call list.Add(ci)
         recordSet.MoveNext
     Loop
-    Set recordSet = Nothing
-
     Set IDataEntryDao_GetColumnInfoList = list
 End Function
 

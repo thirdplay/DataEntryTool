@@ -62,21 +62,18 @@ On Error GoTo Finally
     Dim setting As Setting
     Dim tableNames As Collection
     Dim tableInfoList As Collection
-    
+
     ' 設定とテーブル名一覧の取得
     Set setting = mView.GetSetting
     Set tableNames = mView.GetTableNameList
 
     ' テーブル名一覧を元に、Modelからテーブル情報一覧を取得
-    mModel.Setting = setting
+    Call mModel.Setup(setting)
     Set tableInfoList = mModel.GetTableInfoList(tableNames)
 
     ' テーブル情報一覧を元に、テーブル定義シートを再作成する
     Call mView.RecreateTableDefinition(tableInfoList)
 Finally:
-    Set setting = Nothing
-    Set tableNames = Nothing
-    Set tableInfoList = Nothing
     If Err.Number <> 0 Then
         Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
     End If

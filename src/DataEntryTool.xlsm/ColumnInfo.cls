@@ -18,9 +18,9 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mOrdinalPosition As Long        ' 列順
-Private mColumnName As String           ' 項目名
-Private mComment As String              ' コメント
+Private mColumnId As Long               ' 項目ID
+Private mColumnName As String           ' 列名
+Private mComments As String             ' コメント
 Private mDataType As String             ' データ型
 Private mDataLength As String           ' データ長
 Private mIsNullable As String           ' NULL指定可能(0:NULL不可,1:NULL可能)
@@ -28,18 +28,18 @@ Private mIsPrimaryKey As String         ' 主キー指定(0:主キー以外,1:主キー)
 
 
 '====================================================================================================
-' 列順の取得/設定
+' 列IDの取得/設定
 '====================================================================================================
-Public Property Get OrdinalPosition() As Long
-    OrdinalPosition = mOrdinalPosition
+Public Property Get ColumnId() As Long
+    ColumnId = mColumnId
 End Property
-Public Property Let OrdinalPosition(OrdinalPosition As Long)
-    mOrdinalPosition = OrdinalPosition
+Public Property Let ColumnId(ColumnId As Long)
+    mColumnId = ColumnId
 End Property
 
 
 '====================================================================================================
-' 項目名の取得/設定
+' 列名の取得/設定
 '====================================================================================================
 Public Property Get ColumnName() As String
     ColumnName = mColumnName
@@ -52,11 +52,11 @@ End Property
 '====================================================================================================
 ' コメントの取得/設定
 '====================================================================================================
-Public Property Get Comment() As String
-    Comment = mComment
+Public Property Get Comments() As String
+    Comments = mComments
 End Property
-Public Property Let Comment(Comment As String)
-    mComment = Comment
+Public Property Let Comments(Comments As String)
+    mComments = Comments
 End Property
 
 

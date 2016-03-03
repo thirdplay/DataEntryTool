@@ -32,7 +32,8 @@ Private Const cstSheetTemplate = "テンプレート"         ' テンプレートシート
 
 ' テーブル一覧の参照値
 Private Enum TableListIndex
-    PhysicsName = 1
+    No = 1
+    PhysicsName
     LogicName
     Target
     Result
@@ -126,6 +127,7 @@ Public Sub RecreateTableDefinition(tableInfoList As Collection)
 On Error GoTo Finally
     Dim ti As TableInfo
     Dim ci As ColumnInfo
+    Dim columnRange As Variant
     Dim tmplSheet As Object
     Set tmplSheet = ThisWorkbook.Worksheets(cstSheetTemplate)
     tmplSheet.Visible = True
@@ -141,23 +143,22 @@ On Error GoTo Finally
         ThisWorkbook.ActiveSheet.Name = ti.TableName
 
         ' コピーしたシートにカラム情報を書き込む
-        With ThisWorkbook.ActiveSheet
+        If ti.ColumnInfoList.Count > 0 Then
+            ReDim columnRange(6, ti.ColumnInfoList.Count)
             For Each ci In ti.ColumnInfoList
-                .Cells(1, ci.OrdinalPosition).Value = ci.Comment
-                .Cells(2, ci.OrdinalPosition).Value = ci.ColumnName
-                .Cells(3, ci.OrdinalPosition).Value = ci.DataType
-                .Cells(4, ci.OrdinalPosition).Value = ci.DataLength
-                .Cells(5, ci.OrdinalPosition).Value = ci.IsNullable
-                .Cells(6, ci.OrdinalPosition).Value = ci.IsPrimaryKey
+                columnRange(0, ci.ColumnId - 1) = ci.Comments
+                columnRange(1, ci.ColumnId - 1) = ci.ColumnName
+                columnRange(2, ci.ColumnId - 1) = ci.DataType
+                columnRange(3, ci.ColumnId - 1) = ci.DataLength
+                columnRange(4, ci.ColumnId - 1) = ci.IsNullable
+                columnRange(5, ci.ColumnId - 1) = ci.IsPrimaryKey
             Next
-        End With
+            ThisWorkbook.ActiveSheet.Range(Cells(1, 1), Cells(6, ti.ColumnInfoList.Count)) = columnRange
+        End If
     Next
 Finally:
     ThisWorkbook.Worksheets(cstSheetMain).Activate
     tmplSheet.Visible = False
-    Set ti = Nothing
-    Set ci = Nothing
-    Set tmplSheet = Nothing
     If Err.Number <> 0 Then
         Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
     End If
@@ -171,11 +172,11 @@ End Sub
 '====================================================================================================
 ' 入力値をチェックします。
 '----------------------------------------------------------------------------------------------------
-' IN : value 入力値
+' IN : inputValue 入力値
 '    : itemName 項目名
 '====================================================================================================
-Private Sub CheckInputValue(value As String, itemName As String)
-    If value = "" Then
+Private Sub CheckInputValue(inputValue As String, itemName As String)
+    If inputValue = "" Then
         Err.Raise 100, , itemName & "を入力してください。"
     End If
 End Sub

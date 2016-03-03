@@ -8,6 +8,9 @@ Option Explicit
 Public Sub RecreateTableDefinition()
 On Error GoTo Finally
     Dim control As DataEntryControl
+    Dim Start As Single
+    Dim Finish As Single
+    Start = Timer
 
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
@@ -20,12 +23,14 @@ On Error GoTo Finally
     End With
 
 Finally:
+    Finish = Timer
     Application.ScreenUpdating = True
     Application.DisplayAlerts = True
     Set control = Nothing
     If Err.Number <> 0 Then
         MsgBox Err.Description
     Else
-        MsgBox "テーブル定義再作成完了"
+        Debug.Print "処理時間:" & (Finish - Start)
+        MsgBox "テーブル定義再作成完了" & ":" & (Finish - Start)
     End If
 End Sub
