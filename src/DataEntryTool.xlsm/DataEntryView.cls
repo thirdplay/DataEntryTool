@@ -32,8 +32,7 @@ Private Const cstSheetTemplate = "テンプレート"         ' テンプレートシート
 
 ' テーブル一覧の参照値
 Private Enum TableListIndex
-    No = 1
-    PhysicsName
+    PhysicsName = 1
     LogicName
     Target
     Result
@@ -146,12 +145,12 @@ On Error GoTo Finally
         If ti.ColumnInfoList.Count > 0 Then
             ReDim columnRange(6, ti.ColumnInfoList.Count)
             For Each ci In ti.ColumnInfoList
-                columnRange(0, ci.ColumnId - 1) = ci.Comments
-                columnRange(1, ci.ColumnId - 1) = ci.ColumnName
-                columnRange(2, ci.ColumnId - 1) = ci.DataType
-                columnRange(3, ci.ColumnId - 1) = ci.DataLength
-                columnRange(4, ci.ColumnId - 1) = ci.IsNullable
-                columnRange(5, ci.ColumnId - 1) = ci.IsPrimaryKey
+                columnRange(0, ci.ColumnId) = ci.Comments
+                columnRange(1, ci.ColumnId) = ci.ColumnName
+                columnRange(2, ci.ColumnId) = ci.DataType
+                columnRange(3, ci.ColumnId) = ci.DataLength
+                columnRange(4, ci.ColumnId) = ci.IsNullable
+                columnRange(5, ci.ColumnId) = ci.IsPrimaryKey
             Next
             ThisWorkbook.ActiveSheet.Range(Cells(1, 1), Cells(6, ti.ColumnInfoList.Count)) = columnRange
         End If
