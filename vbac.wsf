@@ -1129,6 +1129,7 @@ function main(args) {
     
     var h = new CommandHelper(param);
     h.runCommand();
+    return 0;
 }
 
 main(args);

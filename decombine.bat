@@ -9,7 +9,9 @@ copy %BIN_DIR%\* %BAK_DIR% >nul
 
 @rem 分離処理実行
 cscript //nologo vbac.wsf decombine /binary %BAK_DIR%
+if not %ERRORLEVEL%==0 pause
 cscript //nologo vbac.wsf clear /binary %BAK_DIR%
+if not %ERRORLEVEL%==0 pause
 
 @rem bak/*.xlsmをsrcにコピー
 cd %BAK_DIR%
