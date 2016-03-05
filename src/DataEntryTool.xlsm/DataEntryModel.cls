@@ -41,9 +41,9 @@ End Sub
 '----------------------------------------------------------------------------------------------------
 ' IN : setting ê›íË
 '====================================================================================================
-Public Sub Setup(setting As Setting)
-    Set mDao = DaoFactory.Create(setting)
-    Call mDao.Connect(setting)
+Public Sub Setup(Setting As Setting)
+    Set mDao = DaoFactory.Create(Setting)
+    Call mDao.Connect(Setting)
 End Sub
 
 
@@ -55,7 +55,7 @@ End Sub
 '====================================================================================================
 Public Function GetTableDefinitions(tableNames As Collection) As Collection
     Dim i As Long
-    Dim td AS TableDefinition
+    Dim td As TableDefinition
     Dim list As Collection
 
     Set list = New Collection

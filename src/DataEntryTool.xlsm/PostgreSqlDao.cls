@@ -52,16 +52,16 @@ End Sub
 '----------------------------------------------------------------------------------------------------
 ' IN : setting データベース情報
 '====================================================================================================
-Public Sub IDataEntryDao_Connect(setting As Setting)
+Public Sub IDataEntryDao_Connect(Setting As Setting)
 On Error GoTo ErrHandler
     Set mConnect = CreateObject("ADODB.Connection")
 
     mConnect.Open "Driver={PostgreSQL Unicode};" _
-        & "SERVER=" & setting.ServerName & ";" _
-        & "DATABASE=" & setting.DatabaseName & ";" _
-        & "UID=" & setting.UserId & ";" _
-        & "PWD=" & setting.Password & ";" _
-        & "PORT=" & setting.Port & ";"
+        & "SERVER=" & Setting.ServerName & ";" _
+        & "DATABASE=" & Setting.DatabaseName & ";" _
+        & "UID=" & Setting.UserId & ";" _
+        & "PWD=" & Setting.Password & ";" _
+        & "PORT=" & Setting.Port & ";"
     Exit Sub
 ErrHandler:
     Set mConnect = Nothing
@@ -121,14 +121,14 @@ End Sub
 ' IN : tableName テーブル名
 ' OUT: カラム情報リスト
 '====================================================================================================
-Public Function IDataEntryDao_GetColumnDefinitions(tableName As String) As Collection
+Public Function IDataEntryDao_GetColumnDefinitions(TableName As String) As Collection
     Dim recordSet As Object
     Dim query As String
     Dim cd As ColumnDefinition
     Dim list As Collection
     Set list = New Collection
 
-    query = Replace(cstColumnDefinitionGetQuery, "${tableName}", tableName)
+    query = Replace(cstColumnDefinitionGetQuery, "${tableName}", TableName)
     Set recordSet = mConnect.Execute(query)
     Do Until recordSet.EOF
         Set cd = New ColumnDefinition

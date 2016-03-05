@@ -31,7 +31,7 @@ Private mIsPrimaryKey As String         ' 主キー指定(0:主キー以外,1:主キー)
 ' 列IDの取得/設定
 '====================================================================================================
 Public Property Get ColumnId() As Long
-    ColumnId = mColumnId    
+    ColumnId = mColumnId
 End Property
 Public Property Let ColumnId(ColumnId As Long)
     mColumnId = ColumnId

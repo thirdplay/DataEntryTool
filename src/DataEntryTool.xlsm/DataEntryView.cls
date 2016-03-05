@@ -34,7 +34,7 @@ Private Const cstSheetTemplate = "テンプレート"         ' テンプレートシート
 Private Enum TableListIndex
     PhysicsName = 1         ' 物理名
     LogicName               ' 論理名
-    Target                  ' 対象
+    DataEntryTarget         ' データ操作対象
     ProcessCount            ' 処理件数
     Max = ProcessCount
 End Enum
@@ -50,29 +50,6 @@ Private mSetting As Setting     ' 設定
 ' コンストラクタ
 '====================================================================================================
 Private Sub Class_Initialize()
-    Set mSetting = New Setting
-    With ThisWorkbook.Worksheets(cstSheetMain)
-        mSetting.DatabaseType = .Range(cstDatabaseType).Value
-        mSetting.ServerName = .Range(cstServerName).Value
-        mSetting.Port = .Range(cstPort).Value
-        mSetting.DatabaseName = .Range(cstDatabaseName).Value
-        mSetting.UserId = .Range(cstUserId).Value
-        mSetting.Password = .Range(cstPassword).Value
-    End With
-
-    ' 入力チェック
-    'Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
-    If mSetting.DatabaseType = cstDatabaseTypeOracle Then
-        Call CheckInputValue(mSetting.ServerName, "サーバ名")
-        Call CheckInputValue(mSetting.UserId, "ユーザID")
-        Call CheckInputValue(mSetting.Password, "パスワード")
-    ElseIf mSetting.DatabaseType = cstDatabaseTypePostgreSQL Then
-        Call CheckInputValue(mSetting.ServerName, "サーバ名")
-        Call CheckInputValue(mSetting.Port, "ポート")
-        Call CheckInputValue(mSetting.DatabaseName, "データベース名")
-        Call CheckInputValue(mSetting.UserId, "ユーザID")
-        Call CheckInputValue(mSetting.Password, "パスワード")
-    End If
 End Sub
 
 
@@ -85,11 +62,59 @@ End Sub
 
 
 '====================================================================================================
+' セル範囲の変更イベント
+'----------------------------------------------------------------------------------------------------
+' IN : sheet ワークシート
+'    : target 対象のセル範囲
+'====================================================================================================
+Public Sub ChangeCellRange(sheet As Object, ByVal target As Range)
+    With sheet
+        If Not Intersect(target, .Range(cstDatabaseType)) Is Nothing Then
+            ' PostgreSQL
+            If Target.Value = cstDatabaseTypePostgreSQL Then
+                .Range(cstPort).Rows.Hidden = False
+                .Range(cstDatabaseName).Rows.Hidden = False
+            ' PostgreSQL以外
+            Else
+                .Range(cstPort).Rows.Hidden = True
+                .Range(cstDatabaseName).Rows.Hidden = True
+            End If
+        End If
+    End With
+End Sub
+
+
+'====================================================================================================
 ' 設定を返却します
 '----------------------------------------------------------------------------------------------------
-' OUT:設定
+' OUT: 設定
 '====================================================================================================
 Public Function GetSetting() As Setting
+    If mSetting Is Nothing Then
+        Set mSetting = New Setting
+        With ThisWorkbook.Worksheets(cstSheetMain)
+            mSetting.DatabaseType = .Range(cstDatabaseType).Value
+            mSetting.ServerName = .Range(cstServerName).Value
+            mSetting.Port = .Range(cstPort).Value
+            mSetting.DatabaseName = .Range(cstDatabaseName).Value
+            mSetting.UserId = .Range(cstUserId).Value
+            mSetting.Password = .Range(cstPassword).Value
+        End With
+
+        ' 入力チェック
+        'Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
+        If mSetting.DatabaseType = cstDatabaseTypeOracle Then
+            Call CheckInputValue(mSetting.ServerName, "サーバ名")
+            Call CheckInputValue(mSetting.UserId, "ユーザID")
+            Call CheckInputValue(mSetting.Password, "パスワード")
+        ElseIf mSetting.DatabaseType = cstDatabaseTypePostgreSQL Then
+            Call CheckInputValue(mSetting.ServerName, "サーバ名")
+            Call CheckInputValue(mSetting.Port, "ポート")
+            Call CheckInputValue(mSetting.DatabaseName, "データベース名")
+            Call CheckInputValue(mSetting.UserId, "ユーザID")
+            Call CheckInputValue(mSetting.Password, "パスワード")
+        End If
+    End If
     Set GetSetting = mSetting
 End Function
 
@@ -97,7 +122,7 @@ End Function
 '====================================================================================================
 ' テーブル名一覧を返却します
 '----------------------------------------------------------------------------------------------------
-' OUT:テーブル情報一覧
+' OUT: テーブル情報一覧
 '====================================================================================================
 Public Function GetTableNameList() As Collection
     Dim list As Collection
@@ -138,7 +163,7 @@ On Error GoTo Finally
         End If
 
         ' テンプレートシートをコピーする
-        tmplSheet.Copy Before := tmplSheet
+        tmplSheet.Copy Before:=tmplSheet
         ThisWorkbook.ActiveSheet.Name = td.TableName
 
         ' コピーしたシートにカラム情報を書き込む

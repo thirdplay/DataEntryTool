@@ -20,7 +20,7 @@ Option Explicit
 '----------------------------------------------------------------------------------------------------
 ' IN : setting 設定
 '====================================================================================================
-Public Sub Connect(setting As Setting)
+Public Sub Connect(Setting As Setting)
 End Sub
 
 
@@ -67,7 +67,7 @@ End Sub
 ' IN : tableName テーブル名
 ' OUT: カラム定義リスト
 '====================================================================================================
-Public Function GetColumnDefinitions(tableName As String) As Collection
+Public Function GetColumnDefinitions(TableName As String) As Collection
 End Function
 
 

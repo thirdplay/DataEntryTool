@@ -59,18 +59,18 @@ End Property
 '====================================================================================================
 Public Sub CreateTableSheet()
 On Error GoTo Finally
-    Dim setting As Setting
+    Dim Setting As Setting
     Dim tableNames As Collection
     Dim tableDefinitions As Collection
 
     ' 設定とテーブル情報一覧の取得
     Debug.Print "DataEntryControl.CreateTableSheet:GetTableNameList"
-    Set setting = mView.GetSetting
+    Set Setting = mView.GetSetting
     Set tableNames = mView.GetTableNameList
 
     ' テーブル名一覧を元に、Modelからテーブル情報一覧を取得
     Debug.Print "DataEntryControl.CreateTableSheet:GetTableDefinitions"
-    Call mModel.Setup(setting)
+    Call mModel.Setup(Setting)
     Set tableDefinitions = mModel.GetTableDefinitions(tableNames)
 
     ' テーブル情報一覧を元に、テーブル定義シートを再作成する

@@ -37,7 +37,7 @@ End Sub
 '----------------------------------------------------------------------------------------------------
 ' IN : setting 設定
 '====================================================================================================
-Public Sub IDataEntryDao_Connect(setting As Setting)
+Public Sub IDataEntryDao_Connect(Setting As Setting)
 End Sub
 
 
@@ -88,7 +88,7 @@ End Sub
 ' IN : tableName テーブル名
 ' OUT: カラム情報リスト
 '====================================================================================================
-Public Function IDataEntryDao_GetColumnDefinitions(tableName As String) As Collection
+Public Function IDataEntryDao_GetColumnDefinitions(TableName As String) As Collection
     Dim i As Long
     Dim cd As ColumnDefinition
     Dim list As Collection
