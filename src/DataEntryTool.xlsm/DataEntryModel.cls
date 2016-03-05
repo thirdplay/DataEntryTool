@@ -53,20 +53,20 @@ End Sub
 ' IN : tableNames テーブル名リスト
 ' OUT: テーブル情報リスト
 '====================================================================================================
-Public Function GetTableInfoList(tableNames As Collection) As Collection
+Public Function GetTableDefinitions(tableNames As Collection) As Collection
     Dim i As Long
-    Dim ti AS TableInfo
-    Dim tiList As Collection
+    Dim td AS TableDefinition
+    Dim list As Collection
 
-    Set tiList = New Collection
+    Set list = New Collection
 
     For i = 1 To tableNames.Count
-        Set ti = New TableInfo
-        ti.ColumnInfoList = mDao.GetColumnInfoList(tableNames(i))
-        ti.TableName = tableNames(i)
-        Call tiList.Add(ti)
+        Set td = New TableDefinition
+        td.ColumnDefinitions = mDao.GetColumnDefinitions(tableNames(i))
+        td.TableName = tableNames(i)
+        Call list.Add(td)
     Next
 
-    Set GetTableInfoList = tiList
+    Set GetTableDefinitions = list
 End Function
 

@@ -55,24 +55,27 @@ End Property
 
 
 '====================================================================================================
-' テーブル定義再作成
+' テーブルシート作成
 '====================================================================================================
-Public Sub RecreateTableDefinition()
+Public Sub CreateTableSheet()
 On Error GoTo Finally
     Dim setting As Setting
     Dim tableNames As Collection
-    Dim tableInfoList As Collection
+    Dim tableDefinitions As Collection
 
-    ' 設定とテーブル名一覧の取得
+    ' 設定とテーブル情報一覧の取得
+    Debug.Print "DataEntryControl.CreateTableSheet:GetTableNameList"
     Set setting = mView.GetSetting
     Set tableNames = mView.GetTableNameList
 
     ' テーブル名一覧を元に、Modelからテーブル情報一覧を取得
+    Debug.Print "DataEntryControl.CreateTableSheet:GetTableDefinitions"
     Call mModel.Setup(setting)
-    Set tableInfoList = mModel.GetTableInfoList(tableNames)
+    Set tableDefinitions = mModel.GetTableDefinitions(tableNames)
 
     ' テーブル情報一覧を元に、テーブル定義シートを再作成する
-    Call mView.RecreateTableDefinition(tableInfoList)
+    Debug.Print "DataEntryControl.CreateTableSheet:CreateTableSheet"
+    Call mView.CreateTableSheet(tableDefinitions)
 Finally:
     If Err.Number <> 0 Then
         Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext

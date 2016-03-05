@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ColumnInfo"
+Attribute VB_Name = "ColumnDefinition"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,7 +11,7 @@ Option Explicit
 
 '====================================================================================================
 '
-' カラム情報
+' カラム定義
 '
 '====================================================================================================
 
@@ -31,7 +31,7 @@ Private mIsPrimaryKey As String         ' 主キー指定(0:主キー以外,1:主キー)
 ' 列IDの取得/設定
 '====================================================================================================
 Public Property Get ColumnId() As Long
-    ColumnId = mColumnId
+    ColumnId = mColumnId    
 End Property
 Public Property Let ColumnId(ColumnId As Long)
     mColumnId = ColumnId
@@ -102,4 +102,3 @@ End Property
 Public Property Let IsPrimaryKey(IsPrimaryKey As String)
     mIsPrimaryKey = IsPrimaryKey
 End Property
-

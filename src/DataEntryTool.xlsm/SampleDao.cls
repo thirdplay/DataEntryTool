@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "IDataEntryDao"
+Attribute VB_Name = "SampleDao"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,44 +11,64 @@ Option Explicit
 
 '====================================================================================================
 '
-' データ投入用のDaoインターフェース
+' サンプル用Dao
 '
 '====================================================================================================
+Implements IDataEntryDao
+
+
+'====================================================================================================
+' コンストラクタ
+'====================================================================================================
+Private Sub Class_Initialize()
+End Sub
+
+
+'====================================================================================================
+' デストラクタ
+'====================================================================================================
+Private Sub Class_Terminate()
+    Call IDataEntryDao_Disconnect
+End Sub
+
 
 '====================================================================================================
 ' DB接続
 '----------------------------------------------------------------------------------------------------
 ' IN : setting 設定
 '====================================================================================================
-Public Sub Connect(setting As Setting)
+Public Sub IDataEntryDao_Connect(setting As Setting)
 End Sub
 
 
 '====================================================================================================
 ' DB切断
 '====================================================================================================
-Public Sub Disconnect()
+Public Sub IDataEntryDao_Disconnect()
 End Sub
 
 
 '====================================================================================================
 ' トランザクション開始
 '====================================================================================================
-Public Sub BeginTrans()
+Public Sub IDataEntryDao_BeginTrans()
+    Debug.Print "DataEntrySampleDao.BeginTrans"
 End Sub
 
 
 '====================================================================================================
 ' コミット
 '====================================================================================================
-Public Sub CommitTrans()
+Public Sub IDataEntryDao_CommitTrans()
+    Debug.Print "DataEntrySampleDao.CommitTrans"
 End Sub
 
 
 '====================================================================================================
 ' ロールバック
 '====================================================================================================
-Public Sub RollbackTrans()
+Public Sub IDataEntryDao_RollbackTrans()
+    Debug.Print "DataEntrySampleDao.RollbackTrans"
 End Sub
 
 
@@ -57,17 +77,37 @@ End Sub
 '----------------------------------------------------------------------------------------------------
 ' IN : query クエリ文字列
 '====================================================================================================
-Public Sub Execute(query)
+Public Sub IDataEntryDao_Execute(query)
+    Debug.Print "DataEntrySampleDao.Execute"
 End Sub
 
 
 '====================================================================================================
-' 指定されたテーブルのカラム定義リストを取得します
+' 指定されたテーブルのカラム情報リストを取得します
 '----------------------------------------------------------------------------------------------------
 ' IN : tableName テーブル名
-' OUT: カラム定義リスト
+' OUT: カラム情報リスト
 '====================================================================================================
-Public Function GetColumnDefinitions(tableName As String) As Collection
+Public Function IDataEntryDao_GetColumnDefinitions(tableName As String) As Collection
+    Dim i As Long
+    Dim cd As ColumnDefinition
+    Dim list As Collection
+    Set list = New Collection
+
+    For i = 0 To 50
+        Set cd = New ColumnDefinition
+        With cd
+            .ColumnId = i
+            .ColumnName = "col_" & i
+            .Comments = "カラム" & i
+            .DataType = "VARCHAR2"
+            .DataLength = 10 * (i + 1)
+            .IsNullable = "0"
+            .IsPrimaryKey = "0"
+        End With
+        Call list.Add(cd)
+    Next
+    Set IDataEntryDao_GetColumnDefinitions = list
 End Function
 
 

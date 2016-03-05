@@ -9,12 +9,14 @@ Option Explicit
 
 
 '====================================================================================================
-' データベース種別に対応したDAOを生成して返却します。
+' データベース種別に対応したDAOを生成して返却します
 '====================================================================================================
 Public Function Create(Setting As Setting) As IDataEntryDao
     If Setting.DatabaseType = cstDatabaseTypeOracle Then
-        Set Create = New DataEntryOracleDao
+        Set Create = New OracleDao
     ElseIf Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
-        Set Create = New DataEntryPostgreSqlDao
+        Set Create = New PostgreSqlDao
+    Else
+        Set Create = New SampleDao
     End If
 End Function

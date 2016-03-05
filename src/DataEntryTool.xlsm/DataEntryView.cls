@@ -32,10 +32,11 @@ Private Const cstSheetTemplate = "テンプレート"         ' テンプレートシート
 
 ' テーブル一覧の参照値
 Private Enum TableListIndex
-    PhysicsName = 1
-    LogicName
-    Target
-    Result
+    PhysicsName = 1         ' 物理名
+    LogicName               ' 論理名
+    Target                  ' 対象
+    ProcessCount            ' 処理件数
+    Max = ProcessCount
 End Enum
 
 
@@ -60,7 +61,7 @@ Private Sub Class_Initialize()
     End With
 
     ' 入力チェック
-    Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
+    'Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
     If mSetting.DatabaseType = cstDatabaseTypeOracle Then
         Call CheckInputValue(mSetting.ServerName, "サーバ名")
         Call CheckInputValue(mSetting.UserId, "ユーザID")
@@ -96,20 +97,19 @@ End Function
 '====================================================================================================
 ' テーブル名一覧を返却します
 '----------------------------------------------------------------------------------------------------
-' OUT:テーブル名一覧
+' OUT:テーブル情報一覧
 '====================================================================================================
 Public Function GetTableNameList() As Collection
     Dim list As Collection
-    Dim index As Long
+    Dim rowIndex As Long
     
     With ThisWorkbook.Worksheets(cstSheetMain)
         Set list = New Collection
-        index = .Range(cstTableBase).Row + 1
-        
-        ' 対象列に値が設定されているテーブル名を追加する
-        Do While .Cells(index, TableListIndex.PhysicsName).Value <> ""
-            Call list.Add(.Cells(index, TableListIndex.PhysicsName).Value)
-            index = index + 1
+        rowIndex = .Range(cstTableBase).Row + 1
+
+        Do While .Cells(rowIndex, TableListIndex.PhysicsName).Value <> ""
+            Call list.Add(.Cells(rowIndex, TableListIndex.PhysicsName).Value)
+            rowIndex = rowIndex + 1
         Loop
     End With
     Set GetTableNameList = list
@@ -118,41 +118,41 @@ End Function
 
 
 '====================================================================================================
-' テーブル定義シートの再作成
+' テーブルシートの作成
 '----------------------------------------------------------------------------------------------------
-' IN : tableInfoList テーブル情報リスト
+' IN : tableDefinitions テーブル情報リスト
 '====================================================================================================
-Public Sub RecreateTableDefinition(tableInfoList As Collection)
+Public Sub CreateTableSheet(tableDefinitions As Collection)
 On Error GoTo Finally
-    Dim ti As TableInfo
-    Dim ci As ColumnInfo
+    Dim td As TableDefinition
+    Dim cd As ColumnDefinition
     Dim columnRange As Variant
     Dim tmplSheet As Object
     Set tmplSheet = ThisWorkbook.Worksheets(cstSheetTemplate)
     tmplSheet.Visible = True
 
-    For Each ti In TableInfoList
+    For Each td In tableDefinitions
         ' 既にシートが存在する場合は削除する
-        If ExistsSheet(ti.TableName) Then
-            ThisWorkbook.Worksheets(ti.TableName).Delete
+        If ExistsSheet(td.TableName) Then
+            ThisWorkbook.Worksheets(td.TableName).Delete
         End If
 
         ' テンプレートシートをコピーする
         tmplSheet.Copy Before := tmplSheet
-        ThisWorkbook.ActiveSheet.Name = ti.TableName
+        ThisWorkbook.ActiveSheet.Name = td.TableName
 
         ' コピーしたシートにカラム情報を書き込む
-        If ti.ColumnInfoList.Count > 0 Then
-            ReDim columnRange(6, ti.ColumnInfoList.Count)
-            For Each ci In ti.ColumnInfoList
-                columnRange(0, ci.ColumnId) = ci.Comments
-                columnRange(1, ci.ColumnId) = ci.ColumnName
-                columnRange(2, ci.ColumnId) = ci.DataType
-                columnRange(3, ci.ColumnId) = ci.DataLength
-                columnRange(4, ci.ColumnId) = ci.IsNullable
-                columnRange(5, ci.ColumnId) = ci.IsPrimaryKey
+        If td.ColumnDefinitions.Count > 0 Then
+            ReDim columnRange(6, td.ColumnDefinitions.Count)
+            For Each cd In td.ColumnDefinitions
+                columnRange(0, cd.ColumnId) = cd.Comments
+                columnRange(1, cd.ColumnId) = cd.ColumnName
+                columnRange(2, cd.ColumnId) = cd.DataType
+                columnRange(3, cd.ColumnId) = cd.DataLength
+                columnRange(4, cd.ColumnId) = cd.IsNullable
+                columnRange(5, cd.ColumnId) = cd.IsPrimaryKey
             Next
-            ThisWorkbook.ActiveSheet.Range(Cells(1, 1), Cells(6, ti.ColumnInfoList.Count)) = columnRange
+            ThisWorkbook.ActiveSheet.Range(Cells(1, 1), Cells(6, td.ColumnDefinitions.Count)) = columnRange
         End If
     Next
 Finally:
@@ -164,12 +164,14 @@ Finally:
 End Sub
 
 
-' テーブルデータ一覧取得
+'====================================================================================================
+' テーブルデータ取得
+'====================================================================================================
 'GetTableDataList
 
 
 '====================================================================================================
-' 入力値をチェックします。
+' 入力値をチェックします
 '----------------------------------------------------------------------------------------------------
 ' IN : inputValue 入力値
 '    : itemName 項目名
@@ -182,7 +184,7 @@ End Sub
 
 
 '====================================================================================================
-' シートが存在するか判定します。
+' シートが存在するか判定します
 '----------------------------------------------------------------------------------------------------
 ' IN : sheetName シート名
 ' OUT: 存在する場合はtrue、それ以外はfalse

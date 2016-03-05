@@ -3,9 +3,9 @@ Option Explicit
 
 
 '====================================================================================================
-' テーブル定義を最新化します。
+' テーブルシートを作成します
 '====================================================================================================
-Public Sub RecreateTableDefinition()
+Public Sub CreateTableSheet()
 On Error GoTo Finally
     Dim control As DataEntryControl
     Dim Start As Single
@@ -19,7 +19,7 @@ On Error GoTo Finally
     With control
         .View = New DataEntryView
         .Model = New DataEntryModel
-        .RecreateTableDefinition
+        .CreateTableSheet
     End With
 
 Finally:

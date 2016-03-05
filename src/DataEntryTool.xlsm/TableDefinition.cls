@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "TableInfo"
+Attribute VB_Name = "TableDefinition"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,15 +11,15 @@ Option Explicit
 
 '====================================================================================================
 '
-' テーブル情報
+' テーブル定義
 '
 '====================================================================================================
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mTableName As String                ' テーブル名
-Private mColumnInfoList As Collection       ' カラム情報リスト
+Private mTableName AS String                    ' テーブル名
+Private mColumnDefinitions As Collection        ' カラム定義リスト
 
 
 '====================================================================================================
@@ -34,12 +34,11 @@ End Property
 
 
 '====================================================================================================
-' カラム情報リストの取得/設定
+' カラム定義リストの取得/設定
 '====================================================================================================
-Public Property Get ColumnInfoList() As Collection
-    Set ColumnInfoList = mColumnInfoList
+Public Property Get ColumnDefinitions() As Collection
+    Set ColumnDefinitions = mColumnDefinitions
 End Property
-Public Property Let ColumnInfoList(ColumnInfoList As Collection)
-    Set mColumnInfoList = ColumnInfoList
+Public Property Let ColumnDefinitions(ColumnDefinitions As Collection)
+    Set mColumnDefinitions = ColumnDefinitions
 End Property
-

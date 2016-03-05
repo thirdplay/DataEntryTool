@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "DataEntryOracleDao"
+Attribute VB_Name = "OracleDao"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -21,7 +21,7 @@ Implements IDataEntryDao
 ' 定数
 '====================================================================================================
 ' カラム情報取得クエリ
-Private Const cstColumnInfoGetQuery As String = "SELECT (utc.column_id - 1) AS column_id, utc.column_name, ucc.comments, utc.data_type, CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length, DECODE(utc.nullable,'N','0','1') AS is_nullable, DECODE(pkc.table_name, NULL, '0', '1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name, cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name='${tableName}' ORDER BY utc.column_id"
+Private Const cstColumnDefinitionGetQuery As String = "SELECT (utc.column_id - 1) AS column_id, utc.column_name, ucc.comments, utc.data_type, CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length, DECODE(utc.nullable,'N','0','1') AS is_nullable, DECODE(pkc.table_name, NULL, '0', '1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name, cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name='${tableName}' ORDER BY utc.column_id"
 
 
 '====================================================================================================
@@ -83,7 +83,7 @@ End Sub
 ' トランザクション開始
 '====================================================================================================
 Public Sub IDataEntryDao_BeginTrans()
-    MsgBox "Oracle:BeginTrans"
+    Debug.Print "Oracle:BeginTrans"
 End Sub
 
 
@@ -91,7 +91,7 @@ End Sub
 ' コミット
 '====================================================================================================
 Public Sub IDataEntryDao_CommitTrans()
-    MsgBox "Oracle:CommitTrans"
+    Debug.Print "Oracle:CommitTrans"
 End Sub
 
 
@@ -99,28 +99,38 @@ End Sub
 ' ロールバック
 '====================================================================================================
 Public Sub IDataEntryDao_RollbackTrans()
-    MsgBox "Oracle:RollbackTrans"
+    Debug.Print "Oracle:RollbackTrans"
 End Sub
 
 
 '====================================================================================================
-' 指定されたテーブルのカラム情報リストを取得します。
+' クエリ実行
+'----------------------------------------------------------------------------------------------------
+' IN : query クエリ文字列
+'====================================================================================================
+Public Sub IDataEntryDao_Execute(query)
+    Debug.Print "Execute"
+End Sub
+
+
+'====================================================================================================
+' 指定されたテーブルのカラム情報リストを取得します
 '----------------------------------------------------------------------------------------------------
 ' IN : tableName テーブル名
 ' OUT: カラム情報リスト
 '====================================================================================================
-Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collection
+Public Function IDataEntryDao_GetColumnDefinitions(tableName As String) As Collection
     Dim recordSet As Object
     Dim query As String
-    Dim ci As ColumnInfo
+    Dim cd As ColumnDefinition
     Dim list As Collection
     Set list = New Collection
 
-    query = Replace(cstColumnInfoGetQuery, "${tableName}", tableName)
+    query = Replace(cstColumnDefinitionGetQuery, "${tableName}", tableName)
     Set recordSet = mConnect.Execute(query)
     Do Until recordSet.EOF
-        Set ci = New ColumnInfo
-        With ci
+        Set cd = New ColumnDefinition
+        With cd
             .ColumnId = recordSet("column_id")
             .ColumnName = recordSet("column_name")
             .Comments = recordSet("comments")
@@ -129,17 +139,10 @@ Public Function IDataEntryDao_GetColumnInfoList(tableName As String) As Collecti
             .IsNullable = recordSet("is_nullable")
             .IsPrimaryKey = recordSet("is_primary_key")
         End With
-        Call list.Add(ci)
+        Call list.Add(cd)
         recordSet.MoveNext
     Loop
-    Set IDataEntryDao_GetColumnInfoList = list
+    Set IDataEntryDao_GetColumnDefinitions = list
 End Function
 
 
-'====================================================================================================
-' クエリ実行
-'----------------------------------------------------------------------------------------------------
-' IN : query クエリ文字列
-'====================================================================================================
-'Public Sub Execute(query)
-'End Sub
