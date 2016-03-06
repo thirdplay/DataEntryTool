@@ -20,7 +20,7 @@ Implements IDataEntryDao
 '====================================================================================================
 ' 定数
 '====================================================================================================
-' カラム情報取得クエリ
+' カラム定義取得クエリ
 Private Const cstColumnDefinitionGetQuery As String = "SELECT (utc.column_id - 1) AS column_id, utc.column_name, ucc.comments, utc.data_type, CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length, DECODE(utc.nullable,'N','0','1') AS is_nullable, DECODE(pkc.table_name, NULL, '0', '1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name, cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name='${tableName}' ORDER BY utc.column_id"
 
 
@@ -114,10 +114,10 @@ End Sub
 
 
 '====================================================================================================
-' 指定されたテーブルのカラム情報リストを取得します
+' 指定されたテーブルのカラム定義リストを取得します
 '----------------------------------------------------------------------------------------------------
 ' IN : tableName テーブル名
-' OUT: カラム情報リスト
+' OUT: カラム定義リスト
 '====================================================================================================
 Public Function IDataEntryDao_GetColumnDefinitions(TableName As String) As Collection
     Dim recordSet As Object

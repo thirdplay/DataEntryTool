@@ -48,22 +48,22 @@ End Sub
 
 
 '====================================================================================================
-' テーブル名一覧のテーブル情報をDBから取得し、返却します
+' テーブル設定リストのテーブル情報をDBから取得し、返却します
 '----------------------------------------------------------------------------------------------------
-' IN : tableNames テーブル名リスト
-' OUT: テーブル情報リスト
+' IN : tableSetting テーブル設定リスト
+' OUT: テーブル定義リスト
 '====================================================================================================
-Public Function GetTableDefinitions(tableNames As Collection) As Collection
-    Dim i As Long
+Public Function GetTableDefinitions(tableSetting As Collection) As Collection
+    Dim ts As TableSetting
     Dim td As TableDefinition
     Dim list As Collection
 
     Set list = New Collection
 
-    For i = 1 To tableNames.Count
+    For Each ts In tableSetting
         Set td = New TableDefinition
-        td.ColumnDefinitions = mDao.GetColumnDefinitions(tableNames(i))
-        td.TableName = tableNames(i)
+        td.ColumnDefinitions = mDao.GetColumnDefinitions(ts.PhysicsName)
+        td.TableName = ts.PhysicsName
         Call list.Add(td)
     Next
 

@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "DataEntryControl"
+Attribute VB_Name = "TableSetting"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,74 +11,70 @@ Option Explicit
 
 '====================================================================================================
 '
-' データ投入コントロール
+' テーブル設定
 '
 '====================================================================================================
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mView As DataEntryView          ' データ投入ビュー
-Private mModel As DataEntryModel        ' データ投入モデル
+Private mRow AS String                      ' 行番号
+Private mPhysicsName AS String              ' 物理名
+Private mLogicalName As String              ' 論理名
+Private mDataEntryTarget As String          ' データ投入対象
+Private mProcessCount As String             ' 処理件数
 
 
 '====================================================================================================
-' コンストラクタ
+' 行番号の取得/設定
 '====================================================================================================
-Private Sub Class_Initialize()
-End Sub
-
-
-'====================================================================================================
-' デストラクタ
-'====================================================================================================
-Private Sub Class_Terminate()
-    Set mView = Nothing
-    Set mModel = Nothing
-End Sub
-
-
-'====================================================================================================
-' ビューの設定
-'====================================================================================================
-Public Property Let View(View As DataEntryView)
-    Set mView = View
+Public Property Get Row() As String
+    Row = mRow
+End Property
+Public Property Let Row(Row As String)
+    mRow = Row
 End Property
 
 
 '====================================================================================================
-' モデルの設定
+' 物理名の取得/設定
 '====================================================================================================
-Public Property Let Model(Model As DataEntryModel)
-    Set mModel = Model
+Public Property Get PhysicsName() As String
+    PhysicsName = mPhysicsName
+End Property
+Public Property Let PhysicsName(PhysicsName As String)
+    mPhysicsName = PhysicsName
 End Property
 
 
 '====================================================================================================
-' テーブルシート作成
+' 論理名の取得/設定
 '====================================================================================================
-Public Sub CreateTableSheet()
-On Error GoTo Finally
-    Dim Setting As Setting
-    Dim tableSetting As Collection
-    Dim tableDefinitions As Collection
+Public Property Get LogicalName() As String
+    LogicalName = mLogicalName
+End Property
+Public Property Let LogicalName(LogicalName As String)
+    mLogicalName = LogicalName
+End Property
 
-    ' 設定とテーブル設定リストの取得
-    Debug.Print "DataEntryControl.CreateTableSheet:GetTableSettings"
-    Set Setting = mView.GetSetting
-    Set tableSetting = mView.GetTableSettings
 
-    ' テーブル設定リストを元に、Modelからテーブル定義を取得
-    Debug.Print "DataEntryControl.CreateTableSheet:GetTableDefinitions"
-    Call mModel.Setup(Setting)
-    Set tableDefinitions = mModel.GetTableDefinitions(tableSetting)
+'====================================================================================================
+' データ投入対象の取得/設定
+'====================================================================================================
+Public Property Get DataEntryTarget() As String
+    DataEntryTarget = mDataEntryTarget
+End Property
+Public Property Let DataEntryTarget(DataEntryTarget As String)
+    mDataEntryTarget = DataEntryTarget
+End Property
 
-    ' テーブル定義を元に、テーブルシートを作成する
-    Debug.Print "DataEntryControl.CreateTableSheet:CreateTableSheet"
-    Call mView.CreateTableSheet(tableDefinitions)
-Finally:
-    If Err.Number <> 0 Then
-        Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
-    End If
-End Sub
 
+'====================================================================================================
+' 処理件数の取得/設定
+'====================================================================================================
+Public Property Get ProcessCount() As String
+    ProcessCount = mProcessCount
+End Property
+Public Property Let ProcessCount(ProcessCount As String)
+    mProcessCount = ProcessCount
+End Property
