@@ -136,25 +136,45 @@ End Function
 ' OUT: テーブル設定リスト
 '====================================================================================================
 Public Function GetTableSettings() As Collection
+    Set GetTableSettings = GetTableSettingsByCriteria(False)
+End Function
+
+
+'====================================================================================================
+' データ投入対象のテーブル設定リストを返却します
+'----------------------------------------------------------------------------------------------------
+' IN : criteriaFlg 取得条件フラグ(true:対象のみ,false:全て)
+' OUT: テーブル設定リスト
+'====================================================================================================
+Public Function GetTableSettingsByCriteria(criteriaFlg As Boolean) As Collection
     Dim rowIndex As Long
     Dim ts As TableSetting
+    Dim isTarget As Boolean
     Dim list As Collection
     Set list = New Collection
 
     With ThisWorkbook.Worksheets(cstSheetMain)
         rowIndex = .Range(cstTableBase).Row + 1
         Do While .Cells(rowIndex, TableSettingCol.PhysicsName).Value <> ""
-            Set ts = New TableSetting
-            ts.Row = rowIndex
-            ts.PhysicsName = .Cells(rowIndex, TableSettingCol.PhysicsName).Value
-            ts.LogicalName = .Cells(rowIndex, TableSettingCol.LogicalName).Value
-            ts.DataEntryTarget = .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value
-            ts.ProcessCount = .Cells(rowIndex, TableSettingCol.ProcessCount).Value
-            Call list.Add(ts)
+            ' 取得条件フラグがtrueかつ、データ投入対象列が空の場合、対象外
+            isTarget = True
+            If criteriaFlg And .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value = "" Then
+                isTarget = False
+            End If
+
+            If isTarget Then
+                Set ts = New TableSetting
+                ts.Row = rowIndex
+                ts.PhysicsName = .Cells(rowIndex, TableSettingCol.PhysicsName).Value
+                ts.LogicalName = .Cells(rowIndex, TableSettingCol.LogicalName).Value
+                ts.DataEntryTarget = .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value
+                ts.ProcessCount = .Cells(rowIndex, TableSettingCol.ProcessCount).Value
+                Call list.Add(ts)
+            End If
             rowIndex = rowIndex + 1
         Loop
     End With
-    Set GetTableSettings = list
+    Set GetTableSettingsByCriteria = list
 End Function
 
 

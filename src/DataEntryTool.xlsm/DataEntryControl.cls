@@ -55,10 +55,9 @@ End Property
 
 
 '====================================================================================================
-' テーブルシート作成
+' テーブルシートを作成します
 '====================================================================================================
 Public Sub CreateTableSheet()
-On Error GoTo Finally
     Dim Setting As Setting
     Dim tableSettings As Collection
     Dim tableDefinitions As Collection
@@ -76,9 +75,21 @@ On Error GoTo Finally
     ' テーブル定義を元に、テーブルシートを作成する
     Debug.Print "DataEntryControl.CreateTableSheet:CreateTableSheet"
     Call mView.CreateTableSheet(tableDefinitions)
-Finally:
-    If Err.Number <> 0 Then
-        Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
-    End If
+End Sub
+
+
+'====================================================================================================
+' データを投入します
+' ---------------------------------------------------------------------------------------------------
+' IN : entryType 投入種類
+'====================================================================================================
+Public Sub EntryData(entryType As EntryType)
+    MsgBox "EntryType:" & entryType
+    ' 設定と対象テーブル設定の取得
+    ' 対象テーブル設定を全て処理
+        ' (対象テーブルのテーブルデータの取得)
+        ' クエリの作成
+        ' クエリの実行
+        ' 処理件数の書き込み
 End Sub
 
