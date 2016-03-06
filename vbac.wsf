@@ -31,6 +31,7 @@ Options:
                     (default: src)
   /vbaproj          Use .vbaproj file
   /dbcompact        With Access DB compaction
+  /template         Use template file
 </resource>
 <script language="JScript">
 <![CDATA[
@@ -458,6 +459,11 @@ Office.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
+    // テンプレート指定されている場合、テンプレートファイルがあればbinディレクトリにコピーする
+    if (self.cmdParam.template) {
+        var templateFile = fso.BuildPath(tsrc, "template" + "." + fso.GetExtensionName(tsrc));
+        if (fso.FileExists(templateFile)) fso.CopyFile(templateFile, tbin);
+    }
     this.loanOfOfficeDocument(tbin, true, function(ofDoc) {
         self.cleanupBinary(ofDoc);
         if (self.cmdParam.vbaproj) {
@@ -479,6 +485,11 @@ Office.prototype.decombine = function(tbin, tsrc) {
         if (self.cmdParam.vbaproj) self.exportProject(ofDoc.VBProject, tsrc);
         self.exportSource(ofDoc, tsrc);
     });
+    if (self.cmdParam.template) {
+        var templateFile = fso.BuildPath(tsrc, "template" + "." + fso.GetExtensionName(tsrc));
+        fso.CopyFile(tbin, templateFile);
+        self.clear(templateFile);
+    }
     
     println();
 };
@@ -1119,7 +1130,8 @@ function main(args) {
             binbak:      new Conditional("bak"),
             vbaproj:     false,
             incQuery:    false,
-            dbCompact:   false
+            dbCompact:   false,
+            template:    false
         })
         .parse(args);
     
