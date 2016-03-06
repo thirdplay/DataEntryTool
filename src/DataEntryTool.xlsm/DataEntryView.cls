@@ -82,7 +82,7 @@ Public Sub ChangeCellRange(sheet As Object, ByVal target As Range)
     With sheet
         If Not Intersect(target, .Range(cstDatabaseType)) Is Nothing Then
             ' PostgreSQL
-            If Target.Value = cstDatabaseTypePostgreSQL Then
+            If target.Value = cstDatabaseTypePostgreSQL Then
                 .Range(cstPort).Rows.Hidden = False
                 .Range(cstDatabaseName).Rows.Hidden = False
             ' PostgreSQLˆÈŠO
@@ -142,7 +142,7 @@ Public Function GetTableSettings() As Collection
     Set list = New Collection
 
     With ThisWorkbook.Worksheets(cstSheetMain)
-        rowIndex= .Range(cstTableBase).Row + 1
+        rowIndex = .Range(cstTableBase).Row + 1
         Do While .Cells(rowIndex, TableSettingCol.PhysicsName).Value <> ""
             Set ts = New TableSetting
             ts.Row = rowIndex

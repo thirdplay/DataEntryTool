@@ -50,17 +50,17 @@ End Sub
 '====================================================================================================
 ' テーブル設定リストのテーブル情報をDBから取得し、返却します
 '----------------------------------------------------------------------------------------------------
-' IN : tableSetting テーブル設定リスト
+' IN : tableSettings テーブル設定リスト
 ' OUT: テーブル定義リスト
 '====================================================================================================
-Public Function GetTableDefinitions(tableSetting As Collection) As Collection
+Public Function GetTableDefinitions(tableSettings As Collection) As Collection
     Dim ts As TableSetting
     Dim td As TableDefinition
     Dim list As Collection
 
     Set list = New Collection
 
-    For Each ts In tableSetting
+    For Each ts In tableSettings
         Set td = New TableDefinition
         td.ColumnDefinitions = mDao.GetColumnDefinitions(ts.PhysicsName)
         td.TableName = ts.PhysicsName

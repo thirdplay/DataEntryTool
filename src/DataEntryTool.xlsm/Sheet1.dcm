@@ -17,7 +17,7 @@ Option Explicit
 Private Sub Worksheet_Change(ByVal target As Range)
     Dim View As DataEntryView
     Set View = New DataEntryView
-    Call View.ChangeCellRange(Thisworkbook.Worksheets(1), target)
+    Call View.ChangeCellRange(ThisWorkbook.Worksheets(1), target)
     Set View = Nothing
 End Sub
 

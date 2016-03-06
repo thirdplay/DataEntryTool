@@ -18,8 +18,8 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mRow AS String                      ' 行番号
-Private mPhysicsName AS String              ' 物理名
+Private mRow As String                      ' 行番号
+Private mPhysicsName As String              ' 物理名
 Private mLogicalName As String              ' 論理名
 Private mDataEntryTarget As String          ' データ投入対象
 Private mProcessCount As String             ' 処理件数
