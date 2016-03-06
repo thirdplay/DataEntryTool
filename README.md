@@ -19,6 +19,7 @@ Excelに入力したデータをデータベースに投入するツールです
 > 
 > Copyright (c) 2011-2015 igeta
 
+* **用途 : インポート/エクスポート処理
 * **ライセンス :** The MIT License (MIT)
 * **ライセンス全文 :** [licenses/Ariawase.txt](licenses/Ariawase.txt)
 
