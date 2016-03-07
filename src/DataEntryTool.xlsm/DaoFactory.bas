@@ -16,7 +16,5 @@ Public Function Create(Setting As Setting) As IDataEntryDao
         Set Create = New OracleDao
     ElseIf Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
         Set Create = New PostgreSqlDao
-    Else
-        Set Create = New SampleDao
     End If
 End Function

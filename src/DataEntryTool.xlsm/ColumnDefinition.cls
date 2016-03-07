@@ -23,7 +23,7 @@ Private mColumnName As String           ' 列名
 Private mComments As String             ' コメント
 Private mDataType As String             ' データ型
 Private mDataLength As String           ' データ長
-Private mIsNullable As String           ' NULL指定可能(0:NULL不可,1:NULL可能)
+Private mIsRequired As String           ' 必須指定(0:任意,1:必須)
 Private mIsPrimaryKey As String         ' 主キー指定(0:主キー以外,1:主キー)
 
 
@@ -85,11 +85,11 @@ End Property
 '====================================================================================================
 ' NULL指定可能の取得/設定
 '====================================================================================================
-Public Property Get IsNullable() As String
-    IsNullable = mIsNullable
+Public Property Get IsRequired() As String
+    IsRequired = mIsRequired
 End Property
-Public Property Let IsNullable(IsNullable As String)
-    mIsNullable = IsNullable
+Public Property Let IsRequired(IsRequired As String)
+    mIsRequired = IsRequired
 End Property
 
 

@@ -45,7 +45,7 @@ Private Enum ColumnDefinitionRow
     ColumnName              ' 列名
     DataType                ' データ型
     DataLength              ' データ長
-    IsNullable              ' NULL指定可能
+    IsRequired              ' 必須指定
     IsPrimaryKey            ' 主キー指定
     Max
 End Enum
@@ -113,7 +113,7 @@ Public Function GetSetting() As Setting
         End With
 
         ' 入力チェック
-        'Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
+        Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
         If mSetting.DatabaseType = cstDatabaseTypeOracle Then
             Call CheckInputValue(mSetting.ServerName, "サーバ名")
             Call CheckInputValue(mSetting.UserId, "ユーザID")
@@ -189,9 +189,9 @@ On Error GoTo Finally
     Dim cd As ColumnDefinition
     Dim columnRange As Variant
 
-    Dim nullableDic As Object
-    Set nullableDic = CreateObject("Scripting.Dictionary")
-    Call nullableDic.Add("1", "必須")
+    Dim requiredDic As Object
+    Set requiredDic = CreateObject("Scripting.Dictionary")
+    Call requiredDic.Add("1", "必須")
     
     Dim primaryKeyDic As Object
     Set primaryKeyDic = CreateObject("Scripting.Dictionary")
@@ -219,7 +219,7 @@ On Error GoTo Finally
                 columnRange(ColumnDefinitionRow.ColumnName, cd.ColumnId) = cd.ColumnName
                 columnRange(ColumnDefinitionRow.DataType, cd.ColumnId) = cd.DataType
                 columnRange(ColumnDefinitionRow.DataLength, cd.ColumnId) = cd.DataLength
-                columnRange(ColumnDefinitionRow.IsNullable, cd.ColumnId) = nullableDic(cd.IsNullable)
+                columnRange(ColumnDefinitionRow.IsRequired, cd.ColumnId) = requiredDic(cd.IsRequired)
                 columnRange(ColumnDefinitionRow.IsPrimaryKey, cd.ColumnId) = primaryKeyDic(cd.IsPrimaryKey)
             Next
             ThisWorkbook.Worksheets(td.TableName).Range(Cells(1, 1), Cells(ColumnDefinitionRow.Max, td.ColumnDefinitions.Count)) = columnRange
