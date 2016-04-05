@@ -49,7 +49,7 @@ Private Const cstTableRecordBase = ColumnDefinitionRow.Max + 1
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mSetting As Setting     ' 設定
+Private mSetting As Setting     ' データ投入ツールの設定
 
 
 '====================================================================================================
@@ -330,6 +330,6 @@ Private Function GetColDataCount(sheetName As String, rowIndex As Long, colIndex
             count = count + 1
         Loop
     End With
-    GetDataCount = count
+    GetColDataCount = count
 End Function
 

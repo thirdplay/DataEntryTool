@@ -81,5 +81,22 @@ End Function
 ' OUT: 処理件数
 '====================================================================================================
 Public Function ExecuteDataEntry(xEntryType As EntryType, xEntryData As EntryData) As Long
+On Error GoTo ErrHandler
+    ' トランザクション開始
+    Call mDatabaseModel.BeginTrans
+
+    ' クエリ生成
+    'MakeQuery
+    ' クエリ実行
+    'execCnt = Execute
+
+    ' コミット
+    Call mDatabaseModel.CommitTrans
+
     ExecuteDataEntry = 0
+    Exit Function
+ErrHandler:
+    Call mDatabaseModel.RollbackTrans
+    Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
+    Exit Function
 End Function
