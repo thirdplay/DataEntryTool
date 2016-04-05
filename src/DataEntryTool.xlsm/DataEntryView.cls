@@ -136,7 +136,6 @@ Public Function GetTableSettingsByCriteria(isEntryTarget As Boolean) As Collecti
                 If .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value = "" Then
                     isTarget = False
                 ElseIf Not ExistsSheet(tableName) Then
-                    'Err.Raise 100, , "シート[" & tableName & "]が存在しません。"
                     isTarget = False
                 ElseIf ThisWorkbook.Worksheets(tableName).Cells(cstTableRecordBase, 1).Value = "" Then
                     isTarget = False
@@ -149,7 +148,6 @@ Public Function GetTableSettingsByCriteria(isEntryTarget As Boolean) As Collecti
                 ts.PhysicsName = .Cells(rowIndex, TableSettingCol.PhysicsName).Value
                 ts.LogicalName = .Cells(rowIndex, TableSettingCol.LogicalName).Value
                 ts.DataEntryTarget = .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value
-                ts.ProcessCount = .Cells(rowIndex, TableSettingCol.ProcessCount).Value
                 Call list.Add(ts)
             End If
             rowIndex = rowIndex + 1
@@ -216,12 +214,12 @@ End Sub
 
 
 '====================================================================================================
-' テーブルデータ取得
+' 投入データ取得
 '----------------------------------------------------------------------------------------------------
 ' IN : tableName テーブル名
 '====================================================================================================
-Public Function GetTableData(tableName As String) As TableData
-    Dim td As TableData
+Public Function GetEntryData(tableName As String) As EntryData
+    Dim ed As EntryData
     Dim cd As ColumnDefinition
     Dim colIndex As Long
     Dim rowIndex As Long
@@ -230,27 +228,58 @@ Public Function GetTableData(tableName As String) As TableData
     Dim rs As Collection
 
     With ThisWorkbook.Worksheets(tableName)
-        Set td = New TableData
+        Set ed = New EntryData
 
         ' カラム定義リストの作成
-        td.ColumnDefinitions = New Collection
+        ed.ColumnDefinitions = New Collection
         colIndex = 1
         Do While .Cells(ColumnDefinitionRow.ColumnName, colIndex).Value <> ""
             Set cd = New ColumnDefinition
             cd.ColumnName = .Cells(ColumnDefinitionRow.ColumnName, colIndex).Value
             cd.DataType = .Cells(ColumnDefinitionRow.DataType, colIndex).Value
             cd.IsPrimaryKey = .Cells(ColumnDefinitionRow.IsPrimaryKey, colIndex).Value
-            Call td.ColumnDefinitions.Add(cd)
+            Call ed.ColumnDefinitions.Add(cd)
             colIndex = colIndex + 1
         Loop
 
         ' レコード範囲の設定
-        dataCount = GetDataCount(tableName, cstTableRecordBase, 1)
-        td.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount, td.ColumnDefinitions.Count))
+        dataCount = GetColDataCount(tableName, cstTableRecordBase, 1)
+        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount, ed.ColumnDefinitions.Count))
 
-        Set GetTableData = td
+        Set GetEntryData = ed
     End With
 End Function
+
+
+'====================================================================================================
+' 処理件数をクリアする
+'====================================================================================================
+Public Sub ClearProcessingCount
+    Dim baseRowIndex As Long
+    Dim dataCount As Long
+
+    With ThisWorkbook.Worksheets(cstSheetMain)
+        ' テーブル設定数の取得
+        baseRowIndex = .Range(cstTableBase).Row + 1
+        dataCount = GetColDataCount(cstSheetMain, baseRowIndex, TableSettingCol.PhysicsName)
+
+        ' 処理件数のクリア
+        Call .Range(.Cells(baseRowIndex, TableSettingCol.ProcessCount), .Cells(baseRowIndex + dataCount, TableSettingCol.ProcessCount)).ClearContents
+    End With
+End Sub
+
+
+'====================================================================================================
+' 処理件数を書き込む
+'----------------------------------------------------------------------------------------------------
+' IN : xTableSetting テーブル設定
+'    : count 処理件数
+'====================================================================================================
+Public Sub WriteProcessingCount(xTableSetting As tableSetting, count As Long)
+    With ThisWorkbook.Worksheets(cstSheetMain)
+        .Cells(xTableSetting.Row, TableSettingCol.ProcessCount).Value = count
+    End With
+End Sub
 
 
 '====================================================================================================
@@ -285,22 +314,22 @@ End Function
 
 
 '====================================================================================================
-' 指定列上のデータがいくつあるか取得します
+' 行データ数を取得する
 '----------------------------------------------------------------------------------------------------
 ' IN : sheetName シート名
 '    : rowIndex 行インデックス
 '    : colIndex 列インデックス
 ' OUT: データ数
 '====================================================================================================
-Private Function GetDataCount(sheetName As String, rowIndex As Long, colIndex As Long) As Long
-    Dim startIndex As Long
+Private Function GetColDataCount(sheetName As String, rowIndex As Long, colIndex As Long) As Long
+    Dim count As Long
 
-    startIndex = rowIndex
+    count = 0
     With ThisWorkbook.Worksheets(sheetName)
-        Do While .Cells(rowIndex, colIndex).Value <> ""
-            rowIndex = rowIndex + 1
+        Do While .Cells(rowIndex + count, colIndex).Value <> ""
+            count = count + 1
         Loop
     End With
-    GetDataCount = rowIndex - startIndex - 1
+    GetDataCount = count
 End Function
 

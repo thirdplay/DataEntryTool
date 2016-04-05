@@ -89,50 +89,30 @@ Public Sub EntryData(xEntryType As EntryType)
     Dim xSetting As Setting
     Dim tableSettings As Collection
     Dim ts As TableSetting
-    Dim td As TableData
-    Dim rr As Range
-
-    ' 処理件数のクリア
+    Dim ed As EntryData
+    Dim count As Long
 
     ' 設定の取得＆モデルの構成
     Set xSetting = mView.GetSetting
     Call mModel.Setup(xSetting)
 
-    ' 設定と対象テーブル設定の取得
+    ' 処理件数のクリア
+    Call mView.ClearProcessingCount
+
+    ' 対象テーブル設定の取得
     Debug.Print "DataEntryControl.CreateTableSheet:GetTableSettingsByCriteria"
     Set tableSettings = mView.GetTableSettingsByCriteria(True)
 
     ' 対象テーブル設定を全て処理
     For Each ts In tableSettings
         ' 対象テーブルのテーブルデータの取得
-        Set td = mView.GetTableData(ts.PhysicsName)
+        Set ed = mView.GetEntryData(ts.PhysicsName)
 
-'        Debug.Print ">>カラム定義"
-'        Dim cd As ColumnDefinition
-'        For Each cd In td.ColumnDefinitions
-'            Debug.Print cd.ColumnName & "," & cd.DataType
-'        Next
-'
-'        Debug.Print ">>レコード"
-'        Dim i As Long
-'        Dim j As Long
-'        For i = 1 To td.RecordRange.Rows.Count
-'            Dim recordStr As String
-'            recordStr = ""
-'            For j = 1 To td.RecordRange.Columns.Count
-'                recordStr = recordStr & td.RecordRange(i, j) & ","
-'            Next
-'            Debug.Print "[" & recordStr & "]"
-'        Next
-
-        ' テーブルデータを全て処理
-        For Each rr In td.RecordRange.Rows
-            ' クエリの実行
-            'mModel.ExecuteQuery(xEntryType, data)
-        Next
+        ' データ投入実行
+        count = mModel.ExecuteDataEntry(xEntryType, ed)
 
         ' 処理件数の書き込み
-        'mView.WriteProcessCount
+        Call mView.WriteProcessingCount(ts, count)
     Next
 End Sub
 

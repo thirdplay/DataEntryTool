@@ -18,20 +18,19 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mRow As String                      ' 行番号
+Private mRow As Long                        ' 行番号
 Private mPhysicsName As String              ' 物理名
 Private mLogicalName As String              ' 論理名
 Private mDataEntryTarget As String          ' データ投入対象
-Private mProcessCount As String             ' 処理件数
 
 
 '====================================================================================================
 ' 行番号の取得/設定
 '====================================================================================================
-Public Property Get Row() As String
+Public Property Get Row() As Long
     Row = mRow
 End Property
-Public Property Let Row(Row As String)
+Public Property Let Row(Row As Long)
     mRow = Row
 End Property
 
@@ -69,12 +68,3 @@ Public Property Let DataEntryTarget(DataEntryTarget As String)
 End Property
 
 
-'====================================================================================================
-' 処理件数の取得/設定
-'====================================================================================================
-Public Property Get ProcessCount() As String
-    ProcessCount = mProcessCount
-End Property
-Public Property Let ProcessCount(ProcessCount As String)
-    mProcessCount = ProcessCount
-End Property

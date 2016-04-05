@@ -72,3 +72,14 @@ Public Function GetTableDefinitions(tableSettings As Collection) As Collection
     Set GetTableDefinitions = list
 End Function
 
+
+'====================================================================================================
+' データ投入を実行します
+'----------------------------------------------------------------------------------------------------
+' IN : xEntryType 投入種別
+'    : xEntryData 投入データ
+' OUT: 処理件数
+'====================================================================================================
+Public Function ExecuteDataEntry(xEntryType As EntryType, xEntryData As EntryData) As Long
+    ExecuteDataEntry = 0
+End Function
