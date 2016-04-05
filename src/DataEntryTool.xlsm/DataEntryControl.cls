@@ -41,16 +41,16 @@ End Sub
 '====================================================================================================
 ' ビューの設定
 '====================================================================================================
-Public Property Let View(View As DataEntryView)
-    Set mView = View
+Public Property Let View(xView As DataEntryView)
+    Set mView = xView
 End Property
 
 
 '====================================================================================================
 ' モデルの設定
 '====================================================================================================
-Public Property Let Model(Model As DataEntryModel)
-    Set mModel = Model
+Public Property Let Model(xModel As DataEntryModel)
+    Set mModel = xModel
 End Property
 
 
@@ -58,18 +58,20 @@ End Property
 ' テーブルシートを作成します
 '====================================================================================================
 Public Sub CreateTableSheet()
-    Dim Setting As Setting
+    Dim xSetting As Setting
     Dim tableSettings As Collection
     Dim tableDefinitions As Collection
 
-    ' 設定とテーブル設定リストの取得
+    ' 設定の取得＆モデルの構成
+    Set xSetting = mView.GetSetting
+    Call mModel.Setup(xSetting)
+
+    ' テーブル設定リストの取得
     Debug.Print "DataEntryControl.CreateTableSheet:GetTableSettings"
-    Set Setting = mView.GetSetting
     Set tableSettings = mView.GetTableSettings
 
     ' テーブル設定リストを元に、Modelからテーブル定義を取得
     Debug.Print "DataEntryControl.CreateTableSheet:GetTableDefinitions"
-    Call mModel.Setup(Setting)
     Set tableDefinitions = mModel.GetTableDefinitions(tableSettings)
 
     ' テーブル定義を元に、テーブルシートを作成する
@@ -81,15 +83,56 @@ End Sub
 '====================================================================================================
 ' データを投入します
 ' ---------------------------------------------------------------------------------------------------
-' IN : entryType 投入種類
+' IN : xEntryType 投入種類
 '====================================================================================================
-Public Sub EntryData(entryType As EntryType)
-    MsgBox "EntryType:" & entryType
+Public Sub EntryData(xEntryType As EntryType)
+    Dim xSetting As Setting
+    Dim tableSettings As Collection
+    Dim ts As TableSetting
+    Dim td As TableData
+    Dim rr As Range
+
+    ' 処理件数のクリア
+
+    ' 設定の取得＆モデルの構成
+    Set xSetting = mView.GetSetting
+    Call mModel.Setup(xSetting)
+
     ' 設定と対象テーブル設定の取得
+    Debug.Print "DataEntryControl.CreateTableSheet:GetTableSettingsByCriteria"
+    Set tableSettings = mView.GetTableSettingsByCriteria(True)
+
     ' 対象テーブル設定を全て処理
-        ' (対象テーブルのテーブルデータの取得)
-        ' クエリの作成
-        ' クエリの実行
+    For Each ts In tableSettings
+        ' 対象テーブルのテーブルデータの取得
+        Set td = mView.GetTableData(ts.PhysicsName)
+
+'        Debug.Print ">>カラム定義"
+'        Dim cd As ColumnDefinition
+'        For Each cd In td.ColumnDefinitions
+'            Debug.Print cd.ColumnName & "," & cd.DataType
+'        Next
+'
+'        Debug.Print ">>レコード"
+'        Dim i As Long
+'        Dim j As Long
+'        For i = 1 To td.RecordRange.Rows.Count
+'            Dim recordStr As String
+'            recordStr = ""
+'            For j = 1 To td.RecordRange.Columns.Count
+'                recordStr = recordStr & td.RecordRange(i, j) & ","
+'            Next
+'            Debug.Print "[" & recordStr & "]"
+'        Next
+
+        ' テーブルデータを全て処理
+        For Each rr In td.RecordRange.Rows
+            ' クエリの実行
+            'mModel.ExecuteQuery(xEntryType, data)
+        Next
+
         ' 処理件数の書き込み
+        'mView.WriteProcessCount
+    Next
 End Sub
 

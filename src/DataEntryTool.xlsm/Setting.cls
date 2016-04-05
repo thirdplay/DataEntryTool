@@ -24,6 +24,8 @@ Private mPort As String             ' ポート
 Private mDatabaseName As String     ' データベース名
 Private mUserId As String           ' ユーザID
 Private mPassword As String         ' パスワード
+Private mLinefeedCode As String     ' 改行コード
+Private mDateFormat As String       ' 日付書式
 
 
 '====================================================================================================
@@ -103,5 +105,27 @@ Public Property Get Password() As String
 End Property
 Public Property Let Password(Password As String)
     mPassword = Password
+End Property
+
+
+'====================================================================================================
+' 改行コードの取得/設定
+'====================================================================================================
+Public Property Get LinefeedCode() As String
+    LinefeedCode = mLinefeedCode
+End Property
+Public Property Let LinefeedCode(LinefeedCode As String)
+    mLinefeedCode = LinefeedCode
+End Property
+
+
+'====================================================================================================
+' 日付書式の取得/設定
+'====================================================================================================
+Public Property Get DateFormat() As String
+    DateFormat = mDateFormat
+End Property
+Public Property Let DateFormat(DateFormat As String)
+    mDateFormat = DateFormat
 End Property
 

@@ -18,7 +18,7 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDao As IDataEntryDao   ' データ投入Daoインターフェース
+Private mDatabaseModel As DatabaseModel   ' データベースモデル
 
 
 '====================================================================================================
@@ -32,18 +32,18 @@ End Sub
 ' デストラクタ
 '====================================================================================================
 Private Sub Class_Terminate()
-    Set mDao = Nothing
+    Set mDatabaseModel = Nothing
 End Sub
 
 
 '====================================================================================================
 ' モデルを構成します
 '----------------------------------------------------------------------------------------------------
-' IN : setting 設定
+' IN : xSetting 設定
 '====================================================================================================
-Public Sub Setup(Setting As Setting)
-    Set mDao = DaoFactory.Create(Setting)
-    Call mDao.Connect(Setting)
+Public Sub Setup(xSetting As Setting)
+    Set mDatabaseModel = New DatabaseModel
+    Call mDatabaseModel.Connect(xSetting)
 End Sub
 
 
@@ -59,10 +59,12 @@ Public Function GetTableDefinitions(tableSettings As Collection) As Collection
     Dim list As Collection
 
     Set list = New Collection
-
     For Each ts In tableSettings
         Set td = New TableDefinition
-        td.ColumnDefinitions = mDao.GetColumnDefinitions(ts.PhysicsName)
+        td.ColumnDefinitions = mDatabaseModel.GetColumnDefinitions(ts.PhysicsName)
+        If td.ColumnDefinitions.Count = 0 Then
+            Err.Raise 100, , "テーブル[" & ts.PhysicsName & "]のカラム定義が取得できません。"
+        End If
         td.TableName = ts.PhysicsName
         Call list.Add(td)
     Next
