@@ -204,9 +204,11 @@ End Sub
 '====================================================================================================
 ' 投入データ取得
 '----------------------------------------------------------------------------------------------------
-' IN : tableName テーブル名
+' IN : xEntryType 投入種類
+'    : tableName テーブル名
+' OUT: 投入データ
 '====================================================================================================
-Public Function GetEntryData(tableName As String) As EntryData
+Public Function GetEntryData(xEntryType As EntryType, tableName As String) As EntryData
     Dim ed As EntryData
     Dim cd As ColumnDefinition
     Dim colIndex As Long
@@ -217,6 +219,8 @@ Public Function GetEntryData(tableName As String) As EntryData
 
     With ThisWorkbook.Worksheets(tableName)
         Set ed = New EntryData
+        ed.EntryType = xEntryType
+        ed.TableName = tableName
 
         ' カラム定義リストの作成
         ed.ColumnDefinitions = New Collection
@@ -232,7 +236,7 @@ Public Function GetEntryData(tableName As String) As EntryData
 
         ' レコード範囲の設定
         dataCount = GetColDataCount(tableName, cstTableRecordBase, 1)
-        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount, ed.ColumnDefinitions.Count))
+        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount - 1, ed.ColumnDefinitions.Count))
 
         Set GetEntryData = ed
     End With

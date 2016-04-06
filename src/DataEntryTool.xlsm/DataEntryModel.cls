@@ -74,27 +74,37 @@ End Function
 '====================================================================================================
 ' データ投入を実行します
 '----------------------------------------------------------------------------------------------------
-' IN : xEntryType 投入種別
-'    : xEntryData 投入データ
+' IN : xEntryData 投入データ
 ' OUT: 処理件数
 '====================================================================================================
-Public Function ExecuteDataEntry(xEntryType As EntryType, xEntryData As EntryData) As Long
+Public Function ExecuteDataEntry(xEntryData As EntryData) As Long
 On Error GoTo ErrHandler
+    Dim i As Long
+    Dim queries As Collection
+    Dim execCnt As Long
+    execCnt = 0
+
     ' トランザクション開始
     Call mDatabaseModel.BeginTrans
 
     ' クエリ生成
-    'MakeQuery
+    Set queries = mDatabaseModel.GenerateQueries(xEntryData)
+
     ' クエリ実行
-    'execCnt = Execute
+    For i = 1 To queries.Count
+        Debug.Print queries(i)
+        'execCnt = execCnt + mDatabaseModel.ExecuteQuery(query)
+    Next
 
     ' コミット
     Call mDatabaseModel.CommitTrans
 
-    ExecuteDataEntry = 0
+    ExecuteDataEntry = execCnt
     Exit Function
 ErrHandler:
+    ' ロールバック
     Call mDatabaseModel.RollbackTrans
     Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
     Exit Function
 End Function
+

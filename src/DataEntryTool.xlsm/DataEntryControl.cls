@@ -92,16 +92,15 @@ Public Sub EntryData(xEntryType As EntryType)
     Call mView.ClearProcessingCount
 
     ' 対象テーブル設定の取得
-    Debug.Print "DataEntryControl.CreateTableSheet:GetTableSettingsByCriteria"
     Set tableSettings = mView.GetTableSettingsByCriteria(True)
 
     ' 対象テーブル設定を全て処理
     For Each ts In tableSettings
         ' 対象テーブルのテーブルデータの取得
-        Set ed = mView.GetEntryData(ts.PhysicsName)
+        Set ed = mView.GetEntryData(xEntryType, ts.PhysicsName)
 
         ' データ投入実行
-        count = mModel.ExecuteDataEntry(xEntryType, ed)
+        count = mModel.ExecuteDataEntry(ed)
 
         ' 処理件数の書き込み
         Call mView.WriteProcessingCount(ts, count)

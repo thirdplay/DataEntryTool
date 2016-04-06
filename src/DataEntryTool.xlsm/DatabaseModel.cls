@@ -16,6 +16,17 @@ Option Explicit
 '====================================================================================================
 
 '====================================================================================================
+' 定数
+'====================================================================================================
+' Insertクエリ
+Private Const cstInsertQuery = "INSERT INTO ${tableName} (${columns}) VALUES (${values})"
+' Updateクエリ
+Private Const cstInsertQuery = "UPDATE ${tableName} SET (${set}) WHERE (${where})"
+' Deleteクエリ
+Private Const cstInsertQuery = "DELETE FROM ${tableName} WHERE (${where})"
+
+
+'====================================================================================================
 ' メンバ変数
 '====================================================================================================
 Dim mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
@@ -107,13 +118,13 @@ End Sub
 
 
 '====================================================================================================
-' クエリ実行
+' クエリを実行します
 '----------------------------------------------------------------------------------------------------
 ' IN : query クエリ文字列
 ' OUT: 処理件数
 '====================================================================================================
-Public Function Execute(query As String)
-    Execute = 0
+Public Function ExecuteQuery(query As String) As Long
+    ExecuteQuery = 0
 End Function
 
 
@@ -123,14 +134,14 @@ End Function
 ' IN : tableName テーブル名
 ' OUT: カラム定義リスト
 '====================================================================================================
-Public Function GetColumnDefinitions(TableName As String) As Collection
+Public Function GetColumnDefinitions(tableName As String) As Collection
     Dim recordSet As Object
     Dim query As String
     Dim cd As ColumnDefinition
     Dim list As Collection
     Set list = New Collection
 
-    query = Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", TableName)
+    query = Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", tableName)
     Set recordSet = mConnect.Execute(query)
     Do Until recordSet.EOF
         Set cd = New ColumnDefinition
@@ -149,4 +160,89 @@ Public Function GetColumnDefinitions(TableName As String) As Collection
     Set GetColumnDefinitions = list
 End Function
 
+
+'====================================================================================================
+' クエリを生成します
+'----------------------------------------------------------------------------------------------------
+' IN : xEntryData 投入データ
+' OUT: クエリリスト
+'====================================================================================================
+Public Function GenerateQueries(xEntryData As EntryData) As Collection
+    Select Case xEntryData.EntryType
+    Case EntryType.Register
+        Set GenerateQueries = GenerateInsertQueries(xEntryData)
+    Case EntryType.Update
+        Set GenerateQueries = GenerateUpdateQueries(xEntryData)
+    Case EntryType.Remove
+        Set GenerateQueries = GenerateDeleteQueries(xEntryData)
+    End Select
+End Function
+
+
+'====================================================================================================
+' Insertクエリリストを生成します
+'----------------------------------------------------------------------------------------------------
+' IN : xEntryData 投入データ
+' OUT: クエリリスト
+'====================================================================================================
+Public Function GenerateInsertQueries(xEntryData As EntryData) As Collection
+    Dim i As Long
+    Dim query As String
+    Dim queries As Collection
+
+    Set queries = New Collection
+    For i = 1 To xEntryData.RecordRange.Rows.Count
+        query = cstInsertQuery
+        query = Replace(query, "${tableName}", xEntryData.TableName)
+        query = Replace(query, "${columns}", "") 'GetColumnsPhrase(xEntryData.ColumnsDefinitions)
+        query = Replace(query, "${values}", "") 'GetValuesPhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        Call queries.Add(query)
+    Next
+    Set GenerateInsertQueries = queries
+End Function
+
+
+'====================================================================================================
+' Updateクエリリストを生成します
+'----------------------------------------------------------------------------------------------------
+' IN : xEntryData 投入データ
+' OUT: クエリリスト
+'====================================================================================================
+Public Function GenerateUpdateQueries(xEntryData As EntryData) As Collection
+    Dim i As Long
+    Dim query As String
+    Dim queries As Collection
+
+    Set queries = New Collection
+    For i = 1 To xEntryData.RecordRange.Rows.Count
+        query = cstUpdateQuery
+        query = Replace(query, "${tableName}", xEntryData.TableName)
+        query = Replace(query, "${set}", "") 'GetSetPhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        query = Replace(query, "${where}", "") 'GetWherePhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        Call queries.Add(query)
+    Next
+    Set GenerateUpdateQueries = queries
+End Function
+
+
+'====================================================================================================
+' Deleteクエリリストを生成します
+'----------------------------------------------------------------------------------------------------
+' IN : xEntryData 投入データ
+' OUT: クエリリスト
+'====================================================================================================
+Public Function GenerateDeleteQueries(xEntryData As EntryData) As Collection
+    Dim i As Long
+    Dim query As String
+    Dim queries As Collection
+
+    Set queries = New Collection
+    For i = 1 To xEntryData.RecordRange.Rows.Count
+        query = cstDeleteQuery
+        query = Replace(query, "${tableName}", xEntryData.TableName)
+        query = Replace(query, "${where}", "") 'GetWherePhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        Call queries.Add(query)
+    Next
+    Set GenerateDeleteQueries = Nothing
+End Function
 
