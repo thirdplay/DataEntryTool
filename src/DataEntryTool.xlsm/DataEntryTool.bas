@@ -69,6 +69,7 @@ Private Sub ExecuteEntryData(xEntryType As EntryType)
 On Error GoTo Finally
     Dim operationStr As String
     Dim control As DataEntryControl
+    Dim operationDic As Object
     Dim start As Single
     Dim finish As Single
     start = Timer
@@ -88,30 +89,28 @@ Finally:
     Application.ScreenUpdating = True
     Application.DisplayAlerts = True
     Set control = Nothing
-    operationStr = GetOperationStr(xEntryType)
+
+    Set operationDic = GetOperationDic
     If Err.Number <> 0 Then
-        MsgBox "データ" & operationStr & "に失敗しました" & vbNewLine & Err.Description
+        MsgBox "データ" & operationDic(xEntryType) & "に失敗しました" & vbNewLine & Err.Description
     Else
         Debug.Print "処理時間:" & (finish - start)
-        MsgBox "データ" & operationStr & "が完了しました" & ":" & (finish - start)
+        MsgBox "データ" & operationDic(xEntryType) & "が完了しました" & ":" & (finish - start)
     End If
 End Sub
 
 
 '====================================================================================================
-' 投入種類に対応する操作文字列を取得します
+' 投入種類に対応した投入文字列を格納する辞書を取得します
 '----------------------------------------------------------------------------------------------------
-' IN : xEntryType 投入種類
-' OUT: 操作文字列
+' OUT: 投入辞書
 '====================================================================================================
-Private Function GetOperationStr(xEntryType As EntryType)
-    Select Case xEntryType
-        Case EntryType.Register
-            GetOperationStr = "登録"
-        Case EntryType.Register
-            GetOperationStr = "更新"
-        Case EntryType.Register
-            GetOperationStr = "削除"
-    End Select
+Private Function GetOperationDic
+    Dim dic As Object
+    Set dic = CreateObject("Scripting.Dictionary")
+    Call dic.Add(EntryType.Register, "登録")
+    Call dic.Add(EntryType.Update, "更新")
+    Call dic.Add(EntryType.Remove, "削除")
+    Set GetOperationDic = dic
 End Function
 

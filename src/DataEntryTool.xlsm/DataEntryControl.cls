@@ -43,6 +43,7 @@ End Sub
 '====================================================================================================
 Public Property Let View(xView As DataEntryView)
     Set mView = xView
+    Call mView.Setup
 End Property
 
 
@@ -51,6 +52,7 @@ End Property
 '====================================================================================================
 Public Property Let Model(xModel As DataEntryModel)
     Set mModel = xModel
+    Call mModel.Setup
 End Property
 
 
@@ -58,13 +60,8 @@ End Property
 ' テーブルシートを作成します
 '====================================================================================================
 Public Sub CreateTableSheet()
-    Dim xSetting As Setting
     Dim tableSettings As Collection
     Dim tableDefinitions As Collection
-
-    ' 設定の取得＆モデルの構成
-    Set xSetting = mView.GetSetting
-    Call mModel.Setup(xSetting)
 
     ' テーブル設定リストの取得
     Debug.Print "DataEntryControl.CreateTableSheet:GetTableSettings"
@@ -86,15 +83,10 @@ End Sub
 ' IN : xEntryType 投入種類
 '====================================================================================================
 Public Sub EntryData(xEntryType As EntryType)
-    Dim xSetting As Setting
     Dim tableSettings As Collection
     Dim ts As TableSetting
     Dim ed As EntryData
     Dim count As Long
-
-    ' 設定の取得＆モデルの構成
-    Set xSetting = mView.GetSetting
-    Call mModel.Setup(xSetting)
 
     ' 処理件数のクリア
     Call mView.ClearProcessingCount

@@ -18,7 +18,6 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Dim mSetting As Setting                 ' データ投入ツールの設定
 Dim mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
 Dim mConnect As Object                  ' 接続オブジェクト
 
@@ -34,40 +33,34 @@ End Sub
 ' デストラクタ
 '====================================================================================================
 Private Sub Class_Terminate()
-    Set mSetting = Nothing
     Call Disconnect
 End Sub
 
 
 '====================================================================================================
 ' モデルを構成する
-'----------------------------------------------------------------------------------------------------
-' IN : xSetting 設定
 '====================================================================================================
-Public Sub Setup(xSetting As Setting)
-    Set mSetting = Setting
-    Call Connect(xSetting)
+Public Sub Setup
+    Call Connect
 End Sub
 
 
 '====================================================================================================
 ' DB接続
-'----------------------------------------------------------------------------------------------------
-' IN : xSetting 設定
 '====================================================================================================
-Public Sub Connect(xSetting As Setting)
+Public Sub Connect()
 On Error GoTo ErrHandler
     If mConnect Is Nothing Then
         ' データベースコアの生成
-        If xSetting.DatabaseType = cstDatabaseTypeOracle Then
+        If Setting.DatabaseType = cstDatabaseTypeOracle Then
             Set mDatabaseCore = New DatabaseCoreOracle
-        ElseIf xSetting.DatabaseType = cstDatabaseTypePostgreSQL Then
+        ElseIf Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
             Set mDatabaseCore = New DatabaseCorePostgreSql
         End If
 
         ' データベース接続
         Set mConnect = CreateObject("ADODB.Connection")
-        mConnect.Open mDatabaseCore.GetConnectStr(xSetting)
+        mConnect.Open mDatabaseCore.GetConnectStr
         Exit Sub
     End If
 ErrHandler:

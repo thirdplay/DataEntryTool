@@ -30,11 +30,11 @@ Private Const cstColumnDefinitionQuery As String = "SELECT utc.column_id, utc.co
 ' IN : xSetting ê›íË
 ' OUT: ê⁄ë±ï∂éöóÒ
 '====================================================================================================
-Public Function IDatabaseCore_GetConnectStr(xSetting As Setting) As String
+Public Function IDatabaseCore_GetConnectStr As String
     IDatabaseCore_GetConnectStr = "Driver={Microsoft ODBC for Oracle};" _
-        & "Server=" & xSetting.ServerName & ";" _
-        & "UID=" & xSetting.UserId & ";" _
-        & "PWD=" & xSetting.Password & ";"
+        & "Server=" & Setting.ServerName & ";" _
+        & "UID=" & Setting.UserId & ";" _
+        & "PWD=" & Setting.Password & ";"
 End Function
 
 

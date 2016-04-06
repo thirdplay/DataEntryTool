@@ -29,16 +29,15 @@ Private Const cstColumnDefinitionQuery As String = _
 '====================================================================================================
 ' データベースの接続文字列を取得します
 '----------------------------------------------------------------------------------------------------
-' IN : xSetting 設定
 ' OUT: 接続文字列
 '====================================================================================================
-Public Function IDatabaseCore_GetConnectStr(xSetting As Setting) As String
+Public Function IDatabaseCore_GetConnectStr As String
     IDatabaseCore_GetConnectStr = "Driver={PostgreSQL Unicode};" _
-        & "SERVER=" & xSetting.ServerName & ";" _
-        & "DATABASE=" & xSetting.DatabaseName & ";" _
-        & "UID=" & xSetting.UserId & ";" _
-        & "PWD=" & xSetting.Password & ";" _
-        & "PORT=" & xSetting.Port & ";"
+        & "SERVER=" & Setting.ServerName & ";" _
+        & "DATABASE=" & Setting.DatabaseName & ";" _
+        & "UID=" & Setting.UserId & ";" _
+        & "PWD=" & Setting.Password & ";" _
+        & "PORT=" & Setting.Port & ";"
 End Function
 
 
@@ -58,8 +57,7 @@ End Function
 ' IN : dataType データ種別
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeString(dataType As String) As Boolean
-    dataType = UCase(dataType)
-    If InStr(dataType, "CHAR") OR dataType = "TEXT" Then
+    If InStr(UCase(dataType), "CHAR") OR UCase(dataType) = "TEXT" Then
         IDatabaseCore_IsDataTypeString = True
     Else
         IDatabaseCore_IsDataTypeString = False

@@ -47,12 +47,6 @@ Private Const cstTableRecordBase = ColumnDefinitionRow.Max + 1
 
 
 '====================================================================================================
-' メンバ変数
-'====================================================================================================
-Private mSetting As Setting     ' データ投入ツールの設定
-
-
-'====================================================================================================
 ' コンストラクタ
 '====================================================================================================
 Private Sub Class_Initialize()
@@ -63,43 +57,37 @@ End Sub
 ' デストラクタ
 '====================================================================================================
 Private Sub Class_Terminate()
-    Set mSetting = Nothing
 End Sub
 
 
 '====================================================================================================
-' 設定を返却します
-'----------------------------------------------------------------------------------------------------
-' OUT: 設定
+' ビューを構成する
 '====================================================================================================
-Public Function GetSetting() As Setting
-    If mSetting Is Nothing Then
-        Set mSetting = New Setting
-        With ThisWorkbook.Worksheets(cstSheetMain)
-            mSetting.DatabaseType = .Range(cstDatabaseType).Value
-            mSetting.ServerName = .Range(cstServerName).Value
-            mSetting.Port = .Range(cstPort).Value
-            mSetting.DatabaseName = .Range(cstDatabaseName).Value
-            mSetting.UserId = .Range(cstUserId).Value
-            mSetting.Password = .Range(cstPassword).Value
-            mSetting.LinefeedCode = .Range(cstLinefeedCode).Value
-            mSetting.DateFormat = .Range(cstDateFormat).Value
-        End With
+Public Sub Setup()
+    ' 設定をモジュールに反映する
+    With ThisWorkbook.Worksheets(cstSheetMain)
+        Setting.DatabaseType = .Range(cstDatabaseType).Value
+        Setting.ServerName = .Range(cstServerName).Value
+        Setting.Port = .Range(cstPort).Value
+        Setting.DatabaseName = .Range(cstDatabaseName).Value
+        Setting.UserId = .Range(cstUserId).Value
+        Setting.Password = .Range(cstPassword).Value
+        Setting.LinefeedCode = .Range(cstLinefeedCode).Value
+        Setting.DateFormat = .Range(cstDateFormat).Value
+    End With
 
-        ' 入力チェック
-        Call CheckInputValue(mSetting.DatabaseType, "データベース種類")
-        Call CheckInputValue(mSetting.ServerName, "サーバ名")
-        If mSetting.DatabaseType = cstDatabaseTypePostgreSQL Then
-            Call CheckInputValue(mSetting.Port, "ポート")
-            Call CheckInputValue(mSetting.DatabaseName, "データベース名")
-        End If
-        Call CheckInputValue(mSetting.UserId, "ユーザID")
-        Call CheckInputValue(mSetting.Password, "パスワード")
-        Call CheckInputValue(mSetting.LinefeedCode, "改行コード")
-        Call CheckInputValue(mSetting.DateFormat, "日付書式")
+    ' 入力チェック
+    Call CheckInputValue(Setting.DatabaseType, "データベース種類")
+    Call CheckInputValue(Setting.ServerName, "サーバ名")
+    If Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
+        Call CheckInputValue(Setting.Port, "ポート")
+        Call CheckInputValue(Setting.DatabaseName, "データベース名")
     End If
-    Set GetSetting = mSetting
-End Function
+    Call CheckInputValue(Setting.UserId, "ユーザID")
+    Call CheckInputValue(Setting.Password, "パスワード")
+    Call CheckInputValue(Setting.LinefeedCode, "改行コード")
+    Call CheckInputValue(Setting.DateFormat, "日付書式")
+End Sub
 
 
 '====================================================================================================

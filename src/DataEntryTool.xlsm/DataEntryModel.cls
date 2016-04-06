@@ -38,12 +38,10 @@ End Sub
 
 '====================================================================================================
 ' ƒ‚ƒfƒ‹‚ğ\¬‚µ‚Ü‚·
-'----------------------------------------------------------------------------------------------------
-' IN : xSetting İ’è
 '====================================================================================================
-Public Sub Setup(xSetting As Setting)
+Public Sub Setup()
     Set mDatabaseModel = New DatabaseModel
-    Call mDatabaseModel.Connect(xSetting)
+    Call mDatabaseModel.Connect
 End Sub
 
 
