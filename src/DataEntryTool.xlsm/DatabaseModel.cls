@@ -194,8 +194,8 @@ Public Function GenerateInsertQueries(xEntryData As EntryData) As Collection
     For i = 1 To xEntryData.RecordRange.Rows.Count
         query = cstInsertQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
-        query = Replace(query, "${columns}", "") 'GetColumnsPhrase(xEntryData.ColumnsDefinitions)
-        query = Replace(query, "${values}", "") 'GetValuesPhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        query = Replace(query, "${columns}", GetColumnPhrase(xEntryData.ColumnDefinitions))
+        query = Replace(query, "${values}", GetValuePhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
         Call queries.Add(query)
     Next
     Set GenerateInsertQueries = queries
@@ -246,3 +246,64 @@ Public Function GenerateDeleteQueries(xEntryData As EntryData) As Collection
     Set GenerateDeleteQueries = Nothing
 End Function
 
+
+'====================================================================================================
+' Insert文のColumn句を取得します
+'----------------------------------------------------------------------------------------------------
+' IN : xColumnDefinitions カラム定義リスト
+' OUT: Column句
+'====================================================================================================
+Private Function GetColumnPhrase(xColumnDefinitions As Collection) As String
+    Dim result As String
+    Dim cd As ColumnDefinition
+
+    For Each cd In xColumnDefinitions
+        result = result + cd.ColumnName + ","
+    Next
+    GetColumnPhrase = Left(result, Len(result) - 1)
+End Function
+
+
+'====================================================================================================
+' Insert文のValue句を取得します
+'----------------------------------------------------------------------------------------------------
+' IN : record レコード
+' OUT: Value句
+'====================================================================================================
+Private Function GetValuePhrase(xColumnDefinitions As Collection, record As Range) As String
+    Dim result As String
+    Dim i As Long
+    Dim cd As ColumnDefinition
+
+    For i = 1 To record.Columns.Count
+        result = result + GetItemValue(record.Cells(1, i), xColumnDefinitions(i).DataType) + ","
+    Next
+    GetValuePhrase = Left(result, Len(result) - 1)
+End Function
+
+
+'====================================================================================================
+' データ型に対応したデータ値の項目値を取得します
+'----------------------------------------------------------------------------------------------------
+' IN : dataValue データ値
+'    : dataType データ型
+' OUT: Value句
+'====================================================================================================
+Private Function GetItemValue(ByVal dataValue As String, ByVal dataType As String) As String
+    Dim itemValue As String
+
+    If dataValue = "" Then
+        itemValue = "NULL"
+    ' 文字列
+    ElseIf mDatabaseCore.IsDataTypeString(dataType) Then
+        itemValue = Replace(dataValue, "'", "''")
+        itemValue = "'" & itemValue & "'"
+    ' 日付
+    ElseIf mDatabaseCore.IsDataTypeDate(dataType) Then
+        itemValue = "TO_DATE(" & dataValue & "," & Setting.DateFormat & ")"
+    ' その他
+    Else
+        itemValue = dataValue
+    End If
+    GetItemValue = itemValue
+End Function
