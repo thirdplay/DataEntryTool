@@ -1,6 +1,6 @@
 Attribute VB_Name = "DataEntryTool"
 Option Explicit
-
+Option Private Module
 
 '====================================================================================================
 ' テーブルシートを作成します

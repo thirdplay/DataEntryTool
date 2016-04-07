@@ -1,5 +1,6 @@
 Attribute VB_Name = "Constant"
 Option Explicit
+Option Private Module
 
 '====================================================================================================
 '

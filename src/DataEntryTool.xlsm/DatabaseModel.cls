@@ -21,9 +21,9 @@ Option Explicit
 ' Insertクエリ
 Private Const cstInsertQuery = "INSERT INTO ${tableName} (${columns}) VALUES (${values})"
 ' Updateクエリ
-Private Const cstInsertQuery = "UPDATE ${tableName} SET (${set}) WHERE (${where})"
+Private Const cstUpdateQuery = "UPDATE ${tableName} SET (${set}) WHERE (${where})"
 ' Deleteクエリ
-Private Const cstInsertQuery = "DELETE FROM ${tableName} WHERE (${where})"
+Private Const cstDeleteQuery = "DELETE FROM ${tableName} WHERE (${where})"
 
 
 '====================================================================================================
