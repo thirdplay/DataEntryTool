@@ -57,7 +57,7 @@ End Function
 Public Function IDatabaseCore_IsDataTypeString(ByVal dataType As String) As Boolean
     If InStr(UCase(dataType), "CHAR") Then
         IDatabaseCore_IsDataTypeString = True
-        End Function
+        Exit Function
     End If
     IDatabaseCore_IsDataTypeString = False
 End Function
@@ -73,7 +73,7 @@ Public Function IDatabaseCore_IsDataTypeDate(ByVal dataType As String) As Boolea
     dataType = UCase(dataType)
     If InStr(dataType, "TIMESTAMP") OR dataType = "DATE" Then
         IDatabaseCore_IsDataTypeDate = True
-        End Function
+        Exit Function
     End If
     IDatabaseCore_IsDataTypeDate = False
 End Function

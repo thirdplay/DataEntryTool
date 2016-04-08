@@ -21,9 +21,15 @@ Option Explicit
 ' Insertクエリ
 Private Const cstInsertQuery = "INSERT INTO ${tableName} (${columns}) VALUES (${values})"
 ' Updateクエリ
-Private Const cstUpdateQuery = "UPDATE ${tableName} SET (${set}) WHERE (${where})"
+Private Const cstUpdateQuery = "UPDATE ${tableName} SET ${set} WHERE ${where}"
 ' Deleteクエリ
-Private Const cstDeleteQuery = "DELETE FROM ${tableName} WHERE (${where})"
+Private Const cstDeleteQuery = "DELETE FROM ${tableName} WHERE ${where}"
+' 等価比較条件
+Private Const cstEqualComparisonCriteria = "${column} = ${value}"
+' 区切り文字
+Private Const cstDelimiter = ","
+' Where句の区切り文字
+Private Const cstWherePhraseDelimiter = " AND "
 
 
 '====================================================================================================
@@ -124,7 +130,11 @@ End Sub
 ' OUT: 処理件数
 '====================================================================================================
 Public Function ExecuteQuery(query As String) As Long
-    ExecuteQuery = 0
+    Dim procCnt As Long
+
+    Debug.Print query
+    Call mConnect.Execute(CommandText:=query, RecordsAffected:=procCnt)
+    ExecuteQuery = procCnt
 End Function
 
 
@@ -217,8 +227,8 @@ Public Function GenerateUpdateQueries(xEntryData As EntryData) As Collection
     For i = 1 To xEntryData.RecordRange.Rows.Count
         query = cstUpdateQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
-        query = Replace(query, "${set}", "") 'GetSetPhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
-        query = Replace(query, "${where}", "") 'GetWherePhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        query = Replace(query, "${set}", GetSetPhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
+        query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
         Call queries.Add(query)
     Next
     Set GenerateUpdateQueries = queries
@@ -240,10 +250,10 @@ Public Function GenerateDeleteQueries(xEntryData As EntryData) As Collection
     For i = 1 To xEntryData.RecordRange.Rows.Count
         query = cstDeleteQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
-        query = Replace(query, "${where}", "") 'GetWherePhrase(xEntryData.ColumnsDefinitions, xEntryData.RecordRange.Rows(i))
+        query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
         Call queries.Add(query)
     Next
-    Set GenerateDeleteQueries = Nothing
+    Set GenerateDeleteQueries = queries
 End Function
 
 
@@ -258,27 +268,73 @@ Private Function GetColumnPhrase(xColumnDefinitions As Collection) As String
     Dim cd As ColumnDefinition
 
     For Each cd In xColumnDefinitions
-        result = result + cd.ColumnName + ","
+        result = result & cd.ColumnName & cstDelimiter
     Next
-    GetColumnPhrase = Left(result, Len(result) - 1)
+    GetColumnPhrase = Left(result, Len(result) - Len(cstDelimiter))
 End Function
 
 
 '====================================================================================================
 ' Insert文のValue句を取得します
 '----------------------------------------------------------------------------------------------------
-' IN : record レコード
+' IN : cd カラム定義リスト
+'    : record レコード
 ' OUT: Value句
 '====================================================================================================
-Private Function GetValuePhrase(xColumnDefinitions As Collection, record As Range) As String
+Private Function GetValuePhrase(cd As Collection, record As Range) As String
     Dim result As String
     Dim i As Long
-    Dim cd As ColumnDefinition
 
     For i = 1 To record.Columns.Count
-        result = result + GetItemValue(record.Cells(1, i), xColumnDefinitions(i).DataType) + ","
+        result = result & GetItemValue(record.Cells(1, i), cd(i).DataType) & cstDelimiter
     Next
-    GetValuePhrase = Left(result, Len(result) - 1)
+    GetValuePhrase = Left(result, Len(result) - Len(cstDelimiter))
+End Function
+
+
+'====================================================================================================
+' Update文のSet句を取得します
+'----------------------------------------------------------------------------------------------------
+' IN : cd カラム定義リスト
+'    : record レコード
+' OUT: Set句
+'====================================================================================================
+Private Function GetSetPhrase(cd As Collection, record As Range) As String
+    Dim result As String
+    Dim i As Long
+
+    For i = 1 To record.Columns.Count
+        If cd(i).IsPrimaryKey = "" Then
+            result = result & cstEqualComparisonCriteria
+            result = Replace(result, "${column}", cd(i).ColumnName)
+            result = Replace(result, "${value}", GetItemValue(record.Cells(1, i), cd(i).DataType))
+            result = result & cstDelimiter
+        End If
+    Next
+    GetSetPhrase = Left(result, Len(result) - Len(cstDelimiter))
+End Function
+
+
+'====================================================================================================
+' Where句を取得します
+'----------------------------------------------------------------------------------------------------
+' IN : cd カラム定義リスト
+'    : record レコード
+' OUT: Value句
+'====================================================================================================
+Private Function GetWherePhrase(cd As Collection, record As Range) As String
+    Dim result As String
+    Dim i As Long
+
+    For i = 1 To record.Columns.Count
+        If cd(i).IsPrimaryKey <> "" Then
+            result = result & cstEqualComparisonCriteria
+            result = Replace(result, "${column}", cd(i).ColumnName)
+            result = Replace(result, "${value}", GetItemValue(record.Cells(1, i), cd(i).DataType))
+            result = result & cstWherePhraseDelimiter
+        End If
+    Next
+    GetWherePhrase = Left(result, Len(result) - Len(cstWherePhraseDelimiter))
 End Function
 
 
@@ -292,18 +348,17 @@ End Function
 Private Function GetItemValue(ByVal dataValue As String, ByVal dataType As String) As String
     Dim itemValue As String
 
-    If dataValue = "" Then
+    itemValue = dataValue
+    If itemValue = "" Then
         itemValue = "NULL"
     ' 文字列
     ElseIf mDatabaseCore.IsDataTypeString(dataType) Then
-        itemValue = Replace(dataValue, "'", "''")
-        itemValue = "'" & itemValue & "'"
+        itemValue = Replace(itemValue, "'", "''")                                   ' 単一引用符エスケープ
+        itemValue = Replace(itemValue, vbLf, "'" & Setting.LinefeedCode & "'")      ' 改行コード変換
+        itemValue = "'" & itemValue & "'"                                           ' 単一引用符付与
     ' 日付
     ElseIf mDatabaseCore.IsDataTypeDate(dataType) Then
-        itemValue = "TO_DATE(" & dataValue & "," & Setting.DateFormat & ")"
-    ' その他
-    Else
-        itemValue = dataValue
+        itemValue = "TO_DATE('" & itemValue & "','" & Setting.DateFormat & "')"
     End If
     GetItemValue = itemValue
 End Function

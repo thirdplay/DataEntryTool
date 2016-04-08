@@ -211,11 +211,10 @@ End Sub
 Public Function GetEntryData(xEntryType As EntryType, tableName As String) As EntryData
     Dim ed As EntryData
     Dim cd As ColumnDefinition
-    Dim colIndex As Long
     Dim rowIndex As Long
     Dim dataCount As Long
+    Dim columnRange As Range
     Dim i As Long
-    Dim rs As Collection
 
     With ThisWorkbook.Worksheets(tableName)
         Set ed = New EntryData
@@ -224,18 +223,18 @@ Public Function GetEntryData(xEntryType As EntryType, tableName As String) As En
 
         ' カラム定義リストの作成
         ed.ColumnDefinitions = New Collection
-        colIndex = 1
-        Do While .Cells(ColumnDefinitionRow.ColumnName, colIndex).Value <> ""
+        dataCount = GetColDataCount(tableName, ColumnDefinitionRow.ColumnName, 1)
+        Set columnRange = .Range(.Cells(1, 1), .Cells(ColumnDefinitionRow.Max, dataCount))
+        For i = 1 To columnRange.Columns.Count
             Set cd = New ColumnDefinition
-            cd.ColumnName = .Cells(ColumnDefinitionRow.ColumnName, colIndex).Value
-            cd.DataType = .Cells(ColumnDefinitionRow.DataType, colIndex).Value
-            cd.IsPrimaryKey = .Cells(ColumnDefinitionRow.IsPrimaryKey, colIndex).Value
+            cd.ColumnName = columnRange.Cells(ColumnDefinitionRow.ColumnName, i)
+            cd.DataType = columnRange.Cells(ColumnDefinitionRow.DataType, i)
+            cd.IsPrimaryKey = columnRange.Cells(ColumnDefinitionRow.IsPrimaryKey, i)
             Call ed.ColumnDefinitions.Add(cd)
-            colIndex = colIndex + 1
-        Loop
+        Next
 
         ' レコード範囲の設定
-        dataCount = GetColDataCount(tableName, cstTableRecordBase, 1)
+        dataCount = GetRowDataCount(tableName, cstTableRecordBase, 1)
         ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount - 1, ed.ColumnDefinitions.Count))
 
         Set GetEntryData = ed
@@ -253,7 +252,7 @@ Public Sub ClearProcessingCount
     With ThisWorkbook.Worksheets(cstSheetMain)
         ' テーブル設定数の取得
         baseRowIndex = .Range(cstTableBase).Row + 1
-        dataCount = GetColDataCount(cstSheetMain, baseRowIndex, TableSettingCol.PhysicsName)
+        dataCount = GetRowDataCount(cstSheetMain, baseRowIndex, TableSettingCol.PhysicsName)
 
         ' 処理件数のクリア
         Call .Range(.Cells(baseRowIndex, TableSettingCol.ProcessCount), .Cells(baseRowIndex + dataCount, TableSettingCol.ProcessCount)).ClearContents
@@ -313,12 +312,33 @@ End Function
 '    : colIndex 列インデックス
 ' OUT: データ数
 '====================================================================================================
-Private Function GetColDataCount(sheetName As String, rowIndex As Long, colIndex As Long) As Long
+Private Function GetRowDataCount(sheetName As String, rowIndex As Long, colIndex As Long) As Long
     Dim count As Long
 
     count = 0
     With ThisWorkbook.Worksheets(sheetName)
         Do While .Cells(rowIndex + count, colIndex).Value <> ""
+            count = count + 1
+        Loop
+    End With
+    GetRowDataCount = count
+End Function
+
+
+'====================================================================================================
+' 列データ数を取得する
+'----------------------------------------------------------------------------------------------------
+' IN : sheetName シート名
+'    : rowIndex 行インデックス
+'    : colIndex 列インデックス
+' OUT: データ数
+'====================================================================================================
+Private Function GetColDataCount(sheetName As String, rowIndex As Long, colIndex As Long) As Long
+    Dim count As Long
+
+    count = 0
+    With ThisWorkbook.Worksheets(sheetName)
+        Do While .Cells(rowIndex, colIndex + count).Value <> ""
             count = count + 1
         Loop
     End With

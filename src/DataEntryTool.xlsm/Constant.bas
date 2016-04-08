@@ -22,6 +22,10 @@ Public Const cstTableBase = "TableBase"                     ' テーブル一覧の基準
 Public Const cstDatabaseTypeOracle = "Oracle"               ' Oracle
 Public Const cstDatabaseTypePostgreSQL = "PostgreSQL"       ' PostgreSQL
 
+' 改行コード
+Public Const cstLinefeedCodeCRLF = "CRLF"                   ' CRLF
+Public Const cstLinefeedCodeLF = "LF"                       ' LF
+
 ' 投入種類
 Public Enum EntryType
     Register = 0        ' 登録

@@ -91,7 +91,12 @@ End Property
 ' 改行コードの取得/設定
 '====================================================================================================
 Public Property Get LinefeedCode() As String
-    LinefeedCode = mLinefeedCode
+    Dim result As String
+    result = "|| CHR(10) ||"
+    If mLinefeedCode = cstLinefeedCodeCRLF Then
+        result = "|| CHR(13) " & result
+    End If
+    LinefeedCode = result
 End Property
 Public Property Let LinefeedCode(LinefeedCode As String)
     mLinefeedCode = LinefeedCode

@@ -81,8 +81,8 @@ Public Function ExecuteDataEntry(xEntryData As EntryData) As Long
 On Error GoTo ErrHandler
     Dim i As Long
     Dim queries As Collection
-    Dim execCnt As Long
-    execCnt = 0
+    Dim procCnt As Long
+    procCnt = 0
 
     ' トランザクション開始
     Call mDatabaseModel.BeginTrans
@@ -92,14 +92,13 @@ On Error GoTo ErrHandler
 
     ' クエリ実行
     For i = 1 To queries.Count
-        Debug.Print queries(i)
-        'execCnt = execCnt + mDatabaseModel.ExecuteQuery(query)
+        procCnt = procCnt + mDatabaseModel.ExecuteQuery(queries(i))
     Next
 
     ' コミット
     Call mDatabaseModel.CommitTrans
 
-    ExecuteDataEntry = execCnt
+    ExecuteDataEntry = procCnt
     Exit Function
 ErrHandler:
     ' ロールバック
