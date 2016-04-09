@@ -19,7 +19,7 @@ Dim mDatabaseModel As DatabaseModel     ' データベースモデル
 '====================================================================================================
 Public Function Create() As Object
     If mDatabaseModel Is Nothing Then
-        Set mDatabaseModel = new DatabaseModel
+        Set mDatabaseModel = New DatabaseModel
     End If
     Set Create = mDatabaseModel
 End Function
