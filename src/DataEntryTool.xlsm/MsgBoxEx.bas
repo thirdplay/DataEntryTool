@@ -14,7 +14,7 @@ Option Private Module
 ' IN : message メッセージ
 '    : detailMessage 詳細メッセージ
 '====================================================================================================
-Public Sub Warning(ByVal message As String, ByVal Optional detailMessage As String = "")
+Public Sub Warning(ByVal message As String, Optional ByVal detailMessage As String = "")
     If detailMessage <> "" Then
         message = message & vbNewLine & vbNewLine & detailMessage
     End If
