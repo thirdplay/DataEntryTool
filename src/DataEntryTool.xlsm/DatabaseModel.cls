@@ -117,17 +117,17 @@ End Function
 '====================================================================================================
 ' 指定されたテーブルのカラム定義リストを取得します
 '----------------------------------------------------------------------------------------------------
-' IN : tableName テーブル名
+' IN : xTableName テーブル名
 ' OUT: カラム定義リスト
 '====================================================================================================
-Public Function GetColumnDefinitions(tableName As String) As Collection
+Public Function GetColumnDefinitions(xTableName As String) As Collection
     Dim recordSet As Object
     Dim query As String
     Dim cd As ColumnDefinition
     Dim list As Collection
     Set list = New Collection
 
-    query = Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", tableName)
+    query = Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", xTableName)
     Set recordSet = mConnect.Execute(query)
     Do Until recordSet.EOF
         Set cd = New ColumnDefinition

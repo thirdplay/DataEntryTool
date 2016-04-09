@@ -12,10 +12,10 @@ Option Private Module
 ' 投入データを取得します
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryType 投入種類
-'    : tableName テーブル名
+'    : xTableName テーブル名
 ' OUT: 投入データ
 '====================================================================================================
-Public Function GetEntryData(xEntryType As EntryType, tableName As String) As EntryData
+Public Function GetEntryData(xEntryType As EntryType, xTableName As String) As EntryData
     Dim ed As EntryData
     Dim cd As ColumnDefinition
     Dim rowIndex As Long
@@ -23,14 +23,14 @@ Public Function GetEntryData(xEntryType As EntryType, tableName As String) As En
     Dim columnRange As Range
     Dim i As Long
 
-    With ThisWorkbook.Worksheets(tableName)
+    With ThisWorkbook.Worksheets(xTableName)
         Set ed = New EntryData
         ed.EntryType = xEntryType
-        ed.TableName = tableName
+        ed.TableName = xTableName
 
         ' カラム定義リストの作成
         ed.ColumnDefinitions = New Collection
-        dataCount = WorkSheetEx.GetColDataCount(tableName, ColumnDefinitionRow.ColumnName, 1)
+        dataCount = WorkSheetEx.GetColDataCount(xTableName, ColumnDefinitionRow.ColumnName, 1)
         Set columnRange = .Range(.Cells(1, 1), .Cells(ColumnDefinitionRow.Max, dataCount))
         For i = 1 To columnRange.Columns.Count
             Set cd = New ColumnDefinition
@@ -41,7 +41,7 @@ Public Function GetEntryData(xEntryType As EntryType, tableName As String) As En
         Next
 
         ' レコード範囲の設定
-        dataCount = WorkSheetEx.GetRowDataCount(tableName, cstTableRecordBase, 1)
+        dataCount = WorkSheetEx.GetRowDataCount(xTableName, cstTableRecordBase, 1)
         ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount - 1, ed.ColumnDefinitions.Count))
 
         Set GetEntryData = ed

@@ -18,7 +18,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Collection
     Dim rowIndex As Long
     Dim ts As TableSetting
     Dim isTarget As Boolean
-    Dim tableName As String
+    Dim xTableName As String
     Dim list As Collection
     Set list = New Collection
 
@@ -26,14 +26,14 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Collection
         rowIndex = .Range(cstTableBase).Row + 1
         Do While .Cells(rowIndex, TableSettingCol.PhysicsName).Value <> ""
             ' 投入対象フラグがtrueの場合、投入対象外のテーブルは処理しない
-            tableName = .Cells(rowIndex, TableSettingCol.PhysicsName).Value
+            xTableName = .Cells(rowIndex, TableSettingCol.PhysicsName).Value
             isTarget = True
             If isEntryTarget Then
                 If .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value = "" Then
                     isTarget = False
-                ElseIf Not WorkBookEx.ExistsSheet(tableName) Then
+                ElseIf Not WorkBookEx.ExistsSheet(xTableName) Then
                     isTarget = False
-                ElseIf ThisWorkbook.Worksheets(tableName).Cells(cstTableRecordBase, 1).Value = "" Then
+                ElseIf ThisWorkbook.Worksheets(xTableName).Cells(cstTableRecordBase, 1).Value = "" Then
                     isTarget = False
                 End If
             End If
