@@ -97,7 +97,7 @@ End Sub
 '----------------------------------------------------------------------------------------------------
 ' OUT: “Š“ü«‘
 '====================================================================================================
-Private Function GetOperationDic
+Private Function GetOperationDic()
     Dim dic As Object
     Set dic = CreateObject("Scripting.Dictionary")
     Call dic.Add(EntryType.Register, "“o˜^")
