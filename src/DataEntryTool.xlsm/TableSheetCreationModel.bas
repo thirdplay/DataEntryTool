@@ -1,55 +1,12 @@
-Attribute VB_Name = "TableSheetCreation"
+Attribute VB_Name = "TableSheetCreationModel"
 Option Explicit
 Option Private Module
 
 '====================================================================================================
 '
-' テーブルシート作成モジュール
+' テーブルシート作成モデルのモジュール
 '
 '====================================================================================================
-
-'====================================================================================================
-' テーブルシート作成の実行
-'====================================================================================================
-Public Sub Execute()
-On Error GoTo Finally
-    Dim tableSettings As Object
-    Dim tableDefinitions As Collection
-
-    ' 画面描画の抑制
-    Call ApplicationEx.SuppressScreenDrawing(True)
-    ' 設定モジュールの構成
-    Call Setting.Setup
-    If Not Setting.CheckDbSetting() Then
-        Exit Sub
-    End If
-
-    ' テーブル設定リストの取得
-    Set tableSettings = TableSettingModel.GetTableSettings(False)
-    If tableSettings.Count = 0 Then
-        MsgBoxEx.Warning "作成対象のテーブルがありません。", "テーブル一覧にテーブル物理名を入力してください。"
-        Exit Sub
-    End If
-
-    ' テーブル設定リストを元に、テーブル定義リストを取得
-    Set tableDefinitions = TableSheetCreationModel.GetTableDefinitions(tableSettings)
-    ' テーブル定義リストを元に、テーブルシートを作成する
-    Call TableSheetCreationModel.CreateTableSheet(tableDefinitions)
-    ' テーブル設定にハイパーリンクを設定する
-    Call TableSettingModel.SetHyperlink(tableSettings)
-
-Finally:
-    ' 画面描画の抑制解除
-    Call ApplicationEx.SuppressScreenDrawing(False)
-
-    ' 実行結果の表示
-    If Err.Number <> 0 Then
-        MsgBoxEx.Error "テーブルシートの作成に失敗しました", Err.Description
-    Else
-        MsgBox "テーブルシートの作成が完了しました"
-    End If
-End Sub
-
 
 '====================================================================================================
 ' テーブル設定リストのテーブル情報をDBから取得し、返却します
@@ -57,7 +14,7 @@ End Sub
 ' IN : tableSettings テーブル設定リスト
 ' OUT: テーブル定義リスト
 '====================================================================================================
-Private Function GetTableDefinitions(tableSettings As Object) As Collection
+Public Function GetTableDefinitions(tableSettings As Object) As Collection
     Dim ts As TableSetting
     Dim td As TableDefinition
     Dim list As Collection
@@ -86,7 +43,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' IN : tableDefinitions テーブル定義リスト
 '====================================================================================================
-Private Sub CreateTableSheet(tableDefinitions As Collection)
+Public Sub CreateTableSheet(tableDefinitions As Collection)
 On Error GoTo Finally
     Dim td As TableDefinition
     Dim cd As ColumnDefinition

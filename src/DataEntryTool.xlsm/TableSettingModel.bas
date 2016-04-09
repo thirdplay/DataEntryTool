@@ -9,9 +9,9 @@ Option Private Module
 '====================================================================================================
 
 '====================================================================================================
-' データ投入対象のテーブル設定リストを返却します
+' テーブル設定リストを返却します
 '----------------------------------------------------------------------------------------------------
-' IN : isEntryTarget 投入対象フラグ(True:対象のみ,False:全て)
+' IN : isEntryTarget 投入対象フラグ(True:投入対象のみ,False:全て)
 ' OUT: テーブル設定リスト
 '====================================================================================================
 Public Function GetTableSettings(isEntryTarget As Boolean) As Object
@@ -62,4 +62,23 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
     Set GetTableSettings = dic
 End Function
 
+
+'====================================================================================================
+' テーブル設定にハイパーリンクを設定します
+'----------------------------------------------------------------------------------------------------
+' IN : tablSeetings テーブル設定リスト
+'====================================================================================================
+Public Sub SetHyperlink(tableSettings As Object)
+    Dim xKey As Variant
+    Dim ts As TableSetting
+
+    With ThisWorkbook.Worksheets(cstSheetMain)
+        For Each xKey In tableSettings
+            Set ts = tableSettings(xKey)
+            If .Cells(ts.Row, TableSettingCol.LogicalName) <> "" Then
+                Call .Hyperlinks.Add(Anchor:=.Cells(ts.Row, TableSettingCol.LogicalName), Address:="#" & ts.PhysicsName & "!A1")
+            End If
+        Next
+    End With
+End Sub
 
