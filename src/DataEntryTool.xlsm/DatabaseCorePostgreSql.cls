@@ -74,11 +74,27 @@ End Function
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeDate(ByVal xDataType As String) As Boolean
     xDataType = UCase(xDataType)
-    If InStr(xDataType, "TIMESTAMP") Or xDataType = "DATE" Then
+    If xDataType = "DATE" Then
         IDatabaseCore_IsDataTypeDate = True
         Exit Function
     End If
     IDatabaseCore_IsDataTypeDate = False
+End Function
+
+
+'====================================================================================================
+' データ型がタイムスタンプかどうか判定する
+'----------------------------------------------------------------------------------------------------
+' IN : xDataType データ型
+' OUT: True:タイムスタンプ、False:タイムスタンプ以外
+'====================================================================================================
+Public Function IDatabaseCore_IsDataTypeTimestamp(ByVal xDataType As String) As Boolean
+    xDataType = UCase(xDataType)
+    If InStr(xDataType, "TIMESTAMP") Then
+        IDatabaseCore_IsDataTypeTimestamp = True
+        Exit Function
+    End If
+    IDatabaseCore_IsDataTypeTimestamp = False
 End Function
 
 

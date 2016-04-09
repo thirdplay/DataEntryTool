@@ -257,6 +257,9 @@ Private Function GetItemValue(ByVal dataValue As String, ByVal xDataType As Stri
     ' 日付
     ElseIf mDatabaseModel.IsDataTypeDate(xDataType) Then
         itemValue = "TO_DATE('" & itemValue & "','" & Setting.DateFormat & "')"
+    ' タイムスタンプ
+    ElseIf mDatabaseModel.IsDataTypeTimestamp(xDataType) Then
+        itemValue = "TO_TIMESTAMP('" & itemValue & "','" & Setting.TimestampFormat & "')"
     End If
     GetItemValue = itemValue
 End Function
