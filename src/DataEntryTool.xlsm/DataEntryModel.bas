@@ -240,22 +240,22 @@ End Function
 ' データ型に対応したデータ値の項目値を取得します
 '----------------------------------------------------------------------------------------------------
 ' IN : dataValue データ値
-'    : dataType データ型
+'    : xDataType データ型
 ' OUT: Value句
 '====================================================================================================
-Private Function GetItemValue(ByVal dataValue As String, ByVal dataType As String) As String
+Private Function GetItemValue(ByVal dataValue As String, ByVal xDataType As String) As String
     Dim itemValue As String
 
     itemValue = dataValue
     If itemValue = "" Then
         itemValue = "NULL"
     ' 文字列
-    ElseIf mDatabaseModel.IsDataTypeString(dataType) Then
+    ElseIf mDatabaseModel.IsDataTypeString(xDataType) Then
         itemValue = Replace(itemValue, "'", "''")                                   ' 単一引用符エスケープ
         itemValue = Replace(itemValue, vbLf, "'" & Setting.LinefeedCode & "'")      ' 改行コード変換
         itemValue = "'" & itemValue & "'"                                           ' 単一引用符付与
     ' 日付
-    ElseIf mDatabaseModel.IsDataTypeDate(dataType) Then
+    ElseIf mDatabaseModel.IsDataTypeDate(xDataType) Then
         itemValue = "TO_DATE('" & itemValue & "','" & Setting.DateFormat & "')"
     End If
     GetItemValue = itemValue
