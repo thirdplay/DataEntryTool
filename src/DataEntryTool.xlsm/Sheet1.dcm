@@ -15,18 +15,18 @@ Option Explicit
 ' IN : target ëŒè€ÇÃÉZÉãîÕàÕ
 '====================================================================================================
 Private Sub Worksheet_Change(ByVal target As Range)
-    With ThisWorkbook.Worksheets(1)
-        If Not Intersect(target, .Range(cstDatabaseType)) Is Nothing Then
-            ' PostgreSQL
-            If target.Value = cstDatabaseTypePostgreSQL Then
-                .Range(cstPort).Rows.Hidden = False
-                .Range(cstDatabaseName).Rows.Hidden = False
-            ' PostgreSQLà»äO
-            Else
-                .Range(cstPort).Rows.Hidden = True
-                .Range(cstDatabaseName).Rows.Hidden = True
-            End If
-        End If
-    End With
+'    With ThisWorkbook.Worksheets(1)
+'        If Not Intersect(target, .Range(cstDatabaseType)) Is Nothing Then
+'            ' PostgreSQL
+'            If target.Value = cstDatabaseTypePostgreSQL Then
+'                .Range(cstPort).Rows.Hidden = False
+'                .Range(cstDatabaseName).Rows.Hidden = False
+'            ' PostgreSQLà»äO
+'            Else
+'                .Range(cstPort).Rows.Hidden = True
+'                .Range(cstDatabaseName).Rows.Hidden = True
+'            End If
+'        End If
+'    End With
 End Sub
 

@@ -11,14 +11,15 @@ Option Private Module
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDatabaseType As String     ' データベース種類
-Private mServerName As String       ' サーバ名
-Private mPort As String             ' ポート
-Private mDatabaseName As String     ' データベース名
-Private mUserId As String           ' ユーザID
-Private mPassword As String         ' パスワード
-Private mLinefeedCode As String     ' 改行コード
-Private mDateFormat As String       ' 日付書式
+Private mDatabaseType As String         ' データベース種類
+Private mServerName As String           ' サーバ名
+Private mPort As String                 ' ポート
+Private mDatabaseName As String         ' データベース名
+Private mUserId As String               ' ユーザID
+Private mPassword As String             ' パスワード
+Private mLinefeedCode As String         ' 改行コード
+Private mDateFormat As String           ' 日付書式
+Private mTimestampFormat As String      ' タイムスタンプ書式
 
 
 '====================================================================================================
@@ -111,4 +112,15 @@ Public Property Get DateFormat() As String
 End Property
 Public Property Let DateFormat(DateFormat As String)
     mDateFormat = DateFormat
+End Property
+
+
+'====================================================================================================
+' タイムスタンプ書式の取得/設定
+'====================================================================================================
+Public Property Get TimestampFormat() As String
+    TimestampFormat = mTimestampFormat
+End Property
+Public Property Let TimestampFormat(TimestampFormat As String)
+    mTimestampFormat = TimestampFormat
 End Property
