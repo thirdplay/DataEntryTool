@@ -32,6 +32,47 @@ Dim mDatabaseModel As DatabaseModel      ' データベースモデル
 
 
 '====================================================================================================
+' 投入データを取得します
+'----------------------------------------------------------------------------------------------------
+' IN : xEntryType 投入種類
+'    : xTableName テーブル名
+' OUT: 投入データ
+'====================================================================================================
+Public Function GetEntryData(xEntryType As EntryType, xTableName As String) As EntryData
+    Dim ed As EntryData
+    Dim cd As ColumnDefinition
+    Dim rowIndex As Long
+    Dim dataCount As Long
+    Dim columnRange As Range
+    Dim cr As Range
+
+    With ThisWorkbook.Worksheets(xTableName)
+        Set ed = New EntryData
+        ed.EntryType = xEntryType
+        ed.TableName = xTableName
+
+        ' カラム定義リストの作成
+        ed.ColumnDefinitions = New Collection
+        dataCount = WorkSheetEx.GetColDataCount(xTableName, ColumnDefinitionRow.ColumnName, 1)
+        Set columnRange = .Range(.Cells(1, 1), .Cells(ColumnDefinitionRow.Max, dataCount))
+        For Each cr In columnRange.Columns
+            Set cd = New ColumnDefinition
+            cd.ColumnName = cr.Cells(ColumnDefinitionRow.ColumnName, 1)
+            cd.DataType = cr.Cells(ColumnDefinitionRow.DataType, 1)
+            cd.IsPrimaryKey = cr.Cells(ColumnDefinitionRow.IsPrimaryKey, 1)
+            Call ed.ColumnDefinitions.Add(cd)
+        Next
+
+        ' レコード範囲の設定
+        dataCount = WorkSheetEx.GetRowDataCount(xTableName, cstTableRecordBase, 1)
+        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount - 1, ed.ColumnDefinitions.Count))
+
+        Set GetEntryData = ed
+    End With
+End Function
+
+
+'====================================================================================================
 ' データ投入を実行します
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryData 投入データ
@@ -99,16 +140,16 @@ End Function
 ' OUT: クエリリスト
 '====================================================================================================
 Private Function MakeInsertQueries(xEntryData As EntryData) As Collection
-    Dim i As Long
+    Dim rr As Range
     Dim query As String
     Dim queries As Collection
 
     Set queries = New Collection
-    For i = 1 To xEntryData.RecordRange.Rows.Count
+    For Each rr In xEntryData.RecordRange.Rows
         query = cstInsertQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
         query = Replace(query, "${columns}", GetColumnPhrase(xEntryData.ColumnDefinitions))
-        query = Replace(query, "${values}", GetValuePhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
+        query = Replace(query, "${values}", GetValuePhrase(xEntryData.ColumnDefinitions, rr))
         Call queries.Add(query)
     Next
     Set MakeInsertQueries = queries
@@ -122,16 +163,16 @@ End Function
 ' OUT: クエリリスト
 '====================================================================================================
 Private Function MakeUpdateQueries(xEntryData As EntryData) As Collection
-    Dim i As Long
+    Dim rr As Range
     Dim query As String
     Dim queries As Collection
 
     Set queries = New Collection
-    For i = 1 To xEntryData.RecordRange.Rows.Count
+    For Each rr In xEntryData.RecordRange.Rows
         query = cstUpdateQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
-        query = Replace(query, "${set}", GetSetPhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
-        query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
+        query = Replace(query, "${set}", GetSetPhrase(xEntryData.ColumnDefinitions, rr))
+        query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, rr))
         Call queries.Add(query)
     Next
     Set MakeUpdateQueries = queries
@@ -145,15 +186,15 @@ End Function
 ' OUT: クエリリスト
 '====================================================================================================
 Private Function MakeDeleteQueries(xEntryData As EntryData) As Collection
-    Dim i As Long
+    Dim rr As Range
     Dim query As String
     Dim queries As Collection
 
     Set queries = New Collection
-    For i = 1 To xEntryData.RecordRange.Rows.Count
+    For Each rr In xEntryData.RecordRange.Rows
         query = cstDeleteQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
-        query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, xEntryData.RecordRange.Rows(i)))
+        query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, rr))
         Call queries.Add(query)
     Next
     Set MakeDeleteQueries = queries

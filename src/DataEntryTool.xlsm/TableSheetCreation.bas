@@ -13,7 +13,7 @@ Option Private Module
 '====================================================================================================
 Public Sub Execute()
 On Error GoTo Finally
-    Dim tableSettings As Collection
+    Dim tableSettings As Object
     Dim tableDefinitions As Collection
 
     ' 画面描画の抑制
@@ -55,16 +55,18 @@ End Sub
 ' IN : tableSettings テーブル設定リスト
 ' OUT: テーブル定義リスト
 '====================================================================================================
-Private Function GetTableDefinitions(tableSettings As Collection) As Collection
+Private Function GetTableDefinitions(tableSettings As Object) As Collection
     Dim ts As TableSetting
     Dim td As TableDefinition
     Dim list As Collection
+    Dim xKey As Variant
     Dim xDatabaseModel As DatabaseModel
 
     Set xDatabaseModel = DatabaseModelFactory.Create()
 
     Set list = New Collection
-    For Each ts In tableSettings
+    For Each xKey In tableSettings
+        Set ts = tableSettings(xKey)
         Set td = New TableDefinition
         td.ColumnDefinitions = xDatabaseModel.GetColumnDefinitions(ts.PhysicsName)
         If td.ColumnDefinitions.Count = 0 Then

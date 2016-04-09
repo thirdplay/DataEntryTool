@@ -40,9 +40,10 @@ End Sub
 Private Sub Execute(xEntryType As EntryType)
 On Error GoTo Finally
     Dim operationDic As Object
-    Dim tableSettings As Collection
+    Dim tableSettings As Object
     Dim ts As TableSetting
     Dim ed As EntryData
+    Dim xKey As Variant
     Dim procCount As Long
 
     ' 画面描画の抑制
@@ -68,9 +69,11 @@ On Error GoTo Finally
     End If
 
     ' 対象テーブル設定を全て処理
-    For Each ts In tableSettings
+    For Each xKey In tableSettings
+        Set ts = tableSettings(xKey)
+
         ' 対象テーブルのテーブルデータの取得
-        Set ed = EntryDataModel.GetEntryData(xEntryType, ts.PhysicsName)
+        Set ed = DataEntryModel.GetEntryData(xEntryType, ts.PhysicsName)
 
         ' データ投入実行
         procCount = DataEntryModel.ExecuteDataEntry(ed)
