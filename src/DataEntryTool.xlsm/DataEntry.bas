@@ -59,7 +59,7 @@ On Error GoTo Finally
     ' 対象テーブル設定の取得
     Set tableSettings = TableSettingModel.GetTableSettings(True)
     If tableSettings.Count = 0 Then
-        MsgBoxEx.Warning "データ投入対象のデータがありません。" & vbNewLine & vbNewLine & _
+        MsgBoxEx.Warning "データ投入対象のデータがありません。", _
             "下記手順を実施してデータ投入対象のデータを設定してください。" & vbNewLine & _
             "  ・テーブル一覧のデータ投入対象列に空文字以外の値を設定する。" & vbNewLine & _
             "  ・データ投入対象のテーブルシートにデータを入力する。"
@@ -83,9 +83,9 @@ Finally:
     Call ApplicationEx.SuppressScreenDrawing(False)
 
     ' 実行結果の表示
-    Set operationDic = GetOperationDic
+    Set operationDic = GetOperationDic()
     If Err.Number <> 0 Then
-        MsgBoxEx.Error "データ" & operationDic(xEntryType) & "に失敗しました" & vbNewLine & Err.Description
+        MsgBoxEx.Error "データ" & operationDic(xEntryType) & "に失敗しました", Err.Description
     Else
         MsgBox "データ" & operationDic(xEntryType) & "が完了しました"
     End If

@@ -32,7 +32,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Collection
                 If .Cells(rowIndex, TableSettingCol.DataEntryTarget).Value = "" Then
                     isTarget = False
                 ElseIf Not WorkBookEx.ExistsSheet(xTableName) Then
-                    isTarget = False
+                    Err.Raise 100, , "テーブル[" & xTableName & "]のシートが存在しません。" & vbNewLine & "テーブルシート作成を行い、テーブルシートを作成してください。"
                 ElseIf ThisWorkbook.Worksheets(xTableName).Cells(cstTableRecordBase, 1).Value = "" Then
                     isTarget = False
                 End If

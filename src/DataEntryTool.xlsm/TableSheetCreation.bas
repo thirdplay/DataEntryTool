@@ -27,7 +27,7 @@ On Error GoTo Finally
     ' テーブル設定リストの取得
     Set tableSettings = TableSettingModel.GetTableSettings(False)
     If tableSettings.Count = 0 Then
-        MsgBoxEx.Warning "作成対象のテーブルがありません。" & vbNewLine & "テーブル一覧にテーブル物理名を入力してください。"
+        MsgBoxEx.Warning "作成対象のテーブルがありません。", "テーブル一覧にテーブル物理名を入力してください。"
         Exit Sub
     End If
 
@@ -42,7 +42,7 @@ Finally:
 
     ' 実行結果の表示
     If Err.Number <> 0 Then
-        MsgBoxEx.Error "テーブルシートの作成に失敗しました" & vbNewLine & Err.Description
+        MsgBoxEx.Error "テーブルシートの作成に失敗しました", Err.Description
     Else
         MsgBox "テーブルシートの作成が完了しました"
     End If
