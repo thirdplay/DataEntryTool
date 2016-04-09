@@ -48,6 +48,6 @@ Public Enum ColumnDefinitionRow
     IsPrimaryKey            ' 主キー指定
     Max = IsPrimaryKey
 End Enum
-' テーブル一覧の開始行
+' テーブルレコードの開始行
 Public Const cstTableRecordBase = ColumnDefinitionRow.Max + 1
 
