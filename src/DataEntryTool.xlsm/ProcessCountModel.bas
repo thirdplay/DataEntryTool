@@ -30,11 +30,11 @@ End Sub
 ' ˆ—Œ”‚ğ‘‚«‚Ş
 '----------------------------------------------------------------------------------------------------
 ' IN : xTableSetting ƒe[ƒuƒ‹İ’è
-'    : count ˆ—Œ”
+'    : procCount ˆ—Œ”
 '====================================================================================================
-Public Sub WriteProcessingCount(xTableSetting As tableSetting, count As Long)
+Public Sub WriteProcessingCount(xTableSetting As tableSetting, procCount As Long)
     With ThisWorkbook.Worksheets(cstSheetMain)
-        .Cells(xTableSetting.Row, TableSettingCol.ProcessCount).Value = count
+        .Cells(xTableSetting.Row, TableSettingCol.ProcessCount).Value = procCount
     End With
 End Sub
 
