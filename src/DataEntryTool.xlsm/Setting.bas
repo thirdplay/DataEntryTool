@@ -9,6 +9,21 @@ Option Private Module
 '====================================================================================================
 
 '====================================================================================================
+' 定数
+'====================================================================================================
+' 名前定義
+Private Const cstDatabaseType = "DatabaseType"              ' データベース種類
+Private Const cstServerName = "ServerName"                  ' サーバ名
+Private Const cstPort = "Port"                              ' ポート
+Private Const cstDatabaseName = "DatabaseName"              ' データベース名
+Private Const cstUserId = "UserId"                          ' ユーザID
+Private Const cstPassword = "Password"                      ' パスワード
+Private Const cstLinefeedCode = "LinefeedCode"              ' 改行コード
+Private Const cstDateFormat = "DateFormat"                  ' 日付書式
+Private Const cstTimestampFormat = "TimestampFormat"        ' タイムスタンプ書式
+
+
+'====================================================================================================
 ' メンバ変数
 '====================================================================================================
 Private mDatabaseType As String         ' データベース種類
@@ -124,3 +139,79 @@ End Property
 Public Property Let TimestampFormat(TimestampFormat As String)
     mTimestampFormat = TimestampFormat
 End Property
+
+
+'====================================================================================================
+' 設定モジュールを構成します
+'====================================================================================================
+Public Sub Setup()
+    With ThisWorkbook.Worksheets(cstSheetMain)
+        Setting.DatabaseType = .Range(cstDatabaseType).Value
+        Setting.ServerName = .Range(cstServerName).Value
+        Setting.Port = .Range(cstPort).Value
+        Setting.DatabaseName = .Range(cstDatabaseName).Value
+        Setting.UserId = .Range(cstUserId).Value
+        Setting.Password = .Range(cstPassword).Value
+        Setting.LinefeedCode = .Range(cstLinefeedCode).Value
+        Setting.DateFormat = .Range(cstDateFormat).Value
+        Setting.TimestampFormat = .Range(cstTimestampFormat).Value
+    End With
+End Sub
+
+
+'====================================================================================================
+' データベース設定をチェックします
+'----------------------------------------------------------------------------------------------------
+' OUT: True:チェックOK,False:チェックNG
+'====================================================================================================
+Public Function CheckDbSetting() As Boolean
+On Error GoTo ErrHandler
+    Call CheckInputValue(Setting.DatabaseType, "データベース種類")
+    Call CheckInputValue(Setting.ServerName, "サーバ名")
+    Call CheckInputValue(Setting.UserId, "ユーザID")
+    Call CheckInputValue(Setting.Password, "パスワード")
+    If Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
+        Call CheckInputValue(Setting.Port, "ポート")
+        Call CheckInputValue(Setting.DatabaseName, "データベース名")
+    End If
+    CheckDbSetting = True
+    Exit Function
+ErrHandler:
+    MsgBoxEx.Warning "データベース設定の" & Err.Description
+    CheckDbSetting = False
+    Exit Function
+End Function
+
+
+'====================================================================================================
+' データ投入設定をチェックします
+'----------------------------------------------------------------------------------------------------
+' OUT: True:チェックOK,False:チェックNG
+'====================================================================================================
+Public Function CheckDataEntrySetting() As Boolean
+On Error GoTo ErrHandler
+    Call CheckInputValue(Setting.LinefeedCode, "改行コード")
+    Call CheckInputValue(Setting.DateFormat, "日付書式")
+    Call CheckInputValue(Setting.TimestampFormat, "タイムスタンプ書式")
+    CheckDataEntrySetting = True
+    Exit Function
+ErrHandler:
+    MsgBoxEx.Warning "データ投入設定の" & Err.Description
+    CheckDataEntrySetting = False
+    Exit Function
+End Function
+
+
+'====================================================================================================
+' 入力値をチェックします
+'----------------------------------------------------------------------------------------------------
+' IN : inputValue 入力値
+'    : itemName 項目名
+'====================================================================================================
+Private Sub CheckInputValue(inputValue As String, itemName As String)
+    If inputValue = "" Then
+        Err.Raise 100, , "[" & itemName & "]を入力してください。"
+    End If
+End Sub
+
+
