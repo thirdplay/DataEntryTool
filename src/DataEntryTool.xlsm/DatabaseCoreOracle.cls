@@ -30,7 +30,7 @@ Private Const cstColumnDefinitionQuery As String = "SELECT utc.column_id, utc.co
 ' IN : xSetting ê›íË
 ' OUT: ê⁄ë±ï∂éöóÒ
 '====================================================================================================
-Public Function IDatabaseCore_GetConnectStr As String
+Public Function IDatabaseCore_GetConnectStr() As String
     IDatabaseCore_GetConnectStr = "Driver={Microsoft ODBC for Oracle};" _
         & "Server=" & Setting.ServerName & ";" _
         & "UID=" & Setting.UserId & ";" _
@@ -71,7 +71,7 @@ End Function
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeDate(ByVal xDataType As String) As Boolean
     xDataType = UCase(xDataType)
-    If InStr(xDataType, "TIMESTAMP") OR xDataType = "DATE" Then
+    If InStr(xDataType, "TIMESTAMP") Or xDataType = "DATE" Then
         IDatabaseCore_IsDataTypeDate = True
         Exit Function
     End If

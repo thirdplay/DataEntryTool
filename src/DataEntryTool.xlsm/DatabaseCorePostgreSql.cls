@@ -31,7 +31,7 @@ Private Const cstColumnDefinitionQuery As String = _
 '----------------------------------------------------------------------------------------------------
 ' OUT: ê⁄ë±ï∂éöóÒ
 '====================================================================================================
-Public Function IDatabaseCore_GetConnectStr As String
+Public Function IDatabaseCore_GetConnectStr() As String
     IDatabaseCore_GetConnectStr = "Driver={PostgreSQL Unicode};" _
         & "SERVER=" & Setting.ServerName & ";" _
         & "DATABASE=" & Setting.DatabaseName & ";" _
@@ -58,7 +58,7 @@ End Function
 ' OUT: True:ï∂éöóÒÅAFalse:ï∂éöóÒà»äO
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeString(ByVal xDataType As String) As Boolean
-    If InStr(UCase(xDataType), "CHAR") OR UCase(xDataType) = "TEXT" Then
+    If InStr(UCase(xDataType), "CHAR") Or UCase(xDataType) = "TEXT" Then
         IDatabaseCore_IsDataTypeString = True
         Exit Function
     End If
@@ -74,7 +74,7 @@ End Function
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeDate(ByVal xDataType As String) As Boolean
     xDataType = UCase(xDataType)
-    If InStr(xDataType, "TIMESTAMP") OR xDataType = "DATE" Then
+    If InStr(xDataType, "TIMESTAMP") Or xDataType = "DATE" Then
         IDatabaseCore_IsDataTypeDate = True
         Exit Function
     End If

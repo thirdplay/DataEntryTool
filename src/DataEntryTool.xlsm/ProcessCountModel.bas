@@ -11,7 +11,7 @@ Option Private Module
 '====================================================================================================
 ' 処理件数をクリアします
 '====================================================================================================
-Public Sub ClearProcessingCount
+Public Sub ClearProcessingCount()
     Dim baseRowIndex As Long
     Dim dataCount As Long
 
@@ -32,7 +32,7 @@ End Sub
 ' IN : xTableSetting テーブル設定
 '    : procCount 処理件数
 '====================================================================================================
-Public Sub WriteProcessingCount(xTableSetting As tableSetting, procCount As Long)
+Public Sub WriteProcessingCount(xTableSetting As TableSetting, procCount As Long)
     With ThisWorkbook.Worksheets(cstSheetMain)
         .Cells(xTableSetting.Row, TableSettingCol.ProcessCount).Value = procCount
     End With
