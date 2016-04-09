@@ -36,20 +36,20 @@ End Function
 '====================================================================================================
 ' データ種別が文字列かどうか判定する
 '----------------------------------------------------------------------------------------------------
-' IN : dataType データ種別
+' IN : xDataType データ型
 ' OUT: True:文字列、False:文字列以外
 '====================================================================================================
-Public Function IsDataTypeString(ByVal dataType As String) As Boolean
+Public Function IsDataTypeString(ByVal xDataType As String) As Boolean
 End Function
 
 
 '====================================================================================================
 ' データ種別が日付かどうか判定する
 '----------------------------------------------------------------------------------------------------
-' IN : dataType データ種別
+' IN : xDataType データ型
 ' OUT: True:日付、False:日付以外
 '====================================================================================================
-Public Function IsDataTypeDate(ByVal dataType As String) As Boolean
+Public Function IsDataTypeDate(ByVal xDataType As String) As Boolean
 End Function
 
 

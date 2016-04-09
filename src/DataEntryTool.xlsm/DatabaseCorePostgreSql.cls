@@ -54,11 +54,11 @@ End Function
 '====================================================================================================
 ' データ種別が文字列かどうか判定する
 '----------------------------------------------------------------------------------------------------
-' IN : dataType データ種別
+' IN : xDataType データ型
 ' OUT: True:文字列、False:文字列以外
 '====================================================================================================
-Public Function IDatabaseCore_IsDataTypeString(ByVal dataType As String) As Boolean
-    If InStr(UCase(dataType), "CHAR") OR UCase(dataType) = "TEXT" Then
+Public Function IDatabaseCore_IsDataTypeString(ByVal xDataType As String) As Boolean
+    If InStr(UCase(xDataType), "CHAR") OR UCase(xDataType) = "TEXT" Then
         IDatabaseCore_IsDataTypeString = True
         Exit Function
     End If
@@ -69,12 +69,12 @@ End Function
 '====================================================================================================
 ' データ種別が日付かどうか判定する
 '----------------------------------------------------------------------------------------------------
-' IN : dataType データ種別
+' IN : xDataType データ型
 ' OUT: True:日付、False:日付以外
 '====================================================================================================
-Public Function IDatabaseCore_IsDataTypeDate(ByVal dataType As String) As Boolean
-    dataType = UCase(dataType)
-    If InStr(dataType, "TIMESTAMP") OR dataType = "DATE" Then
+Public Function IDatabaseCore_IsDataTypeDate(ByVal xDataType As String) As Boolean
+    xDataType = UCase(xDataType)
+    If InStr(xDataType, "TIMESTAMP") OR xDataType = "DATE" Then
         IDatabaseCore_IsDataTypeDate = True
         Exit Function
     End If
