@@ -98,7 +98,6 @@ ErrHandler:
     Err.Raise Err.Number, Err.Source, _
         "[投入情報]" & vbNewLine & _
         "テーブル名:" & xEntryData.TableName & vbNewLine & _
-        "データ行:" & (cstTableRecordBase + i - 1) & vbNewLine & _
         "[エラー詳細]" & vbNewLine & _
         Err.Description, Err.HelpFile, Err.HelpContext
     Exit Function
