@@ -54,7 +54,7 @@ On Error GoTo Finally
         Exit Sub
     End If
     ' データベース接続
-    Call Database.Connect()
+    Call Database.Connect
 
     ' 処理件数のクリア
     Call ProcessCountModel.ClearProcessingCount
@@ -85,7 +85,7 @@ On Error GoTo Finally
     Next
 Finally:
     ' データベース切断
-    Call Database.Disconnect()
+    Call Database.Disconnect
     ' 画面描画の抑制解除
     Call ApplicationEx.SuppressScreenDrawing(False)
 

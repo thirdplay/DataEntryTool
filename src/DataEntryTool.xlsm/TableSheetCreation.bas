@@ -24,7 +24,7 @@ On Error GoTo Finally
         Exit Sub
     End If
     ' データベース接続
-    Call Database.Connect()
+    Call Database.Connect
 
     ' テーブル設定リストの取得
     Set tableSettings = DataEntrySheet.GetTableSettings(False)
@@ -42,7 +42,7 @@ On Error GoTo Finally
 
 Finally:
     ' データベース切断
-    Call Database.Disconnect()
+    Call Database.Disconnect
     ' 画面描画の抑制解除
     Call ApplicationEx.SuppressScreenDrawing(False)
 
