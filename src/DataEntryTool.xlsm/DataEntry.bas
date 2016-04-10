@@ -46,15 +46,10 @@ On Error GoTo Finally
     Dim xKey As Variant
     Dim procCount As Long
 
-    ' 画面描画の抑制
-    Call ApplicationEx.SuppressScreenDrawing(True)
-    ' 設定モジュールの構成
-    Call Setting.Setup
-    If Not Setting.CheckDataEntrySetting() Then
+    ' 初期化
+    If Not Initialize Then
         Exit Sub
     End If
-    ' データベース接続
-    Call Database.Connect
 
     ' 処理件数のクリア
     Call TableSheet.ClearProcessingCount
@@ -84,18 +79,46 @@ On Error GoTo Finally
         Call TableSheet.WriteProcessingCount(ts, procCount)
     Next
 Finally:
-    ' データベース切断
-    Call Database.Disconnect
-    ' 画面描画の抑制解除
-    Call ApplicationEx.SuppressScreenDrawing(False)
+    ' 終了化
+    Call Finalize
 
     ' 実行結果の表示
     Set operationDic = GetOperationDic()
-    If Err.Number <> 0 Then
-        MsgBoxEx.Error "データ" & operationDic(xEntryType) & "に失敗しました", Err.Description
-    Else
-        MsgBox "データ" & operationDic(xEntryType) & "が完了しました"
+    Call ApplicationEx.ShowExecutionResult(Err.Number = 0, "データ" & operationDic(xEntryType))
+End Sub
+
+
+'====================================================================================================
+' 初期化
+'----------------------------------------------------------------------------------------------------
+' OUT: True:成功、False:失敗
+'====================================================================================================
+Private Function Initialize() As Boolean
+    ' 画面描画の抑制
+    Call ApplicationEx.SuppressScreenDrawing(True)
+
+    ' 設定モジュールの構成
+    Call Setting.Setup
+    If Not Setting.CheckDataEntrySetting() Then
+        Initialize = False
+        Exit Function
     End If
+
+    ' データベース接続
+    Call Database.Connect
+    Initialize = True
+End Function
+
+
+'====================================================================================================
+' 終了化
+'====================================================================================================
+Private Sub Finalize()
+    ' データベース切断
+    Call Database.Disconnect
+
+    ' 画面描画の抑制解除
+    Call ApplicationEx.SuppressScreenDrawing(False)
 End Sub
 
 

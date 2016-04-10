@@ -162,7 +162,7 @@ End Sub
 '====================================================================================================
 ' データベース設定をチェックします
 '----------------------------------------------------------------------------------------------------
-' OUT: True:チェックOK,False:チェックNG
+' OUT: True:チェックOK、False:チェックNG
 '====================================================================================================
 Public Function CheckDbSetting() As Boolean
 On Error GoTo ErrHandler
@@ -186,10 +186,14 @@ End Function
 '====================================================================================================
 ' データ投入設定をチェックします
 '----------------------------------------------------------------------------------------------------
-' OUT: True:チェックOK,False:チェックNG
+' OUT: True:チェックOK、False:チェックNG
 '====================================================================================================
 Public Function CheckDataEntrySetting() As Boolean
 On Error GoTo ErrHandler
+    If Not CheckDbSetting Then
+        CheckDataEntrySetting = False
+        Exit Function
+    End If
     Call CheckInputValue(Setting.LinefeedCode, "改行コード")
     Call CheckInputValue(Setting.DateFormat, "日付書式")
     Call CheckInputValue(Setting.TimestampFormat, "タイムスタンプ書式")

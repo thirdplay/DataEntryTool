@@ -16,15 +16,10 @@ On Error GoTo Finally
     Dim tableSettings As Object
     Dim tableDefinitions As Collection
 
-    ' 画面描画の抑制
-    Call ApplicationEx.SuppressScreenDrawing(True)
-    ' 設定モジュールの構成
-    Call Setting.Setup
-    If Not Setting.CheckDbSetting() Then
+    ' 初期化
+    If Not Initialize() Then
         Exit Sub
     End If
-    ' データベース接続
-    Call Database.Connect
 
     ' テーブル設定リストの取得
     Set tableSettings = DataEntrySheet.GetTableSettings(False)
@@ -41,17 +36,43 @@ On Error GoTo Finally
     Call DataEntrySheet.SetHyperlink(tableSettings)
 
 Finally:
-    ' データベース切断
-    Call Database.Disconnect
-    ' 画面描画の抑制解除
-    Call ApplicationEx.SuppressScreenDrawing(False)
+    ' 終了化
+    Call Finalize
 
     ' 実行結果の表示
-    If Err.Number <> 0 Then
-        MsgBoxEx.Error "テーブルシートの作成に失敗しました", Err.Description
-    Else
-        MsgBox "テーブルシートの作成が完了しました"
-    End If
+    Call ApplicationEx.ShowExecutionResult(Err.Number = 0, "テーブルシートの作成")
 End Sub
 
 
+'====================================================================================================
+' 初期化
+'----------------------------------------------------------------------------------------------------
+' OUT: True:成功、False:失敗
+'====================================================================================================
+Private Function Initialize() As Boolean
+    ' 画面描画の抑制
+    Call ApplicationEx.SuppressScreenDrawing(True)
+
+    ' 設定モジュールの構成
+    Call Setting.Setup
+    If Not Setting.CheckDbSetting() Then
+        Initialize = False
+        Exit Function
+    End If
+
+    ' データベース接続
+    Call Database.Connect
+    Initialize = True
+End Function
+
+
+'====================================================================================================
+' 終了化
+'====================================================================================================
+Private Sub Finalize()
+    ' データベース切断
+    Call Database.Disconnect
+
+    ' 画面描画の抑制解除
+    Call ApplicationEx.SuppressScreenDrawing(False)
+End Sub
