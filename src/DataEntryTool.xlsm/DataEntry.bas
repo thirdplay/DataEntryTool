@@ -57,7 +57,7 @@ On Error GoTo Finally
     Call Database.Connect
 
     ' 処理件数のクリア
-    Call ProcessCountModel.ClearProcessingCount
+    Call TableSheet.ClearProcessingCount
 
     ' 対象テーブル設定の取得
     Set tableSettings = DataEntrySheet.GetTableSettings(True)
@@ -81,7 +81,7 @@ On Error GoTo Finally
         procCount = DataEntryModel.ExecuteDataEntry(ed)
 
         ' 処理件数の書き込み
-        Call ProcessCountModel.WriteProcessingCount(ts, procCount)
+        Call TableSheet.WriteProcessingCount(ts, procCount)
     Next
 Finally:
     ' データベース切断
