@@ -95,3 +95,13 @@ Public Function IDatabaseCore_IsDataTypeTimestamp(ByVal xDataType As String) As 
 End Function
 
 
+'====================================================================================================
+' ƒNƒGƒŠ‚ÌÚ”ö«‚ğæ“¾‚µ‚Ü‚·
+'----------------------------------------------------------------------------------------------------
+' OUT: Ú”ö«
+'====================================================================================================
+Public Function IDatabaseCore_GetQuerySuffix() As String
+    IDatabaseCore_GetQuerySuffix = ";"
+End Function
+
+

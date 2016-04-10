@@ -51,3 +51,6 @@ End Enum
 ' テーブルレコードの開始行
 Public Const cstTableRecordBase = ColumnDefinitionRow.Max + 1
 
+' カーソルロケーション
+Public Const adUseClient = 3
+

@@ -26,12 +26,6 @@ Private Const cstWherePhraseDelimiter = " AND "
 
 
 '====================================================================================================
-' メンバ変数
-'====================================================================================================
-Dim mDatabaseModel As DatabaseModel      ' データベースモデル
-
-
-'====================================================================================================
 ' 投入データを取得します
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryType 投入種類
@@ -81,30 +75,26 @@ End Function
 Public Function ExecuteDataEntry(xEntryData As EntryData) As Long
 On Error GoTo ErrHandler
     Dim i As Long
-    Dim queries As Collection
+    Dim query As String
     Dim procCnt As Long
-    procCnt = 0
 
     ' トランザクション開始
-    Set mDatabaseModel = DatabaseModelFactory.Create()
-    Call mDatabaseModel.BeginTrans
+    Call Database.BeginTrans
 
     ' クエリ生成
-    Set queries = MakeQueries(xEntryData)
+    query = MakeQuery(xEntryData)
 
     ' クエリ実行
-    For i = 1 To queries.Count
-        procCnt = procCnt + mDatabaseModel.ExecuteQuery(queries(i))
-    Next
+    procCnt = Database.ExecuteQuery(query)
 
     ' コミット
-    Call mDatabaseModel.CommitTrans
+    Call Database.CommitTrans
 
     ExecuteDataEntry = procCnt
     Exit Function
 ErrHandler:
     ' ロールバック
-    Call mDatabaseModel.RollbackTrans
+    Call Database.RollbackTrans
     Err.Raise Err.Number, Err.Source, _
         "[投入情報]" & vbNewLine & _
         "テーブル名:" & xEntryData.TableName & vbNewLine & _
@@ -119,16 +109,16 @@ End Function
 ' クエリを生成します
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryData 投入データ
-' OUT: クエリリスト
+' OUT: クエリ文字列
 '====================================================================================================
-Private Function MakeQueries(xEntryData As EntryData) As Collection
+Private Function MakeQuery(xEntryData As EntryData) As String
     Select Case xEntryData.EntryType
     Case EntryType.Register
-        Set MakeQueries = MakeInsertQueries(xEntryData)
+        MakeQuery = MakeInsertQuery(xEntryData)
     Case EntryType.Update
-        Set MakeQueries = MakeUpdateQueries(xEntryData)
+        MakeQuery = MakeUpdateQuery(xEntryData)
     Case EntryType.Remove
-        Set MakeQueries = MakeDeleteQueries(xEntryData)
+        MakeQuery = MakeDeleteQuery(xEntryData)
     End Select
 End Function
 
@@ -137,22 +127,20 @@ End Function
 ' Insertクエリリストを生成します
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryData 投入データ
-' OUT: クエリリスト
+' OUT: クエリ文字列
 '====================================================================================================
-Private Function MakeInsertQueries(xEntryData As EntryData) As Collection
+Private Function MakeInsertQuery(xEntryData As EntryData) As String
     Dim rr As Range
     Dim query As String
-    Dim queries As Collection
 
-    Set queries = New Collection
     For Each rr In xEntryData.RecordRange.Rows
-        query = cstInsertQuery
+        query = query & cstInsertQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
         query = Replace(query, "${columns}", GetColumnPhrase(xEntryData.ColumnDefinitions))
         query = Replace(query, "${values}", GetValuePhrase(xEntryData.ColumnDefinitions, rr))
-        Call queries.Add(query)
+        query = query & Database.GetQuerySuffix()
     Next
-    Set MakeInsertQueries = queries
+    MakeInsertQuery = query
 End Function
 
 
@@ -160,22 +148,20 @@ End Function
 ' Updateクエリリストを生成します
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryData 投入データ
-' OUT: クエリリスト
+' OUT: クエリ文字列
 '====================================================================================================
-Private Function MakeUpdateQueries(xEntryData As EntryData) As Collection
+Private Function MakeUpdateQuery(xEntryData As EntryData) As String
     Dim rr As Range
     Dim query As String
-    Dim queries As Collection
 
-    Set queries = New Collection
     For Each rr In xEntryData.RecordRange.Rows
-        query = cstUpdateQuery
+        query = query & cstUpdateQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
         query = Replace(query, "${set}", GetSetPhrase(xEntryData.ColumnDefinitions, rr))
         query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, rr))
-        Call queries.Add(query)
+        query = query & Database.GetQuerySuffix()
     Next
-    Set MakeUpdateQueries = queries
+    MakeUpdateQuery = query
 End Function
 
 
@@ -185,19 +171,17 @@ End Function
 ' IN : xEntryData 投入データ
 ' OUT: クエリリスト
 '====================================================================================================
-Private Function MakeDeleteQueries(xEntryData As EntryData) As Collection
+Private Function MakeDeleteQuery(xEntryData As EntryData) As String
     Dim rr As Range
     Dim query As String
-    Dim queries As Collection
 
-    Set queries = New Collection
     For Each rr In xEntryData.RecordRange.Rows
-        query = cstDeleteQuery
+        query = query & cstDeleteQuery
         query = Replace(query, "${tableName}", xEntryData.TableName)
         query = Replace(query, "${where}", GetWherePhrase(xEntryData.ColumnDefinitions, rr))
-        Call queries.Add(query)
+        query = query & Database.GetQuerySuffix()
     Next
-    Set MakeDeleteQueries = queries
+    MakeDeleteQuery = query
 End Function
 
 
@@ -296,15 +280,15 @@ Private Function GetItemValue(ByVal dataValue As String, ByVal xDataType As Stri
     If itemValue = "" Then
         itemValue = "NULL"
     ' 文字列
-    ElseIf mDatabaseModel.IsDataTypeString(xDataType) Then
+    ElseIf Database.IsDataTypeString(xDataType) Then
         itemValue = Replace(itemValue, "'", "''")                                   ' 単一引用符エスケープ
         itemValue = Replace(itemValue, vbLf, "'" & Setting.LinefeedCode & "'")      ' 改行コード変換
         itemValue = "'" & itemValue & "'"                                           ' 単一引用符付与
     ' 日付
-    ElseIf mDatabaseModel.IsDataTypeDate(xDataType) Then
+    ElseIf Database.IsDataTypeDate(xDataType) Then
         itemValue = "TO_DATE('" & itemValue & "','" & Setting.DateFormat & "')"
     ' タイムスタンプ
-    ElseIf mDatabaseModel.IsDataTypeTimestamp(xDataType) Then
+    ElseIf Database.IsDataTypeTimestamp(xDataType) Then
         itemValue = "TO_TIMESTAMP('" & itemValue & "','" & Setting.TimestampFormat & "')"
     End If
     GetItemValue = itemValue

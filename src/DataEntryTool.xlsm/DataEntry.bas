@@ -53,12 +53,14 @@ On Error GoTo Finally
     If Not Setting.CheckDataEntrySetting() Then
         Exit Sub
     End If
+    ' データベース接続
+    Call Database.Connect()
 
     ' 処理件数のクリア
     Call ProcessCountModel.ClearProcessingCount
 
     ' 対象テーブル設定の取得
-    Set tableSettings = TableSettingModel.GetTableSettings(True)
+    Set tableSettings = DataEntrySheet.GetTableSettings(True)
     If tableSettings.Count = 0 Then
         MsgBoxEx.Warning "データ投入対象のデータがありません。", _
             "下記手順を実施してデータ投入対象のデータを設定してください。" & vbNewLine & _
@@ -82,6 +84,8 @@ On Error GoTo Finally
         Call ProcessCountModel.WriteProcessingCount(ts, procCount)
     Next
 Finally:
+    ' データベース切断
+    Call Database.Disconnect()
     ' 画面描画の抑制解除
     Call ApplicationEx.SuppressScreenDrawing(False)
 

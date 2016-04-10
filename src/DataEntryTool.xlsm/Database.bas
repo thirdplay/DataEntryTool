@@ -1,47 +1,24 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "DatabaseModel"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Name = "Database"
 Option Explicit
+Option Private Module
 
 '====================================================================================================
 '
-' データベースモデル
+' データベースモジュール
 '
 '====================================================================================================
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Dim mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
-Dim mConnect As Object                  ' 接続オブジェクト
-
-
-'====================================================================================================
-' コンストラクタ
-'====================================================================================================
-Private Sub Class_Initialize()
-    Call Connect
-End Sub
-
-
-'====================================================================================================
-' デストラクタ
-'====================================================================================================
-Private Sub Class_Terminate()
-    Call Disconnect
-End Sub
+Private mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
+Private mConnect As Object                  ' 接続オブジェクト
 
 
 '====================================================================================================
 ' データベース接続
 '====================================================================================================
-Private Sub Connect()
+Public Sub Connect()
 On Error GoTo ErrHandler
     If mConnect Is Nothing Then
         ' データベースコアの生成
@@ -54,6 +31,7 @@ On Error GoTo ErrHandler
         ' データベース接続
         Set mConnect = CreateObject("ADODB.Connection")
         mConnect.Open mDatabaseCore.GetConnectStr
+        mConnect.CursorLocation = adUseClient
     End If
     Exit Sub
 ErrHandler:
@@ -66,7 +44,7 @@ End Sub
 '====================================================================================================
 ' データベース切断
 '====================================================================================================
-Private Sub Disconnect()
+Public Sub Disconnect()
     If Not mConnect Is Nothing Then
         mConnect.Close
         Set mConnect = Nothing
@@ -107,9 +85,13 @@ End Sub
 '====================================================================================================
 Public Function ExecuteQuery(query As String) As Long
     Dim procCnt As Long
+    Dim rs As Object
 
-    Debug.Print query
-    Call mConnect.Execute(CommandText:=query, RecordsAffected:=procCnt)
+    Set rs = mConnect.Execute(CommandText:=query)
+    Do Until rs Is Nothing
+        procCnt = procCnt + rs.RecordCount
+        Set rs = rs.NextRecordset
+    Loop
     ExecuteQuery = procCnt
 End Function
 
@@ -177,6 +159,16 @@ End Function
 '====================================================================================================
 Public Function IsDataTypeTimestamp(ByVal xDataType As String) As Boolean
     IsDataTypeTimestamp = mDatabaseCore.IsDataTypeTimestamp(xDataType)
+End Function
+
+
+'====================================================================================================
+' クエリの接尾辞を取得します
+'----------------------------------------------------------------------------------------------------
+' OUT: 接尾辞
+'====================================================================================================
+Public Function GetQuerySuffix() As String
+    GetQuerySuffix = mDatabaseCore.GetQuerySuffix()
 End Function
 
 

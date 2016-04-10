@@ -1,10 +1,10 @@
-Attribute VB_Name = "TableSettingModel"
+Attribute VB_Name = "DataEntrySheet"
 Option Explicit
 Option Private Module
 
 '====================================================================================================
 '
-' テーブル設定モデルのモジュール
+' テーブル投入シートのモジュール
 '
 '====================================================================================================
 
@@ -39,7 +39,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
                     If tr.Cells(1, TableSettingCol.DataEntryTarget).Value = "" Then
                         isTarget = False
                     ElseIf Not WorkBookEx.ExistsSheet(xTableName) Then
-                        Err.Raise 100, , "テーブル[" & xTableName & "]のシートが存在しません。" & vbNewLine & "テーブルシート作成を行い、テーブルシートを作成してください。"
+                        Err.Raise 1000, , "テーブル[" & xTableName & "]のシートが存在しません。" & vbNewLine & "テーブルシート作成を行い、テーブルシートを作成してください。"
                     ElseIf ThisWorkbook.Worksheets(xTableName).Cells(cstTableRecordBase, 1).Value = "" Then
                         isTarget = False
                     End If
@@ -47,7 +47,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
 
                 If isTarget Then
                     If dic.Exists(tr.Cells(1, TableSettingCol.PhysicsName).Value) Then
-                        Err.Raise 100, , "テーブル[" & xTableName & "]が重複しています。"
+                        Err.Raise 1000, , "テーブル[" & xTableName & "]が重複しています。"
                     End If
                     Set ts = New TableSetting
                     ts.Row = tr.Row

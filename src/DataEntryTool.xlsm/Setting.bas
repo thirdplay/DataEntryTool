@@ -210,7 +210,7 @@ End Function
 '====================================================================================================
 Private Sub CheckInputValue(inputValue As String, itemName As String)
     If inputValue = "" Then
-        Err.Raise 100, , "[" & itemName & "]‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B"
+        Err.Raise 1000, , "[" & itemName & "]‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B"
     End If
 End Sub
 
