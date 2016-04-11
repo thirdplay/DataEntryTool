@@ -13,8 +13,10 @@ Option Private Module
 '====================================================================================================
 ' カラム定義取得クエリの区切り文字
 Private Const cstColumnDefinitionDelimiter = " UNION ALL "
+' カラム定義取得クエリの接頭辞
+Private Const cstColumnDefinitionPrefix = "SELECT * FROM ("
 ' カラム定義取得クエリの接尾辞
-Private Const cstColumnDefinitionSuffix = " ORDER BY table_name, column_id"
+Private Const cstColumnDefinitionSuffix = ") tbl ORDER BY table_name, column_id"
 ' 区切り文字
 Private Const cstDelimiter = ","
 
@@ -122,13 +124,15 @@ Public Function GetColumnDefinitions(tableSettings As Object) As Object
     Loop
 
     ' クエリを作りながらテーブル名の存在チェックをする
+    query = cstColumnDefinitionPrefix
     For Each xTableName In tableSettings.Keys
-        query = query & cstColumnDefinitionDelimiter & Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", xTableName)
+        query = query & Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", xTableName) & cstColumnDefinitionDelimiter
         If Not tableNames.Exists(xTableName) Then
             Err.Raise 1000, , "テーブル[" & xTableName & "]のカラム定義が取得できません。"
         End If
     Next
-    query = Right(query, Len(query) - Len(cstColumnDefinitionDelimiter)) & cstColumnDefinitionSuffix
+    query = Left(query, Len(query) - Len(cstColumnDefinitionDelimiter)) & cstColumnDefinitionSuffix
+    Debug.Print query
 
     ' カラム定義取得クエリの実行
     Set rs = mConnect.Execute(query)
