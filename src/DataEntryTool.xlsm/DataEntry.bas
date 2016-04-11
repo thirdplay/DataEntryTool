@@ -9,42 +9,17 @@ Option Private Module
 '====================================================================================================
 
 '====================================================================================================
-' データを登録します
-'====================================================================================================
-Public Sub RegisterData()
-    Call Execute(EntryType.Register)
-End Sub
-
-
-'====================================================================================================
-' データを更新します
-'====================================================================================================
-Public Sub UpdateData()
-    Call Execute(EntryType.Update)
-End Sub
-
-
-'====================================================================================================
-' データを削除します
-'====================================================================================================
-Public Sub RemoveData()
-    Call Execute(EntryType.Remove)
-End Sub
-
-
-'====================================================================================================
 ' データ投入の実行
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryType 投入種類
 '====================================================================================================
-Private Sub Execute(xEntryType As EntryType)
+Private Sub Execute()
 On Error GoTo Finally
-    Dim operationDic As Object
     Dim tableSettings As Object
     Dim ts As TableSetting
     Dim ed As EntryData
     Dim xKey As Variant
-    Dim procCount As Long
+    Dim procCnt As Long
 
     ' 初期化
     If Not Initialize Then
@@ -61,7 +36,6 @@ On Error GoTo Finally
             "下記手順を実施してデータ投入対象のデータを設定してください。" & vbNewLine & _
             "  ・テーブル一覧のデータ投入対象列に空文字以外の値を設定する。" & vbNewLine & _
             "  ・データ投入対象のテーブルシートにデータを入力する。"
-            
         Exit Sub
     End If
 
@@ -70,21 +44,20 @@ On Error GoTo Finally
         Set ts = tableSettings(xKey)
 
         ' 対象テーブルのテーブルデータの取得
-        Set ed = DataEntryModel.GetEntryData(xEntryType, ts.PhysicsName)
+        Set ed = DataEntryModel.GetEntryData(ts.PhysicsName)
 
         ' データ投入実行
-        procCount = DataEntryModel.ExecuteDataEntry(ed)
+        procCnt = DataEntryModel.ExecuteDataEntry(ed)
 
         ' 処理件数の書き込み
-        Call TableSheet.WriteProcessingCount(ts, procCount)
+        Call TableSheet.WriteProcessingCount(ts, procCnt)
     Next
 Finally:
     ' 終了化
     Call Finalize
 
     ' 実行結果の表示
-    Set operationDic = GetOperationDic()
-    Call ApplicationEx.ShowExecutionResult(Err.Number = 0, "データ" & operationDic(xEntryType))
+    Call ApplicationEx.ShowExecutionResult("データ投入")
 End Sub
 
 
@@ -120,19 +93,3 @@ Private Sub Finalize()
     ' 画面描画の抑制解除
     Call ApplicationEx.SuppressScreenDrawing(False)
 End Sub
-
-
-'====================================================================================================
-' 投入種類に対応した投入文字列を格納する辞書を取得します
-'----------------------------------------------------------------------------------------------------
-' OUT: 投入辞書
-'====================================================================================================
-Private Function GetOperationDic()
-    Dim dic As Object
-    Set dic = CreateObject("Scripting.Dictionary")
-    Call dic.Add(EntryType.Register, "登録")
-    Call dic.Add(EntryType.Update, "更新")
-    Call dic.Add(EntryType.Remove, "削除")
-    Set GetOperationDic = dic
-End Function
-

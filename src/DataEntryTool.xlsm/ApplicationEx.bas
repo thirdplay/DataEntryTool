@@ -25,11 +25,10 @@ End Sub
 ' IN : result          実行結果
 '    : operationDetail 操作内容
 '====================================================================================================
-Public Sub ShowExecutionResult(result As Boolean, operationDetail As String)
-    If result Then
+Public Sub ShowExecutionResult(operationDetail As String)
+    If Err.Number = 0 Then
         MsgBoxEx.Information operationDetail & "が完了しました。"
     Else
         MsgBoxEx.Error operationDetail & "に失敗しました。", Err.Description
     End If
 End Sub
-

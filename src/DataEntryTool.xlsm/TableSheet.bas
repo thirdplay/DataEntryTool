@@ -11,19 +11,20 @@ Option Private Module
 '====================================================================================================
 ' テーブルシートの作成
 '----------------------------------------------------------------------------------------------------
-' IN : tableDefinitions テーブル定義リスト
+' IN : tableDefinitions テーブル定義の連装配列
 '====================================================================================================
-Public Sub CreateTableSheet(tableDefinitions As Collection)
+Public Sub CreateTableSheet(tableDefinitions As Object)
 On Error GoTo Finally
     Dim td As TableDefinition
     Dim cd As ColumnDefinition
     Dim columnRange As Variant
     Dim ws As Worksheet
+    Dim xKey As Variant
 
     Dim requiredDic As Object
     Set requiredDic = CreateObject("Scripting.Dictionary")
     Call requiredDic.Add("1", "必須")
-    
+
     Dim primaryKeyDic As Object
     Set primaryKeyDic = CreateObject("Scripting.Dictionary")
     Call primaryKeyDic.Add("1", "PK")
@@ -39,7 +40,8 @@ On Error GoTo Finally
         End If
     Next
 
-    For Each td In tableDefinitions
+    For Each xKey In tableDefinitions
+        Set td = tableDefinitions(xKey)
         ' テンプレートシートをコピーする
         tmplSheet.Copy Before:=tmplSheet
         ThisWorkbook.ActiveSheet.Name = td.TableName
@@ -96,4 +98,3 @@ Public Sub WriteProcessingCount(xTableSetting As TableSetting, procCount As Long
         .Cells(xTableSetting.Row, TableSettingCol.ProcessCount).Value = procCount
     End With
 End Sub
-

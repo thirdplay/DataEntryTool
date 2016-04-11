@@ -18,21 +18,9 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mEntryType As EntryType             ' 投入種類
 Private mTableName As String                ' テーブル名
 Private mColumnDefinitions As Collection    ' カラム定義リスト
 Private mRecordRange As Range               ' レコード範囲
-
-
-'====================================================================================================
-' 投入種類の取得/設定
-'====================================================================================================
-Public Property Get EntryType() As EntryType
-    EntryType = mEntryType
-End Property
-Public Property Let EntryType(xEntryType As EntryType)
-    mEntryType = xEntryType
-End Property
 
 
 '====================================================================================================
@@ -66,4 +54,3 @@ End Property
 Public Property Let RecordRange(RecordRange As Range)
     Set mRecordRange = RecordRange
 End Property
-
