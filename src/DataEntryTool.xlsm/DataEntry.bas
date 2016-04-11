@@ -21,8 +21,8 @@ On Error GoTo Finally
     Dim xKey As Variant
     Dim procCnt As Long
 
-    ' 初期化
-    If Not Initialize Then
+    ' マクロ起動
+    If Not ApplicationEx.StartupMacro(MacroType.DataEntry) Then
         Exit Sub
     End If
 
@@ -53,43 +53,9 @@ On Error GoTo Finally
         Call TableSheet.WriteProcessingCount(ts, procCnt)
     Next
 Finally:
-    ' 終了化
-    Call Finalize
+    ' マクロ停止
+    Call ApplicationEx.ShutdownMacro
 
     ' 実行結果の表示
     Call ApplicationEx.ShowExecutionResult("データ投入")
-End Sub
-
-
-'====================================================================================================
-' 初期化
-'----------------------------------------------------------------------------------------------------
-' OUT: True:成功、False:失敗
-'====================================================================================================
-Private Function Initialize() As Boolean
-    ' 画面描画の抑制
-    Call ApplicationEx.SuppressScreenDrawing(True)
-
-    ' 設定モジュールの構成
-    Call Setting.Setup
-    If Not Setting.CheckDataEntrySetting() Then
-        Initialize = False
-        Exit Function
-    End If
-
-    ' データベース接続
-    Call Database.Connect
-    Initialize = True
-End Function
-
-
-'====================================================================================================
-' 終了化
-'====================================================================================================
-Private Sub Finalize()
-    ' データベース切断
-    Call Database.Disconnect
-
-    ' 画面描画の抑制解除
-    Call ApplicationEx.SuppressScreenDrawing(False)
 End Sub

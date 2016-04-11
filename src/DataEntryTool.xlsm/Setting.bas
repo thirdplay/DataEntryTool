@@ -143,8 +143,11 @@ End Property
 
 '====================================================================================================
 ' 設定モジュールを構成します
+'----------------------------------------------------------------------------------------------------
+' IN : xMacroType マクロ種別
+' OUT: True:成功、False:失敗
 '====================================================================================================
-Public Sub Setup()
+Public Function Setup(xMacroType As MacroType) As Boolean
     With ThisWorkbook.Worksheets(cstSheetMain)
         Setting.DatabaseType = .Range(cstDatabaseType).Value
         Setting.ServerName = .Range(cstServerName).Value
@@ -156,7 +159,21 @@ Public Sub Setup()
         Setting.DateFormat = .Range(cstDateFormat).Value
         Setting.TimestampFormat = .Range(cstTimestampFormat).Value
     End With
-End Sub
+
+    ' 設定モジュールのチェック
+    If xMacroType = MacroType.Database Then
+        If Not CheckDbSetting() Then
+            Setup = False
+            Exit Function
+        End If
+    ElseIf xMacroType = MacroType.DataEntry Then
+        If Not Setting.CheckDataEntrySetting() Then
+            Setup = False
+            Exit Function
+        End If
+    End If
+    Setup = True
+End Function
 
 
 '====================================================================================================
@@ -164,7 +181,7 @@ End Sub
 '----------------------------------------------------------------------------------------------------
 ' OUT: True:チェックOK、False:チェックNG
 '====================================================================================================
-Public Function CheckDbSetting() As Boolean
+Private Function CheckDbSetting() As Boolean
 On Error GoTo ErrHandler
     Call CheckInputValue(Setting.DatabaseType, "データベース種類")
     Call CheckInputValue(Setting.ServerName, "サーバ名")
@@ -188,7 +205,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' OUT: True:チェックOK、False:チェックNG
 '====================================================================================================
-Public Function CheckDataEntrySetting() As Boolean
+Private Function CheckDataEntrySetting() As Boolean
 On Error GoTo ErrHandler
     If Not CheckDbSetting Then
         CheckDataEntrySetting = False
@@ -217,5 +234,3 @@ Private Sub CheckInputValue(inputValue As String, itemName As String)
         Err.Raise 1000, , "[" & itemName & "]を入力してください。"
     End If
 End Sub
-
-

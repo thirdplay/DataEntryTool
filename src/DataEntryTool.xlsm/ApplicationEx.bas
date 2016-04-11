@@ -9,17 +9,53 @@ Option Private Module
 '====================================================================================================
 
 '====================================================================================================
-' 画面描画を抑制します
-'----------------------------------------------------------------------------------------------------
-' IN : isSuppress 抑制フラグ(True:抑制する、False:抑制しない)
+' メンバ変数
 '====================================================================================================
-Public Sub SuppressScreenDrawing(isSuppress As Boolean)
-    Application.ScreenUpdating = Not isSuppress
-    Application.DisplayAlerts = Not isSuppress
-    'Application.EnableEvents = False
-    'mCalculation = Application.Calculation
-    'Application.Calculation = xlCalculationManual
-    'Application.Cirspr = xlWait 'xlDefault
+Private mMacroType As MacroType     ' マクロ種別
+Private mCalculation As Long        ' 自動計算方法(退避用)
+
+'====================================================================================================
+' マクロ起動
+'----------------------------------------------------------------------------------------------------
+' IN : xMacroType マクロ種別
+' OUT: True:成功、False:失敗
+'====================================================================================================
+Public Function StartupMacro(xMacroType As MacroType) As Boolean
+    mMacroType = xMacroType
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+    Application.EnableEvents = False
+    mCalculation = Application.Calculation
+    Application.Calculation = xlCalculationManual
+    Application.Cursor = xlWait
+
+    ' 設定モジュールの構成
+    If Not Setting.Setup(mMacroType) Then
+        StartupMacro = False
+    End If
+
+    ' データベース接続
+    If (mMacroType And MacroType.Database) = MacroType.Database Then
+        Call Database.Connect
+    End If
+    StartupMacro = True
+End Function
+
+
+'====================================================================================================
+' マクロ停止
+'====================================================================================================
+Public Sub ShutdownMacro()
+    ' データベース切断
+    If (mMacroType And MacroType.Database) = MacroType.Database Then
+        Call Database.Disconnect
+    End If
+
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+    Application.EnableEvents = True
+    Application.Calculation = mCalculation
+    Application.Cursor = xlDefault
 End Sub
 
 

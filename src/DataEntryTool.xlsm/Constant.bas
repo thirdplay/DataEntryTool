@@ -22,6 +22,13 @@ Public Const cstDatabaseTypePostgreSQL = "PostgreSQL"       ' PostgreSQL
 Public Const cstLinefeedCodeCRLF = "CRLF"                   ' CRLF
 Public Const cstLinefeedCodeLF = "LF"                       ' LF
 
+' マクロ種別
+Public Enum MacroType
+    Database = &H01                     ' データベース
+    DataEntry = &H02 Or Database        ' データ投入
+    Setting = &H04                      ' 設定
+End Enum
+
 ' テーブル設定の列参照値
 Public Enum TableSettingCol
     PhysicsName = 1         ' 物理名
