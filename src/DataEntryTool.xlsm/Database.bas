@@ -13,6 +13,8 @@ Option Private Module
 '====================================================================================================
 ' カラム定義取得クエリの区切り文字
 Private Const cstColumnDefinitionDelimiter = " UNION ALL "
+' カラム定義取得クエリの接尾辞
+Private Const cstColumnDefinitionSuffix = " ORDER BY table_name, column_id"
 ' 区切り文字
 Private Const cstDelimiter = ","
 
@@ -126,7 +128,7 @@ Public Function GetColumnDefinitions(tableSettings As Object) As Object
             Err.Raise 1000, , "テーブル[" & xTableName & "]のカラム定義が取得できません。"
         End If
     Next
-    query = Right(query, Len(query) - Len(cstColumnDefinitionDelimiter))
+    query = Right(query, Len(query) - Len(cstColumnDefinitionDelimiter)) & cstColumnDefinitionSuffix
 
     ' カラム定義取得クエリの実行
     Set rs = mConnect.Execute(query)

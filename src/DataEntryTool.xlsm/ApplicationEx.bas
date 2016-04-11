@@ -16,6 +16,10 @@ Option Private Module
 Public Sub SuppressScreenDrawing(isSuppress As Boolean)
     Application.ScreenUpdating = Not isSuppress
     Application.DisplayAlerts = Not isSuppress
+    'Application.EnableEvents = False
+    'mCalculation = Application.Calculation
+    'Application.Calculation = xlCalculationManual
+    'Application.Cirspr = xlWait 'xlDefault
 End Sub
 
 
