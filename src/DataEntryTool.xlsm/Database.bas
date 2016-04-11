@@ -177,7 +177,7 @@ Public Function MakeDataEntryQuery(xEntryData As EntryData) As String
         query = Replace(query, "${columns}", GetColumnPhrase(xEntryData.ColumnDefinitions))
         query = Replace(query, "${values}", GetValuePhrase(xEntryData.ColumnDefinitions, rr))
     Next
-    query = query & mDatabaseCore.GetDataEntryQuerySuffix'
+    query = query & mDatabaseCore.GetDataEntryQuerySuffix
     MakeDataEntryQuery = query
 End Function
 
