@@ -21,12 +21,14 @@ Implements IDatabaseCore
 ' 定数
 '====================================================================================================
 ' カラム定義取得クエリ
-Private Const cstColumnDefinitionQuery = "SELECT utc.table_name, utc.column_id, utc.column_name, ucc.comments, utc.data_type, CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length, DECODE(utc.nullable,'N','1','0') AS is_required, DECODE(pkc.table_name, NULL, '0', '1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name, cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name='${tableName}'"
+Private Const cstColumnDefinitionQuery = "SELECT utc.table_name,utc.column_id,utc.column_name,ucc.comments,utc.data_type,CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length,DECODE(utc.nullable,'N','1','0') AS is_required,DECODE(pkc.table_name,NULL,'0','1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name,cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name IN(${tableNameIn}) ORDER BY table_name, column_id"
 ' テーブル名取得クエリ
 Private Const cstTableNameQuery = "SELECT table_name from user_tables"
 Private Const cstDataEntryQueryPrefix = "INSERT ALL "
 Private Const cstDataEntryQuerySuffix = " SELECT * FROM dual"
 Private Const cstDataEntryQuery = "INTO ${tableName} (${columns}) VALUES (${values})"
+' 区切り文字
+Private Const cstDelimiter = ","
 
 
 '====================================================================================================
@@ -43,22 +45,33 @@ End Function
 
 
 '====================================================================================================
-' カラム定義取得クエリを取得します
-'----------------------------------------------------------------------------------------------------
-' OUT: カラム定義取得クエリ
-'====================================================================================================
-Public Function IDatabaseCore_GetColumnDefinitionQuery() As String
-    IDatabaseCore_GetColumnDefinitionQuery = cstColumnDefinitionQuery
-End Function
-
-
-'====================================================================================================
 ' テーブル名取得クエリを取得します
 '----------------------------------------------------------------------------------------------------
 ' OUT: テーブル名取得クエリ
 '====================================================================================================
 Public Function IDatabaseCore_GetTableNameQuery() As String
     IDatabaseCore_GetTableNameQuery = cstTableNameQuery
+End Function
+
+
+'====================================================================================================
+' カラム定義取得クエリを取得します
+'----------------------------------------------------------------------------------------------------
+' IN : tableSettings テーブル設定の連装配列
+' OUT: カラム定義取得クエリ
+'====================================================================================================
+Public Function IDatabaseCore_GetColumnDefinitionQuery(tableSettings As Object) As String
+    Dim query As String
+    Dim xTableName As Variant
+    Dim tableNameInStr As String
+
+    For Each xTableName In tableSettings.Keys
+        tableNameInStr = tableNameInStr & "'" & xTableName & "'" & cstDelimiter
+    Next
+    tableNameInStr = Left(tableNameInStr, Len(tableNameInStr) - Len(cstDelimiter))
+    query = Replace(cstColumnDefinitionQuery, "${tableNameIn}", tableNameInStr)
+
+    IDatabaseCore_GetColumnDefinitionQuery = query
 End Function
 
 

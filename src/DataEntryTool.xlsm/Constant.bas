@@ -22,11 +22,16 @@ Public Const cstDatabaseTypePostgreSQL = "PostgreSQL"       ' PostgreSQL
 Public Const cstLinefeedCodeCRLF = "CRLF"                   ' CRLF
 Public Const cstLinefeedCodeLF = "LF"                       ' LF
 
+' エラー番号
+Public Enum ErrNumber
+    Warning = 2000      ' 警告
+End Enum
+
 ' マクロ種別
 Public Enum MacroType
-    Database = &H01                     ' データベース
-    DataEntry = &H02 Or Database        ' データ投入
-    Setting = &H04                      ' 設定
+    Database = &H1                      ' データベース
+    DataEntry = &H2 Or Database         ' データ投入
+    Setting = &H4                       ' 設定
 End Enum
 
 ' テーブル設定の列参照値

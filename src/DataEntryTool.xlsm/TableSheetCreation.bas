@@ -17,21 +17,18 @@ On Error GoTo Finally
     Dim tableDefinitions As Object
 
     ' マクロ起動
-    If Not ApplicationEx.StartupMacro(MacroType.Database) Then
-        Exit Sub
-    End If
+    Call ApplicationEx.StartupMacro(MacroType.Database)
 
     ' テーブル設定リストの取得
     Set tableSettings = DataEntrySheet.GetTableSettings(False)
     If tableSettings.Count = 0 Then
-        MsgBoxEx.Warning "作成対象のテーブルがありません。", "テーブル一覧にテーブル物理名を入力してください。"
-        Exit Sub
+        Err.Raise ErrNumber.Warning, , "作成対象のテーブルがありません。" & vbNewLine & "テーブル一覧にテーブル物理名を入力してください。"
     End If
 
     ' テーブル設定リストを元に、テーブル定義リストを取得
     Set tableDefinitions = Database.GetColumnDefinitions(tableSettings)
     ' テーブル定義リストを元に、テーブルシートを作成する
-    Call TableSheet.CreateTableSheet(tableDefinitions)
+    Call TableSheet.CreateTableSheet(tableSettings, tableDefinitions)
     ' テーブル設定にハイパーリンクを設定する
     Call DataEntrySheet.SetHyperlink(tableSettings)
 

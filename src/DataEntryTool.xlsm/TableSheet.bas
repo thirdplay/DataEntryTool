@@ -11,9 +11,10 @@ Option Private Module
 '====================================================================================================
 ' テーブルシートの作成
 '----------------------------------------------------------------------------------------------------
-' IN : tableDefinitions テーブル定義の連装配列
+' IN : tableSettings テーブル設定の連装配列
+'    : tableDefinitions テーブル定義の連装配列
 '====================================================================================================
-Public Sub CreateTableSheet(tableDefinitions As Object)
+Public Sub CreateTableSheet(tableSettings As Object, tableDefinitions As Object)
 On Error GoTo Finally
     Dim td As TableDefinition
     Dim cd As ColumnDefinition
@@ -40,7 +41,7 @@ On Error GoTo Finally
         End If
     Next
 
-    For Each xKey In tableDefinitions
+    For Each xKey In tableSettings
         Set td = tableDefinitions(xKey)
         ' テンプレートシートをコピーする
         tmplSheet.Copy Before:=tmplSheet

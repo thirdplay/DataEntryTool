@@ -22,9 +22,7 @@ On Error GoTo Finally
     Dim procCnt As Long
 
     ' マクロ起動
-    If Not ApplicationEx.StartupMacro(MacroType.DataEntry) Then
-        Exit Sub
-    End If
+    Call ApplicationEx.StartupMacro(MacroType.DataEntry)
 
     ' 処理件数のクリア
     Call TableSheet.ClearProcessingCount
@@ -32,11 +30,10 @@ On Error GoTo Finally
     ' 対象テーブル設定の取得
     Set tableSettings = DataEntrySheet.GetTableSettings(True)
     If tableSettings.Count = 0 Then
-        MsgBoxEx.Warning "データ投入対象のデータがありません。", _
+        Err.Raise ErrNumber.Warning, , "データ投入対象のデータがありません。" & vbNewLine & vbNewLine & _
             "下記手順を実施してデータ投入対象のデータを設定してください。" & vbNewLine & _
             "  ・テーブル一覧のデータ投入対象列に空文字以外の値を設定する。" & vbNewLine & _
             "  ・データ投入対象のテーブルシートにデータを入力する。"
-        Exit Sub
     End If
 
     ' 対象テーブル設定を全て処理

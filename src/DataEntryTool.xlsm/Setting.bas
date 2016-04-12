@@ -145,9 +145,8 @@ End Property
 ' 設定モジュールを構成します
 '----------------------------------------------------------------------------------------------------
 ' IN : xMacroType マクロ種別
-' OUT: True:成功、False:失敗
 '====================================================================================================
-Public Function Setup(xMacroType As MacroType) As Boolean
+Public Sub Setup(xMacroType As MacroType)
     With ThisWorkbook.Worksheets(cstSheetMain)
         Setting.DatabaseType = .Range(cstDatabaseType).Value
         Setting.ServerName = .Range(cstServerName).Value
@@ -162,26 +161,17 @@ Public Function Setup(xMacroType As MacroType) As Boolean
 
     ' 設定モジュールのチェック
     If xMacroType = MacroType.Database Then
-        If Not CheckDbSetting() Then
-            Setup = False
-            Exit Function
-        End If
+        Call CheckDbSetting
     ElseIf xMacroType = MacroType.DataEntry Then
-        If Not Setting.CheckDataEntrySetting() Then
-            Setup = False
-            Exit Function
-        End If
+        Call Setting.CheckDataEntrySetting
     End If
-    Setup = True
-End Function
+End Sub
 
 
 '====================================================================================================
 ' データベース設定をチェックします
-'----------------------------------------------------------------------------------------------------
-' OUT: True:チェックOK、False:チェックNG
 '====================================================================================================
-Private Function CheckDbSetting() As Boolean
+Private Sub CheckDbSetting()
 On Error GoTo ErrHandler
     Call CheckInputValue(Setting.DatabaseType, "データベース種類")
     Call CheckInputValue(Setting.ServerName, "サーバ名")
@@ -191,36 +181,25 @@ On Error GoTo ErrHandler
         Call CheckInputValue(Setting.Port, "ポート")
         Call CheckInputValue(Setting.DatabaseName, "データベース名")
     End If
-    CheckDbSetting = True
-    Exit Function
+    Exit Sub
 ErrHandler:
-    MsgBoxEx.Warning "データベース設定の" & Err.Description
-    CheckDbSetting = False
-    Exit Function
-End Function
+    Err.Raise ErrNumber.Warning, , "データベース設定の" & Err.Description
+End Sub
 
 
 '====================================================================================================
 ' データ投入設定をチェックします
-'----------------------------------------------------------------------------------------------------
-' OUT: True:チェックOK、False:チェックNG
 '====================================================================================================
-Private Function CheckDataEntrySetting() As Boolean
+Private Sub CheckDataEntrySetting()
 On Error GoTo ErrHandler
-    If Not CheckDbSetting Then
-        CheckDataEntrySetting = False
-        Exit Function
-    End If
+    Call CheckDbSetting
     Call CheckInputValue(Setting.LinefeedCode, "改行コード")
     Call CheckInputValue(Setting.DateFormat, "日付書式")
     Call CheckInputValue(Setting.TimestampFormat, "タイムスタンプ書式")
-    CheckDataEntrySetting = True
-    Exit Function
+    Exit Sub
 ErrHandler:
-    MsgBoxEx.Warning "データ投入設定の" & Err.Description
-    CheckDataEntrySetting = False
-    Exit Function
-End Function
+    Err.Raise ErrNumber.Warning, , "データ投入設定の" & Err.Description
+End Sub
 
 
 '====================================================================================================

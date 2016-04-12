@@ -13,33 +13,30 @@ Option Private Module
 '====================================================================================================
 Private mMacroType As MacroType     ' マクロ種別
 Private mCalculation As Long        ' 自動計算方法(退避用)
+Private mTime As Variant
 
 '====================================================================================================
 ' マクロ起動
 '----------------------------------------------------------------------------------------------------
 ' IN : xMacroType マクロ種別
-' OUT: True:成功、False:失敗
 '====================================================================================================
-Public Function StartupMacro(xMacroType As MacroType) As Boolean
+Public Sub StartupMacro(xMacroType As MacroType)
     mMacroType = xMacroType
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
-    Application.EnableEvents = False
+    'Application.EnableEvents = False
     mCalculation = Application.Calculation
     Application.Calculation = xlCalculationManual
     Application.Cursor = xlWait
 
     ' 設定モジュールの構成
-    If Not Setting.Setup(mMacroType) Then
-        StartupMacro = False
-    End If
+    Call Setting.Setup(mMacroType)
 
     ' データベース接続
     If (mMacroType And MacroType.Database) = MacroType.Database Then
         Call Database.Connect
     End If
-    StartupMacro = True
-End Function
+End Sub
 
 
 '====================================================================================================
@@ -53,7 +50,7 @@ Public Sub ShutdownMacro()
 
     Application.ScreenUpdating = True
     Application.DisplayAlerts = True
-    Application.EnableEvents = True
+    'Application.EnableEvents = True
     Application.Calculation = mCalculation
     Application.Cursor = xlDefault
 End Sub
@@ -67,8 +64,10 @@ End Sub
 '====================================================================================================
 Public Sub ShowExecutionResult(operationDetail As String)
     If Err.Number = 0 Then
-        MsgBoxEx.Information operationDetail & "が完了しました。"
+        MsgBox operationDetail & "が完了しました。", vbOKOnly + vbInformation
+    ElseIf Err.Number = ErrNumber.Warning Then
+        MsgBox Err.Description, vbOKOnly + vbExclamation
     Else
-        MsgBoxEx.Error operationDetail & "に失敗しました。", Err.Description
+        MsgBox operationDetail & "に失敗しました。" & vbNewLine & vbNewLine & Err.Description, vbOKOnly + vbCritical
     End If
 End Sub

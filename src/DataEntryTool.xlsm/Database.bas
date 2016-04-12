@@ -11,12 +11,6 @@ Option Private Module
 '====================================================================================================
 ' 定数
 '====================================================================================================
-' カラム定義取得クエリの区切り文字
-Private Const cstColumnDefinitionDelimiter = " UNION ALL "
-' カラム定義取得クエリの接頭辞
-Private Const cstColumnDefinitionPrefix = "SELECT * FROM ("
-' カラム定義取得クエリの接尾辞
-Private Const cstColumnDefinitionSuffix = ") tbl ORDER BY table_name, column_id"
 ' 区切り文字
 Private Const cstDelimiter = ","
 
@@ -44,7 +38,7 @@ On Error GoTo ErrHandler
         ' データベース接続
         Set mConnect = CreateObject("ADODB.Connection")
         mConnect.Open mDatabaseCore.GetConnectStr
-        mConnect.CursorLocation = adUseClient
+        'mConnect.CursorLocation = adUseClient
     End If
     Exit Sub
 ErrHandler:
@@ -101,15 +95,15 @@ End Sub
 
 
 '====================================================================================================
-' 指定されたテーブルのカラム定義リストを取得します
+' カラム定義リストを取得します
 '----------------------------------------------------------------------------------------------------
-' IN : tableSettings テーブル設定連想配列
+' IN : tableSettings テーブル設定の連想配列
 ' OUT: カラム定義リスト
 '====================================================================================================
 Public Function GetColumnDefinitions(tableSettings As Object) As Object
     Dim rs As Object
     Dim tableNames As Object
-    Dim query As String
+    Dim tableNameInStr As String
     Dim xTableName As Variant
     Dim td As TableDefinition
     Dim cd As ColumnDefinition
@@ -124,18 +118,14 @@ Public Function GetColumnDefinitions(tableSettings As Object) As Object
     Loop
 
     ' クエリを作りながらテーブル名の存在チェックをする
-    query = cstColumnDefinitionPrefix
-    For Each xTableName In tableSettings.Keys
-        query = query & Replace(mDatabaseCore.GetColumnDefinitionQuery, "${tableName}", xTableName) & cstColumnDefinitionDelimiter
+    For Each xTableName In tableSettings
         If Not tableNames.Exists(xTableName) Then
             Err.Raise 1000, , "テーブル[" & xTableName & "]のカラム定義が取得できません。"
         End If
     Next
-    query = Left(query, Len(query) - Len(cstColumnDefinitionDelimiter)) & cstColumnDefinitionSuffix
-    Debug.Print query
 
     ' カラム定義取得クエリの実行
-    Set rs = mConnect.Execute(query)
+    Set rs = mConnect.Execute(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
 
     ' テーブル定義の連装配列を作成する
     Set dic = CreateObject("Scripting.Dictionary")
@@ -250,3 +240,25 @@ Private Function GetItemValue(ByVal dataValue As String, ByVal xDataType As Stri
     End If
     GetItemValue = itemValue
 End Function
+
+
+'Private Sub GetRecordsetData()
+'   iExecutionCount = iExecutionCount + 1
+'   If rst.State <> adStateClosed Then
+'      rst.Close
+'   End If
+'   rst.Open _
+'      "Select * From Pubs..Publishers, Pubs..Titles, Pubs..Authors", _
+'      con, adOpenKeyset, adLockOptimistic, adAsyncExecute
+'End Sub
+'
+'Private Sub con_ExecuteComplete(ByVal RecordsAffected As Long, _
+'    ByVal pError As ADODB.Error, adStatus As ADODB.EventStatusEnum, _
+'    ByVal pCommand As ADODB.Command, _
+'    ByVal pRecordset As ADODB.Recordset, _
+'    ByVal pConnection As ADODB.Connection)
+'
+'   ' When the ADO recordset has been populated with data, begin opening
+'   ' the next ADO recordset.
+'   GetRecordsetData
+'End Sub
