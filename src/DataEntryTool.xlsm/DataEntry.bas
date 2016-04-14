@@ -9,17 +9,43 @@ Option Private Module
 '====================================================================================================
 
 '====================================================================================================
+' データ登録
+'====================================================================================================
+Public Sub RegisterData()
+    Call Execute(EntryType.Register)
+End Sub
+
+
+'====================================================================================================
+' データ更新
+'====================================================================================================
+Public Sub UpdateData()
+    Call Execute(EntryType.Update)
+End Sub
+
+
+'====================================================================================================
+' データ削除
+'====================================================================================================
+Public Sub DeleteData()
+    Call Execute(EntryType.Delete)
+End Sub
+
+
+'====================================================================================================
 ' データ投入の実行
 '----------------------------------------------------------------------------------------------------
 ' IN : xEntryType 投入種類
 '====================================================================================================
-Private Sub Execute()
+Private Sub Execute(xEntryType As EntryType)
 On Error GoTo Finally
     Dim tableSettings As Object
     Dim ts As TableSetting
     Dim ed As EntryData
     Dim xKey As Variant
     Dim procCnt As Long
+    Dim operationDic As Object
+    Set operationDic = GetOperationDic()
 
     ' マクロ起動
     Call ApplicationEx.StartupMacro(MacroType.DataEntry)
@@ -41,10 +67,10 @@ On Error GoTo Finally
         Set ts = tableSettings(xKey)
 
         ' 対象テーブルのテーブルデータの取得
-        Set ed = DataEntryModel.GetEntryData(ts.PhysicsName)
+        Set ed = TableSheet.GetEntryData(ts.PhysicsName)
 
         ' データ投入実行
-        procCnt = DataEntryModel.ExecuteDataEntry(ed)
+        procCnt = DataEntryModel.ExecuteDataEntry(xEntryType, ed)
 
         ' 処理件数の書き込み
         Call TableSheet.WriteProcessingCount(ts, procCnt)
@@ -54,5 +80,20 @@ Finally:
     Call ApplicationEx.ShutdownMacro
 
     ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult("データ投入")
+    Call ApplicationEx.ShowExecutionResult("データ" & operationDic(xEntryType))
 End Sub
+
+
+'====================================================================================================
+' 投入種類に対応した投入文字列を格納した連装配列を取得します
+'----------------------------------------------------------------------------------------------------
+' OUT: 連装配列
+'====================================================================================================
+Private Function GetOperationDic()
+    Dim dic As Object
+    Set dic = CreateObject("Scripting.Dictionary")
+    Call dic.Add(EntryType.Register, "登録")
+    Call dic.Add(EntryType.Update, "更新")
+    Call dic.Add(EntryType.Delete, "削除")
+    Set GetOperationDic = dic
+End Function

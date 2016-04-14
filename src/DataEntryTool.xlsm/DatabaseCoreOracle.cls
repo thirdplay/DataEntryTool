@@ -26,7 +26,7 @@ Private Const cstColumnDefinitionQuery = "SELECT utc.table_name,utc.column_id,ut
 Private Const cstTableNameQuery = "SELECT table_name from user_tables"
 Private Const cstDataEntryQueryPrefix = "INSERT ALL "
 Private Const cstDataEntryQuerySuffix = " SELECT * FROM dual"
-Private Const cstDataEntryQuery = "INTO ${tableName} (${columns}) VALUES (${values})"
+Private Const cstDataEntryQuery = "INSERT INTO ${tableName} (${columns}) VALUES (${values})"
 ' ãÊêÿÇËï∂éö
 Private Const cstDelimiter = ","
 

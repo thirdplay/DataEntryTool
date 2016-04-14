@@ -38,7 +38,7 @@ On Error GoTo ErrHandler
         ' データベース接続
         Set mConnect = CreateObject("ADODB.Connection")
         mConnect.Open mDatabaseCore.GetConnectStr
-        'mConnect.CursorLocation = adUseClient
+        mConnect.CursorLocation = adUseClient
     End If
     Exit Sub
 ErrHandler:
@@ -88,128 +88,33 @@ End Sub
 ' クエリを実行します
 '----------------------------------------------------------------------------------------------------
 ' IN : query クエリ文字列
+' OUT: 処理件数
 '====================================================================================================
-Public Sub ExecuteQuery(query As String)
-    Call mConnect.Execute(CommandText:=query)
-End Sub
-
-
-'====================================================================================================
-' カラム定義リストを取得します
-'----------------------------------------------------------------------------------------------------
-' IN : tableSettings テーブル設定の連想配列
-' OUT: カラム定義リスト
-'====================================================================================================
-Public Function GetColumnDefinitions(tableSettings As Object) As Object
-    Dim rs As Object
-    Dim tableNames As Object
-    Dim tableNameInStr As String
-    Dim xTableName As Variant
-    Dim td As TableDefinition
-    Dim cd As ColumnDefinition
-    Dim dic As Object
-
-    ' テーブル名連想配列の取得
-    Set rs = mConnect.Execute(mDatabaseCore.GetTableNameQuery)
-    Set tableNames = CreateObject("Scripting.Dictionary")
-    Do Until rs.EOF
-        Call tableNames.Add(rs("table_name").Value, rs("table_name").Value)
-        rs.MoveNext
-    Loop
-
-    ' クエリを作りながらテーブル名の存在チェックをする
-    For Each xTableName In tableSettings
-        If Not tableNames.Exists(xTableName) Then
-            Err.Raise 1000, , "テーブル[" & xTableName & "]のカラム定義が取得できません。"
-        End If
-    Next
-
-    ' カラム定義取得クエリの実行
-    Set rs = mConnect.Execute(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
-
-    ' テーブル定義の連装配列を作成する
-    Set dic = CreateObject("Scripting.Dictionary")
-    Do Until rs.EOF
-        ' テーブル定義生成
-        If Not dic.Exists(rs("table_name").Value) Then
-            Set td = New TableDefinition
-            td.TableName = rs("table_name").Value
-            td.ColumnDefinitions = New Collection
-            Call dic.Add(td.TableName, td)
-        End If
-
-        ' カラム定義生成
-        Set cd = New ColumnDefinition
-        With cd
-            .ColumnId = rs("column_id").Value
-            .ColumnName = rs("column_name").Value
-            .Comments = rs("comments").Value
-            .DataType = rs("data_type").Value
-            .DataLength = rs("data_length").Value
-            .IsRequired = rs("is_required").Value
-            .IsPrimaryKey = rs("is_primary_key").Value
-        End With
-        Call dic(rs("table_name").Value).ColumnDefinitions.Add(cd)
-        rs.MoveNext
-    Loop
-    Set GetColumnDefinitions = dic
+Public Function ExecuteQuery(query As String)
+    Dim procCnt As Long
+    Call mConnect.Execute(CommandText:=query, RecordsAffected:=procCnt)
+    ExecuteQuery = procCnt
 End Function
 
 
 '====================================================================================================
-' データ投入クエリを生成します
+' テーブル名を取得します
 '----------------------------------------------------------------------------------------------------
-' IN : xEntryData 投入データ
-' OUT: クエリ文字列
+' OUT: テーブル名
 '====================================================================================================
-Public Function MakeDataEntryQuery(xEntryData As EntryData) As String
-    Dim rr As Range
-    Dim query As String
-
-    query = mDatabaseCore.GetDataEntryQueryPrefix
-    For Each rr In xEntryData.RecordRange.Rows
-        query = query & mDatabaseCore.GetDataEntryQuery
-        query = Replace(query, "${tableName}", xEntryData.TableName)
-        query = Replace(query, "${columns}", GetColumnPhrase(xEntryData.ColumnDefinitions))
-        query = Replace(query, "${values}", GetValuePhrase(xEntryData.ColumnDefinitions, rr))
-    Next
-    query = query & mDatabaseCore.GetDataEntryQuerySuffix
-    MakeDataEntryQuery = query
+Public Function GetTableName()
+    Set GetTableName = mConnect.Execute(mDatabaseCore.GetTableNameQuery)
 End Function
 
 
 '====================================================================================================
-' Insert文のColumn句を取得します
+' カラム定義を取得します
 '----------------------------------------------------------------------------------------------------
-' IN : xColumnDefinitions カラム定義リスト
-' OUT: Column句
+' IN : tableSettings テーブル設定の連装配列
+' OUT: カラム定義
 '====================================================================================================
-Private Function GetColumnPhrase(xColumnDefinitions As Collection) As String
-    Dim result As String
-    Dim cd As ColumnDefinition
-
-    For Each cd In xColumnDefinitions
-        result = result & cd.ColumnName & cstDelimiter
-    Next
-    GetColumnPhrase = Left(result, Len(result) - Len(cstDelimiter))
-End Function
-
-
-'====================================================================================================
-' Insert文のValue句を取得します
-'----------------------------------------------------------------------------------------------------
-' IN : cd カラム定義リスト
-'    : record レコード
-' OUT: Value句
-'====================================================================================================
-Private Function GetValuePhrase(cd As Collection, record As Range) As String
-    Dim result As String
-    Dim i As Long
-
-    For i = 1 To record.Columns.Count
-        result = result & GetItemValue(record.Cells(1, i), cd(i).DataType) & cstDelimiter
-    Next
-    GetValuePhrase = Left(result, Len(result) - Len(cstDelimiter))
+Public Function GetColumnDefinition(tableSettings As Object)
+    Set GetColumnDefinition = mConnect.Execute(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
 End Function
 
 
@@ -220,7 +125,7 @@ End Function
 '    : xDataType データ型
 ' OUT: Value句
 '====================================================================================================
-Private Function GetItemValue(ByVal dataValue As String, ByVal xDataType As String) As String
+Public Function GetItemValue(ByVal dataValue As String, ByVal xDataType As String) As String
     Dim itemValue As String
 
     itemValue = dataValue

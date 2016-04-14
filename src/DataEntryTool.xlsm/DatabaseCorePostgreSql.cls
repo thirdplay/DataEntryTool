@@ -33,7 +33,7 @@ Private Const cstColumnDefinitionSuffix = ") tbl ORDER BY table_name, column_id"
 ' テーブル名取得クエリ
 Private Const cstTableNameQuery = "SELECT relname AS table_name FROM pg_stat_user_tables"
 ' データ投入クエリ
-Private Const cstDataEntryQuery = "INSERT INTO ${tableName} (${columns}) VALUES (${values});"
+Private Const cstDataEntryQuery = "INSERT INTO ${tableName} (${columns}) VALUES (${values})"
 
 
 '====================================================================================================

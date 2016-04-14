@@ -24,6 +24,7 @@ Public Const cstLinefeedCodeLF = "LF"                       ' LF
 
 ' エラー番号
 Public Enum ErrNumber
+    Error = 1000        ' エラー
     Warning = 2000      ' 警告
 End Enum
 
@@ -32,6 +33,13 @@ Public Enum MacroType
     Database = &H1                      ' データベース
     DataEntry = &H2 Or Database         ' データ投入
     Setting = &H4                       ' 設定
+End Enum
+
+' 投入種類
+Public Enum EntryType
+    Register = 0        ' 登録
+    Update              ' 更新
+    Delete              ' 削除
 End Enum
 
 ' テーブル設定の列参照値

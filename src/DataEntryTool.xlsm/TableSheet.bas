@@ -71,6 +71,45 @@ End Sub
 
 
 '====================================================================================================
+' 投入データを取得します
+'----------------------------------------------------------------------------------------------------
+' IN : xTableName テーブル名
+' OUT: 投入データ
+'====================================================================================================
+Public Function GetEntryData(xTableName As String) As EntryData
+    Dim ed As EntryData
+    Dim cd As ColumnDefinition
+    Dim rowIndex As Long
+    Dim dataCount As Long
+    Dim columnRange As Range
+    Dim cr As Range
+
+    With ThisWorkbook.Worksheets(xTableName)
+        Set ed = New EntryData
+        ed.TableName = xTableName
+
+        ' カラム定義リストの作成
+        ed.ColumnDefinitions = New Collection
+        dataCount = WorkSheetEx.GetColDataCount(xTableName, ColumnDefinitionRow.ColumnName, 1)
+        Set columnRange = .Range(.Cells(1, 1), .Cells(ColumnDefinitionRow.Max, dataCount))
+        For Each cr In columnRange.Columns
+            Set cd = New ColumnDefinition
+            cd.ColumnName = cr.Cells(ColumnDefinitionRow.ColumnName, 1)
+            cd.DataType = cr.Cells(ColumnDefinitionRow.DataType, 1)
+            cd.IsPrimaryKey = cr.Cells(ColumnDefinitionRow.IsPrimaryKey, 1)
+            Call ed.ColumnDefinitions.Add(cd)
+        Next
+
+        ' レコード範囲の設定
+        dataCount = WorkSheetEx.GetRowDataCount(xTableName, cstTableRecordBase, 1)
+        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount - 1, ed.ColumnDefinitions.Count))
+
+        Set GetEntryData = ed
+    End With
+End Function
+
+
+'====================================================================================================
 ' 処理件数をクリアします
 '====================================================================================================
 Public Sub ClearProcessingCount()
