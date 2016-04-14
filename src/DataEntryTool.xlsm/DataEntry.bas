@@ -51,7 +51,7 @@ On Error GoTo Finally
     Call ApplicationEx.StartupMacro(MacroType.DataEntry)
 
     ' 処理件数のクリア
-    Call TableSheet.ClearProcessingCount
+    Call DataEntrySheet.ClearProcessingCount
 
     ' 対象テーブル設定の取得
     Set tableSettings = DataEntrySheet.GetTableSettings(True)
@@ -73,7 +73,7 @@ On Error GoTo Finally
         procCnt = DataEntryModel.ExecuteDataEntry(xEntryType, ed)
 
         ' 処理件数の書き込み
-        Call TableSheet.WriteProcessingCount(ts, procCnt)
+        Call DataEntrySheet.WriteProcessingCount(ts, procCnt)
     Next
 Finally:
     ' マクロ停止
