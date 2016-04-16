@@ -1,10 +1,17 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
 Attribute VB_Name = "DataEntrySheet"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
-Option Private Module
 
 '====================================================================================================
 '
-' テーブル投入シートのモジュール
+' テーブル投入シート
 '
 '====================================================================================================
 
@@ -12,9 +19,9 @@ Option Private Module
 ' テーブル設定リストを返却します
 '----------------------------------------------------------------------------------------------------
 ' IN : isEntryTarget 投入対象フラグ(True:投入対象のみ,False:全て)
-' OUT: テーブル設定リスト
+' OUT: テーブル設定の連装配列
 '====================================================================================================
-Public Function GetTableSettings(isEntryTarget As Boolean) As Object
+Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
     Dim rowIndex As Long
     Dim ts As TableSetting
     Dim isTarget As Boolean
@@ -22,8 +29,8 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
     Dim dataCount As Long
     Dim tableRange As Range
     Dim tr As Range
-    Dim dic As Object
-    Set dic = CreateObject("Scripting.Dictionary")
+    Dim dic As Dictionary
+    Set dic = New Dictionary
 
     With ThisWorkbook.Worksheets(cstSheetMain)
         rowIndex = .Range(cstTableBase).Row + 1
@@ -39,7 +46,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
                     If tr.Cells(1, TableSettingCol.DataEntryTarget).Value = "" Then
                         isTarget = False
                     ElseIf Not WorkBookEx.ExistsSheet(xTableName) Then
-                        Err.Raise 1000, , "テーブル[" & xTableName & "]のシートが存在しません。" & vbNewLine & "テーブルシート作成を行い、テーブルシートを作成してください。"
+                        Err.Raise ErrNumber.Error, , "テーブル[" & xTableName & "]のシートが存在しません。" & vbNewLine & "テーブルシート作成を行い、テーブルシートを作成してください。"
                     ElseIf ThisWorkbook.Worksheets(xTableName).Cells(cstTableRecordBase, 1).Value = "" Then
                         isTarget = False
                     End If
@@ -47,7 +54,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
 
                 If isTarget Then
                     If dic.Exists(tr.Cells(1, TableSettingCol.PhysicsName).Value) Then
-                        Err.Raise 1000, , "テーブル[" & xTableName & "]が重複しています。"
+                        Err.Raise ErrNumber.Error, , "テーブル[" & xTableName & "]が重複しています。"
                     End If
                     Set ts = New TableSetting
                     ts.Row = tr.Row
@@ -66,9 +73,9 @@ End Function
 '====================================================================================================
 ' テーブル設定にハイパーリンクを設定します
 '----------------------------------------------------------------------------------------------------
-' IN : tablSeetings テーブル設定リスト
+' IN : tablSeetings テーブル設定の連装配列
 '====================================================================================================
-Public Sub SetHyperlink(tableSettings As Object)
+Public Sub SetHyperlink(tableSettings As Dictionary)
     Dim xKey As Variant
     Dim ts As TableSetting
 

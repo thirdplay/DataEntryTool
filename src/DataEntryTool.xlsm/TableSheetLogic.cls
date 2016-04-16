@@ -1,43 +1,39 @@
-Attribute VB_Name = "TableSheetCreation"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "TableSheetLogic"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
-Option Private Module
 
 '====================================================================================================
 '
-' テーブルシート作成モジュール
+' テーブルシートのロジック
 '
 '====================================================================================================
 
 '====================================================================================================
-' テーブルシート作成の実行
+' メンバ変数
 '====================================================================================================
-Public Sub Execute()
-On Error GoTo Finally
-    Dim tableSettings As Object
-    Dim tableDefinitions As Object
+Private mDataEntryDao As DataEntryDao
 
-    ' マクロ起動
-    Call ApplicationEx.StartupMacro(MacroType.Database)
 
-    ' テーブル設定リストの取得
-    Set tableSettings = DataEntrySheet.GetTableSettings(False)
-    If tableSettings.Count = 0 Then
-        Err.Raise ErrNumber.Warning, , "作成対象のテーブルがありません。" & vbNewLine & "テーブル一覧にテーブル物理名を入力してください。"
-    End If
+'====================================================================================================
+' コンストラクタ
+'====================================================================================================
+Public Sub Class_Initialize()
+    Set mDataEntryDao = DataEntryDaoFactory.GetDataEntryDao
+End Sub
 
-    ' テーブル設定リストを元に、テーブル定義リストを取得
-    Set tableDefinitions = GetColumnDefinitions(tableSettings)
-    ' テーブル定義リストを元に、テーブルシートを作成する
-    Call TableSheet.CreateTableSheet(tableSettings, tableDefinitions)
-    ' テーブル設定にハイパーリンクを設定する
-    Call DataEntrySheet.SetHyperlink(tableSettings)
 
-Finally:
-    ' マクロ停止
-    Call ApplicationEx.ShutdownMacro
-
-    ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult("テーブルシートの作成")
+'====================================================================================================
+' デストラクタ
+'====================================================================================================
+Public Sub Class_Terminate()
+    Set mDataEntryDao = Nothing
 End Sub
 
 
@@ -47,18 +43,18 @@ End Sub
 ' IN : tableSettings テーブル設定の連想配列
 ' OUT: カラム定義リスト
 '====================================================================================================
-Private Function GetColumnDefinitions(tableSettings As Object) As Object
+Public Function GetColumnDefinitions(tableSettings As Dictionary) As Dictionary
     Dim rs As Object
-    Dim tableNames As Object
+    Dim tableNames As Dictionary
     Dim tableNameInStr As String
     Dim xTableName As Variant
     Dim td As TableDefinition
     Dim cd As ColumnDefinition
-    Dim dic As Object
+    Dim dic As Dictionary
 
     ' テーブル名を取得し、連想配列を作成する
-    Set rs = Database.GetTableName()
-    Set tableNames = CreateObject("Scripting.Dictionary")
+    Set rs = mDataEntryDao.GetTableName()
+    Set tableNames = New Dictionary
     Do Until rs.EOF
         Call tableNames.Add(rs("table_name").Value, rs("table_name").Value)
         rs.MoveNext
@@ -72,10 +68,10 @@ Private Function GetColumnDefinitions(tableSettings As Object) As Object
     Next
 
     ' カラム定義の取得
-    Set rs = Database.GetColumnDefinition(tableSettings)
+    Set rs = mDataEntryDao.GetColumnDefinition(tableSettings)
 
     ' テーブル定義の連装配列を作成する
-    Set dic = CreateObject("Scripting.Dictionary")
+    Set dic = New Dictionary
     Do Until rs.EOF
         ' テーブル定義生成
         If Not dic.Exists(rs("table_name").Value) Then

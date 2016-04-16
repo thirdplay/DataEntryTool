@@ -7,6 +7,10 @@ Option Private Module
 ' 定数モジュール
 '
 '====================================================================================================
+' GUID
+Public Const cstGuidAdodb = "{B691E011-1797-432E-907A-4D8C69339129}"        ' ADODBのGUID
+Public Const cstGuidScripting = "{420B2830-E718-11CF-893D-00A0C9054228}"    ' ScriptingのGUID
+
 ' シート名
 Public Const cstSheetMain = "データ投入ツール"              ' メインシート
 Public Const cstSheetTemplate = "テンプレート"              ' テンプレートシート
@@ -14,7 +18,7 @@ Public Const cstSheetTemplate = "テンプレート"              ' テンプレートシート
 ' 名前定義
 Public Const cstTableBase = "TableBase"                     ' テーブル一覧の基準セル
 
-' データベース種類
+' データベース種別
 Public Const cstDatabaseTypeOracle = "Oracle"               ' Oracle
 Public Const cstDatabaseTypePostgreSQL = "PostgreSQL"       ' PostgreSQL
 
@@ -24,18 +28,19 @@ Public Const cstLinefeedCodeLF = "LF"                       ' LF
 
 ' エラー番号
 Public Enum ErrNumber
-    Error = 1000        ' エラー
-    Warning = 2000      ' 警告
+    Error = 1000                            ' ユーザ定義のエラー
+    Warning = 2000                          ' ユーザ定義の警告
+    AlreadyReferenceConfigured  = 32813     ' 既に参照設定されている
 End Enum
 
-' マクロ種別
-Public Enum MacroType
+' 設定種別
+Public Enum SettingType
+    None = &H0                          ' なし
     Database = &H1                      ' データベース
     DataEntry = &H2 Or Database         ' データ投入
-    Setting = &H4                       ' 設定
 End Enum
 
-' 投入種類
+' 投入種別
 Public Enum EntryType
     Register = 0        ' 登録
     Update              ' 更新
@@ -66,3 +71,5 @@ Public Const cstTableRecordBase = ColumnDefinitionRow.Max + 1
 
 ' カーソルロケーション
 Public Const adUseClient = 3
+' コマンドを非同期に実行することを示す
+Public Const adAsyncExecute = &H10

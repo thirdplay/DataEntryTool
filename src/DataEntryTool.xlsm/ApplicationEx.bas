@@ -11,17 +11,16 @@ Option Private Module
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mMacroType As MacroType     ' マクロ種別
-Private mCalculation As Long        ' 自動計算方法(退避用)
-Private mTime As Variant
+Private mCalculation As Long            ' 自動計算方法(退避用)
+
 
 '====================================================================================================
 ' マクロ起動
-'----------------------------------------------------------------------------------------------------
-' IN : xMacroType マクロ種別
+' ---------------------------------------------------------------------------------------------------
+' IN : xSettingType 設定種別
 '====================================================================================================
-Public Sub StartupMacro(xMacroType As MacroType)
-    mMacroType = xMacroType
+Public Sub StartupMacro(xSettingType As SettingType)
+    ' 描画/計算抑制
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
     'Application.EnableEvents = False
@@ -30,11 +29,11 @@ Public Sub StartupMacro(xMacroType As MacroType)
     Application.Cursor = xlWait
 
     ' 設定モジュールの構成
-    Call Setting.Setup(mMacroType)
+    Call Setting.Setup(xSettingType)
 
-    ' データベース接続
-    If (mMacroType And MacroType.Database) = MacroType.Database Then
-        Call Database.Connect
+    ' データ投入Daoファクトリの初期化
+    If (xSettingType And SettingType.Database) = SettingType.Database Then
+        Call DataEntryDaoFactory.Initialize
     End If
 End Sub
 
@@ -43,11 +42,10 @@ End Sub
 ' マクロ停止
 '====================================================================================================
 Public Sub ShutdownMacro()
-    ' データベース切断
-    If (mMacroType And MacroType.Database) = MacroType.Database Then
-        Call Database.Disconnect
-    End If
+    ' データ投入Daoファクトリの終了化
+    Call DataEntryDaoFactory.Finalize
 
+    ' 描画/計算抑制解除
     Application.ScreenUpdating = True
     Application.DisplayAlerts = True
     'Application.EnableEvents = True

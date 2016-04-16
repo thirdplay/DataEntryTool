@@ -1,25 +1,43 @@
-Attribute VB_Name = "Database"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "DataEntryDao"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
-Option Private Module
 
 '====================================================================================================
 '
-' データベースモジュール
+' データ投入Dao
 '
 '====================================================================================================
-
-'====================================================================================================
-' 定数
-'====================================================================================================
-' 区切り文字
-Private Const cstDelimiter = ","
-
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
-Private mConnect As Object                  ' 接続オブジェクト
+Private mDatabaseCore As IDatabaseCore              ' データベースコアインターフェース
+Private WithEvents mConnect As ADODB.Connection     ' 接続オブジェクト
+Private mAsyncRecordset As ADODB.Recordset          ' 非同期処理のレコードセット
+Private mAsyncRecordsAffected As Long               ' 非同期処理の更新件数
+Private mIsAsyncProc As Boolean                     ' 非同期処理フラグ
+
+
+'====================================================================================================
+' コンストラクタ
+'====================================================================================================
+Public Sub Class_Initialize()
+End Sub
+
+
+'====================================================================================================
+' デストラクタ
+'====================================================================================================
+Public Sub Class_Terminate()
+    Call Me.Disconnect
+End Sub
 
 
 '====================================================================================================
@@ -37,7 +55,7 @@ On Error GoTo ErrHandler
 
         ' データベース接続
         Set mConnect = CreateObject("ADODB.Connection")
-        mConnect.Open mDatabaseCore.GetConnectStr
+        Call mConnect.Open(mDatabaseCore.GetConnectStr(Setting.ServerName, Setting.UserId, Setting.Password, Setting.Port, Setting.DatabaseName))
         mConnect.CursorLocation = adUseClient
     End If
     Exit Sub
@@ -90,11 +108,11 @@ End Sub
 ' IN : query クエリ文字列
 ' OUT: 処理件数
 '====================================================================================================
-Public Function ExecuteQuery(query As String)
-    Dim procCnt As Long
-    Call mConnect.Execute(CommandText:=query, RecordsAffected:=procCnt)
-    ExecuteQuery = procCnt
-End Function
+'Public Function ExecuteQuery(query As String) As Long
+'    Dim procCnt As Long
+'    Call mConnect.Execute(CommandText:=query, RecordsAffected:=procCnt)
+'    ExecuteQuery = procCnt
+'End Function
 
 
 '====================================================================================================
@@ -102,7 +120,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' OUT: テーブル名
 '====================================================================================================
-Public Function GetTableName()
+Public Function GetTableName() As ADODB.Recordset
     Set GetTableName = mConnect.Execute(mDatabaseCore.GetTableNameQuery)
 End Function
 
@@ -113,8 +131,10 @@ End Function
 ' IN : tableSettings テーブル設定の連装配列
 ' OUT: カラム定義
 '====================================================================================================
-Public Function GetColumnDefinition(tableSettings As Object)
-    Set GetColumnDefinition = mConnect.Execute(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
+Public Function GetColumnDefinition(tableSettings As Object) As ADODB.Recordset
+    Call ExecuteAsync(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
+    Call WaitAsync
+    Set GetColumnDefinition = mAsyncRecordset
 End Function
 
 
@@ -123,7 +143,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' IN : dataValue データ値
 '    : xDataType データ型
-' OUT: Value句
+' OUT: 項目値
 '====================================================================================================
 Public Function GetItemValue(ByVal dataValue As String, ByVal xDataType As String) As String
     Dim itemValue As String
@@ -147,6 +167,27 @@ Public Function GetItemValue(ByVal dataValue As String, ByVal xDataType As Strin
 End Function
 
 
+'====================================================================================================
+' クエリ実行(非同期)
+'----------------------------------------------------------------------------------------------------
+' IN : query クエリ文字列
+'====================================================================================================
+Private Sub ExecuteAsync(query As String)
+    mIsAsyncProc = True
+    Call mConnect.Execute(CommandText:=query, Options:=adAsyncExecute)
+End Sub
+
+
+'====================================================================================================
+' 非同期処理が終了するまで待つ
+'====================================================================================================
+Private Sub WaitAsync()
+    Do While mIsAsyncProc
+        DoEvents
+    Loop
+End Sub
+
+
 'Private Sub GetRecordsetData()
 '   iExecutionCount = iExecutionCount + 1
 '   If rst.State <> adStateClosed Then
@@ -156,14 +197,17 @@ End Function
 '      "Select * From Pubs..Publishers, Pubs..Titles, Pubs..Authors", _
 '      con, adOpenKeyset, adLockOptimistic, adAsyncExecute
 'End Sub
-'
-'Private Sub con_ExecuteComplete(ByVal RecordsAffected As Long, _
-'    ByVal pError As ADODB.Error, adStatus As ADODB.EventStatusEnum, _
-'    ByVal pCommand As ADODB.Command, _
-'    ByVal pRecordset As ADODB.Recordset, _
-'    ByVal pConnection As ADODB.Connection)
-'
-'   ' When the ADO recordset has been populated with data, begin opening
-'   ' the next ADO recordset.
-'   GetRecordsetData
-'End Sub
+
+Private Sub mConnect_ExecuteComplete( _
+    ByVal RecordsAffected As Long, _
+    ByVal pError As ADODB.Error, _
+    ByRef adStatus As ADODB.EventStatusEnum, _
+    ByVal pCommand As ADODB.Command, _
+    ByVal pRecordset As ADODB.Recordset, _
+    ByVal pConnection As ADODB.Connection _
+)
+    Debug.Print "ExecuteComplete"
+    Set mAsyncRecordset = pRecordset
+    mAsyncRecordsAffected = RecordsAffected
+    mIsAsyncProc = False
+End Sub

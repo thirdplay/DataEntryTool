@@ -14,10 +14,10 @@ Option Private Module
 ' 名前定義
 Private Const cstDatabaseType = "DatabaseType"              ' データベース種類
 Private Const cstServerName = "ServerName"                  ' サーバ名
-Private Const cstPort = "Port"                              ' ポート
-Private Const cstDatabaseName = "DatabaseName"              ' データベース名
 Private Const cstUserId = "UserId"                          ' ユーザID
 Private Const cstPassword = "Password"                      ' パスワード
+Private Const cstPort = "Port"                              ' ポート
+Private Const cstDatabaseName = "DatabaseName"              ' データベース名
 Private Const cstLinefeedCode = "LinefeedCode"              ' 改行コード
 Private Const cstDateFormat = "DateFormat"                  ' 日付書式
 Private Const cstTimestampFormat = "TimestampFormat"        ' タイムスタンプ書式
@@ -26,19 +26,19 @@ Private Const cstTimestampFormat = "TimestampFormat"        ' タイムスタンプ書式
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDatabaseType As String         ' データベース種類
+Private mDatabaseType As String         ' データベース種別
 Private mServerName As String           ' サーバ名
-Private mPort As String                 ' ポート
-Private mDatabaseName As String         ' データベース名
 Private mUserId As String               ' ユーザID
 Private mPassword As String             ' パスワード
+Private mPort As String                 ' ポート
+Private mDatabaseName As String         ' データベース名
 Private mLinefeedCode As String         ' 改行コード
 Private mDateFormat As String           ' 日付書式
 Private mTimestampFormat As String      ' タイムスタンプ書式
 
 
 '====================================================================================================
-' データベース種類の取得/設定
+' データベース種別の取得/設定
 '====================================================================================================
 Public Property Get DatabaseType() As String
     DatabaseType = mDatabaseType
@@ -56,28 +56,6 @@ Public Property Get ServerName() As String
 End Property
 Public Property Let ServerName(ServerName As String)
     mServerName = ServerName
-End Property
-
-
-'====================================================================================================
-' ポートの取得/設定
-'====================================================================================================
-Public Property Get Port() As String
-    Port = mPort
-End Property
-Public Property Let Port(Port As String)
-    mPort = Port
-End Property
-
-
-'====================================================================================================
-' データベース名の取得/設定
-'====================================================================================================
-Public Property Get DatabaseName() As String
-    DatabaseName = mDatabaseName
-End Property
-Public Property Let DatabaseName(DatabaseName As String)
-    mDatabaseName = DatabaseName
 End Property
 
 
@@ -100,6 +78,28 @@ Public Property Get Password() As String
 End Property
 Public Property Let Password(Password As String)
     mPassword = Password
+End Property
+
+
+'====================================================================================================
+' ポートの取得/設定
+'====================================================================================================
+Public Property Get Port() As String
+    Port = mPort
+End Property
+Public Property Let Port(Port As String)
+    mPort = Port
+End Property
+
+
+'====================================================================================================
+' データベース名の取得/設定
+'====================================================================================================
+Public Property Get DatabaseName() As String
+    DatabaseName = mDatabaseName
+End Property
+Public Property Let DatabaseName(DatabaseName As String)
+    mDatabaseName = DatabaseName
 End Property
 
 
@@ -144,9 +144,9 @@ End Property
 '====================================================================================================
 ' 設定モジュールを構成します
 '----------------------------------------------------------------------------------------------------
-' IN : xMacroType マクロ種別
+' IN : xSettingType 設定種別
 '====================================================================================================
-Public Sub Setup(xMacroType As MacroType)
+Public Sub Setup(xSettingType As SettingType)
     With ThisWorkbook.Worksheets(cstSheetMain)
         Setting.DatabaseType = .Range(cstDatabaseType).Value
         Setting.ServerName = .Range(cstServerName).Value
@@ -160,9 +160,9 @@ Public Sub Setup(xMacroType As MacroType)
     End With
 
     ' 設定モジュールのチェック
-    If xMacroType = MacroType.Database Then
+    If xSettingType = SettingType.Database Then
         Call CheckDbSetting
-    ElseIf xMacroType = MacroType.DataEntry Then
+    ElseIf xSettingType = SettingType.DataEntry Then
         Call Setting.CheckDataEntrySetting
     End If
 End Sub
@@ -210,6 +210,6 @@ End Sub
 '====================================================================================================
 Private Sub CheckInputValue(inputValue As String, itemName As String)
     If inputValue = "" Then
-        Err.Raise 1000, , "[" & itemName & "]を入力してください。"
+        Err.Raise ErrNumber.Error, , "[" & itemName & "]を入力してください。"
     End If
 End Sub

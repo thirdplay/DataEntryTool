@@ -39,15 +39,26 @@ Private Const cstDataEntryQuery = "INSERT INTO ${tableName} (${columns}) VALUES 
 '====================================================================================================
 ' データベースの接続文字列を取得します
 '----------------------------------------------------------------------------------------------------
+' IN : xServerName サーバ名
+'    : xUserId ユーザID
+'    : xPassword パスワード
+'    : xPort ポート
+'    : xDatabaseName データベース名
 ' OUT: 接続文字列
 '====================================================================================================
-Public Function IDatabaseCore_GetConnectStr() As String
+Public Function IDatabaseCore_GetConnectStr( _
+    xServerName As String, _
+    xUserId As String, _
+    xPassword As String, _
+    xPort As String, _
+    xDatabaseName As String _
+) As String
     IDatabaseCore_GetConnectStr = "Driver={PostgreSQL Unicode};" _
-        & "SERVER=" & Setting.ServerName & ";" _
-        & "DATABASE=" & Setting.DatabaseName & ";" _
-        & "UID=" & Setting.UserId & ";" _
-        & "PWD=" & Setting.Password & ";" _
-        & "PORT=" & Setting.Port & ";"
+        & "SERVER=" & xServerName & ";" _
+        & "DATABASE=" & xDatabaseName & ";" _
+        & "UID=" & xUserId & ";" _
+        & "PWD=" & xPassword & ";" _
+        & "PORT=" & xPort & ";"
 End Function
 
 
@@ -78,36 +89,6 @@ Public Function IDatabaseCore_GetColumnDefinitionQuery(tableSettings As Object) 
     query = Left(query, Len(query) - Len(cstColumnDefinitionDelimiter)) & cstColumnDefinitionSuffix
 
     IDatabaseCore_GetColumnDefinitionQuery = query
-End Function
-
-
-'====================================================================================================
-' データ投入クエリの接頭辞を取得します
-'----------------------------------------------------------------------------------------------------
-' OUT: データ投入クエリの接頭辞
-'====================================================================================================
-Public Function IDatabaseCore_GetDataEntryQueryPrefix() As String
-    IDatabaseCore_GetDataEntryQueryPrefix = ""
-End Function
-
-
-'====================================================================================================
-' データ投入クエリの接尾辞を取得します
-'----------------------------------------------------------------------------------------------------
-' OUT: データ投入クエリの接尾辞
-'====================================================================================================
-Public Function IDatabaseCore_GetDataEntryQuerySuffix() As String
-    IDatabaseCore_GetDataEntryQuerySuffix = ""
-End Function
-
-
-'====================================================================================================
-' データ投入クエリを取得します
-'----------------------------------------------------------------------------------------------------
-' OUT: データ投入クエリ
-'====================================================================================================
-Public Function IDatabaseCore_GetDataEntryQuery() As String
-    IDatabaseCore_GetDataEntryQuery = cstDataEntryQuery
 End Function
 
 
