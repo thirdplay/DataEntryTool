@@ -28,7 +28,7 @@ On Error GoTo ErrHandler
     ' クエリ生成
     Select Case xEntryType
     Case EntryType.Register
-        Set queries= xEntryData.MakeInsertQueries()
+        Set queries = xEntryData.MakeInsertQueries()
     Case EntryType.Update
         Set queries = xEntryData.MakeUpdateQueries()
     Case EntryType.Delete
@@ -37,7 +37,7 @@ On Error GoTo ErrHandler
 
     ' データ投入
     For i = 1 To queries.Count
-        procCnt = procCnt + Database.ExecuteQuery (queries(i))
+        procCnt = procCnt + Database.ExecuteQuery(queries(i))
     Next
 
     ' コミット

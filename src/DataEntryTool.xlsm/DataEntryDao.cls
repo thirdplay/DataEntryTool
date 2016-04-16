@@ -20,6 +20,7 @@ Option Explicit
 '====================================================================================================
 Private mDatabaseCore As IDatabaseCore              ' データベースコアインターフェース
 Private WithEvents mConnect As ADODB.Connection     ' 接続オブジェクト
+Attribute mConnect.VB_VarHelpID = -1
 Private mAsyncRecordset As ADODB.Recordset          ' 非同期処理のレコードセット
 Private mAsyncRecordsAffected As Long               ' 非同期処理の更新件数
 Private mIsAsyncProc As Boolean                     ' 非同期処理フラグ

@@ -30,7 +30,7 @@ Public Const cstLinefeedCodeLF = "LF"                       ' LF
 Public Enum ErrNumber
     Error = 1000                            ' ユーザ定義のエラー
     Warning = 2000                          ' ユーザ定義の警告
-    AlreadyReferenceConfigured  = 32813     ' 既に参照設定されている
+    AlreadyReferenceConfigured = 32813      ' 既に参照設定されている
 End Enum
 
 ' 設定種別
