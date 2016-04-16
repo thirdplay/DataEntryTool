@@ -49,6 +49,8 @@ On Error GoTo Finally
     Next
 
     For Each xKey In tableSettings
+        Call ApplicationEx.CheckEvents
+
         Set td = tableDefinitions(xKey)
         ' テンプレートシートをコピーする
         tmplSheet.Copy Before:=tmplSheet

@@ -184,21 +184,21 @@ End Sub
 '====================================================================================================
 Private Sub WaitAsync()
     Do While mIsAsyncProc
-        DoEvents
+        Call ApplicationEx.CheckEvents
     Loop
 End Sub
 
 
-'Private Sub GetRecordsetData()
-'   iExecutionCount = iExecutionCount + 1
-'   If rst.State <> adStateClosed Then
-'      rst.Close
-'   End If
-'   rst.Open _
-'      "Select * From Pubs..Publishers, Pubs..Titles, Pubs..Authors", _
-'      con, adOpenKeyset, adLockOptimistic, adAsyncExecute
-'End Sub
-
+'====================================================================================================
+' コネクションの実行完了イベント
+'----------------------------------------------------------------------------------------------------
+' IN : RecordsAffected 更新件数
+'    : pError ADODBエラー
+'    : adStatus イベントステータス
+'    : pCommand コマンド
+'    : pRecordset レコードセット
+'    : pConnection コネクション
+'====================================================================================================
 Private Sub mConnect_ExecuteComplete( _
     ByVal RecordsAffected As Long, _
     ByVal pError As ADODB.Error, _
@@ -207,7 +207,6 @@ Private Sub mConnect_ExecuteComplete( _
     ByVal pRecordset As ADODB.Recordset, _
     ByVal pConnection As ADODB.Connection _
 )
-    Debug.Print "ExecuteComplete"
     Set mAsyncRecordset = pRecordset
     mAsyncRecordsAffected = RecordsAffected
     mIsAsyncProc = False

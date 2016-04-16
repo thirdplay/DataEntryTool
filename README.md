@@ -3,7 +3,7 @@ Excelに入力したデータをデータベースに投入するツールです
 
 ### 機能
 * データ投入用のテーブルシートの作成
-* データベースへのデータ投入
+* データベースへのデータ登録、更新、削除
 
 ### ライセンス
 
@@ -11,7 +11,17 @@ Excelに入力したデータをデータベースに投入するツールです
 
 ### 使用ライブラリ
 
-以下のライブラリを使用して開発を行っています。
+以下のモジュールを使用して開発を行っています。
+
+#### [progress-bar-vba](https://github.com/storix/progress-bar-vba)
+
+> The MIT License (MIT)
+>
+> Copyright (c) 2015 storix
+
+* **用途 :** プログレスバー表示
+* **ライセンス :** The MIT License (MIT)
+* **ライセンス全文 :** [licenses/progress-bar-vba.txt](licenses/progress-bar-vba.txt)
 
 #### [Ariawase](https://github.com/vbaidiot/Ariawase)
 

@@ -16,6 +16,12 @@ Option Explicit
 '====================================================================================================
 
 '====================================================================================================
+' 定数
+'====================================================================================================
+Private Const cstProcessName = "テーブルシートの作成"
+
+
+'====================================================================================================
 ' メンバ変数
 '====================================================================================================
 Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
@@ -40,19 +46,38 @@ On Error GoTo Finally
         Err.Raise ErrNumber.Warning, , "作成対象のテーブルがありません。" & vbNewLine & "テーブル一覧にテーブル物理名を入力してください。"
     End If
 
+    ' プログレスバー表示
+    Call ProgressBarForm.ResetProgress
+    Call ProgressBarForm.SetMainLabelText(cstProcessName)
+    Call ProgressBarForm.AddMessageToDetailsBox(cstProcessName & "開始")
+    Call ProgressBarForm.Show
+
     ' テーブル定義の取得
+    Call ProgressBarForm.AddMessageToDetailsBox("テーブル定義の取得")
     Set tableDefinitions = mTableSheetLogic.GetColumnDefinitions(tableSettings)
+    Call ProgressBarForm.IncreaseProgressByPercent(50)
 
     ' テーブルシートの作成
+    Call ProgressBarForm.AddMessageToDetailsBox("テーブルシートの作成")
     Call mTableSheet.CreateTableSheet(tableSettings, tableDefinitions)
+    Call ProgressBarForm.IncreaseProgressByPercent(40)
+
     ' ハイパーリンクの設定
+    Call ProgressBarForm.AddMessageToDetailsBox("ハイパーリンクの設定")
     Call mDataEntrySheet.SetHyperlink(tableSettings)
+    Call ProgressBarForm.IncreaseProgressByPercent(10)
+    Call ProgressBarForm.AddMessageToDetailsBox("正常終了")
 
 Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult("テーブルシートの作成")
+    Call ApplicationEx.ShowExecutionResult(cstProcessName)
+
+    ' プログレスバー非表示
+    If Err.Number = 0 Then
+        Unload ProgressBarForm
+    End If
 End Sub
 
 
