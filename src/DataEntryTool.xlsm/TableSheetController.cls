@@ -19,7 +19,6 @@ Option Explicit
 ' 定数
 '====================================================================================================
 Private Const cstProcessName = "テーブルシート作成"
-Private Const cstOperationContens = "テーブルシートの作成"
 
 
 '====================================================================================================
@@ -66,7 +65,7 @@ Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstOperationContens)
+    Call ApplicationEx.ShowExecutionResult(cstProcessName)
     ' ステータスバー非表示
     Call StatusBar.Hide
 End Sub

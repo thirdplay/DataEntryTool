@@ -19,7 +19,6 @@ Option Explicit
 ' 定数
 '====================================================================================================
 Private Const cstProcessName = "データ"
-Private Const cstOperationContens = "データの"
 
 
 '====================================================================================================
@@ -81,7 +80,7 @@ Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstOperationContens & mEntryTypeName)
+    Call ApplicationEx.ShowExecutionResult(cstProcessName & mEntryTypeName)
     ' ステータスバー非表示
     Call StatusBar.Hide
 End Sub
