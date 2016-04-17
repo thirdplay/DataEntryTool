@@ -22,6 +22,7 @@ Private mRow As Long                        ' 行番号
 Private mPhysicsName As String              ' 物理名
 Private mLogicalName As String              ' 論理名
 Private mDataEntryTarget As String          ' データ投入対象
+Private mDataCount As Long                  ' データ数
 
 
 '====================================================================================================
@@ -68,3 +69,12 @@ Public Property Let DataEntryTarget(DataEntryTarget As String)
 End Property
 
 
+'====================================================================================================
+' データ数の取得/設定
+'====================================================================================================
+Public Property Get DataCount() As Long
+    DataCount = mDataCount
+End Property
+Public Property Let DataCount(DataCount As Long)
+    mDataCount = DataCount
+End Property

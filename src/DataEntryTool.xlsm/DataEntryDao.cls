@@ -18,12 +18,12 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDatabaseCore As IDatabaseCore              ' データベースコアインターフェース
-Private WithEvents mConnect As ADODB.Connection     ' 接続オブジェクト
-Attribute mConnect.VB_VarHelpID = -1
-Private mAsyncRecordset As ADODB.Recordset          ' 非同期処理のレコードセット
-Private mAsyncRecordsAffected As Long               ' 非同期処理の更新件数
-Private mIsAsyncProc As Boolean                     ' 非同期処理フラグ
+Private mDatabaseCore As IDatabaseCore                  ' データベースコアインターフェース
+Private WithEvents mConnection As ADODB.Connection      ' 接続オブジェクト
+Attribute mConnection.VB_VarHelpID = -1
+Private mAsyncRecordset As ADODB.Recordset              ' 非同期処理のレコードセット
+Private mAsyncRecordsAffected As Long                   ' 非同期処理の更新件数
+Private mIsAsyncProc As Boolean                         ' 非同期処理フラグ
 
 
 '====================================================================================================
@@ -46,7 +46,7 @@ End Sub
 '====================================================================================================
 Public Sub Connect()
 On Error GoTo ErrHandler
-    If mConnect Is Nothing Then
+    If mConnection Is Nothing Then
         ' データベースコアの生成
         If Setting.DatabaseType = cstDatabaseTypeOracle Then
             Set mDatabaseCore = New DatabaseCoreOracle
@@ -55,13 +55,13 @@ On Error GoTo ErrHandler
         End If
 
         ' データベース接続
-        Set mConnect = CreateObject("ADODB.Connection")
-        Call mConnect.Open(mDatabaseCore.GetConnectStr(Setting.ServerName, Setting.UserId, Setting.Password, Setting.Port, Setting.DatabaseName))
-        mConnect.CursorLocation = adUseClient
+        Set mConnection = New ADODB.Connection
+        Call mConnection.Open(mDatabaseCore.GetConnectStr(Setting.ServerName, Setting.UserId, Setting.Password, Setting.Port, Setting.DatabaseName))
+        mConnection.CursorLocation = adUseClient
     End If
     Exit Sub
 ErrHandler:
-    Set mConnect = Nothing
+    Set mConnection = Nothing
     Err.Raise Err.Number, Err.Source, "データベース接続失敗" & vbNewLine & Err.Description, Err.HelpFile, Err.HelpContext
     Exit Sub
 End Sub
@@ -71,9 +71,9 @@ End Sub
 ' データベース切断
 '====================================================================================================
 Public Sub Disconnect()
-    If Not mConnect Is Nothing Then
-        mConnect.Close
-        Set mConnect = Nothing
+    If Not mConnection Is Nothing Then
+        mConnection.Close
+        Set mConnection = Nothing
         Set mDatabaseCore = Nothing
     End If
 End Sub
@@ -83,7 +83,7 @@ End Sub
 ' トランザクション開始
 '====================================================================================================
 Public Sub BeginTrans()
-    Call mConnect.BeginTrans
+    Call mConnection.BeginTrans
 End Sub
 
 
@@ -91,7 +91,7 @@ End Sub
 ' コミット
 '====================================================================================================
 Public Sub CommitTrans()
-    Call mConnect.CommitTrans
+    Call mConnection.CommitTrans
 End Sub
 
 
@@ -99,21 +99,21 @@ End Sub
 ' ロールバック
 '====================================================================================================
 Public Sub RollbackTrans()
-    Call mConnect.RollbackTrans
+    Call mConnection.RollbackTrans
 End Sub
 
 
 '====================================================================================================
-' クエリを実行します
+' 更新クエリを実行します
 '----------------------------------------------------------------------------------------------------
 ' IN : query クエリ文字列
 ' OUT: 処理件数
 '====================================================================================================
-'Public Function ExecuteQuery(query As String) As Long
-'    Dim procCnt As Long
-'    Call mConnect.Execute(CommandText:=query, RecordsAffected:=procCnt)
-'    ExecuteQuery = procCnt
-'End Function
+Public Function ExecuteUpdate(query As String) As Long
+    Dim procCnt As Long
+    Call mConnection.Execute(CommandText:=query, RecordsAffected:=procCnt)
+    ExecuteUpdate = procCnt
+End Function
 
 
 '====================================================================================================
@@ -122,7 +122,7 @@ End Sub
 ' OUT: テーブル名
 '====================================================================================================
 Public Function GetTableName() As ADODB.Recordset
-    Set GetTableName = mConnect.Execute(mDatabaseCore.GetTableNameQuery)
+    Set GetTableName = mConnection.Execute(mDatabaseCore.GetTableNameQuery)
 End Function
 
 
@@ -175,7 +175,7 @@ End Function
 '====================================================================================================
 Private Sub ExecuteAsync(query As String)
     mIsAsyncProc = True
-    Call mConnect.Execute(CommandText:=query, Options:=adAsyncExecute)
+    Call mConnection.Execute(CommandText:=query, Options:=adAsyncExecute)
 End Sub
 
 
@@ -199,7 +199,7 @@ End Sub
 '    : pRecordset レコードセット
 '    : pConnection コネクション
 '====================================================================================================
-Private Sub mConnect_ExecuteComplete( _
+Private Sub mConnection_ExecuteComplete( _
     ByVal RecordsAffected As Long, _
     ByVal pError As ADODB.Error, _
     ByRef adStatus As ADODB.EventStatusEnum, _

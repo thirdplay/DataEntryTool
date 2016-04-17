@@ -29,6 +29,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
     Dim dataCount As Long
     Dim tableRange As Range
     Dim tr As Range
+    Dim dataCnt As Long
     Dim dic As Dictionary
     Set dic = New Dictionary
 
@@ -38,6 +39,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
         If dataCount > 0 Then
             Set tableRange = .Range(.Cells(rowIndex, TableSettingCol.PhysicsName), .Cells(rowIndex + dataCount - 1, TableSettingCol.Max))
 
+            dataCnt = 0
             For Each tr In tableRange.Rows
                 ' 投入対象フラグがtrueの場合、投入対象外のテーブルは処理しない
                 xTableName = tr.Cells(1, TableSettingCol.PhysicsName).Value
@@ -47,8 +49,11 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
                         isTarget = False
                     ElseIf Not WorkBookEx.ExistsSheet(xTableName) Then
                         Err.Raise ErrNumber.Error, , "テーブル[" & xTableName & "]のシートが存在しません。" & vbNewLine & "テーブルシート作成を行い、テーブルシートを作成してください。"
-                    ElseIf ThisWorkbook.Worksheets(xTableName).Cells(cstTableRecordBase, 1).Value = "" Then
-                        isTarget = False
+                    Else
+                        dataCnt = WorkSheetEx.GetRowDataCount(xTableName, cstTableRecordBase, 1)
+                        If dataCnt = 0 Then
+                            isTarget = False
+                        End If
                     End If
                 End If
 
@@ -61,6 +66,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
                     ts.PhysicsName = tr.Cells(1, TableSettingCol.PhysicsName).Value
                     ts.LogicalName = tr.Cells(1, TableSettingCol.LogicalName).Value
                     ts.DataEntryTarget = tr.Cells(1, TableSettingCol.DataEntryTarget).Value
+                    ts.DataCount = dataCnt
                     Call dic.Add(ts.PhysicsName, ts)
                 End If
             Next

@@ -64,16 +64,15 @@ End Sub
 '====================================================================================================
 ' 実行結果を表示します
 '----------------------------------------------------------------------------------------------------
-' IN : result          実行結果
-'    : operationDetail 操作内容
+' IN : operationContens 操作内容
 '====================================================================================================
-Public Sub ShowExecutionResult(operationDetail As String)
+Public Sub ShowExecutionResult(operationContens As String)
     If Err.Number = 0 Then
-        MsgBox operationDetail & "が完了しました。", vbOKOnly + vbInformation
+        MsgBox operationContens & "が完了しました。", vbOKOnly + vbInformation
     ElseIf Err.Number = ErrNumber.Warning Then
         MsgBox Err.Description, vbOKOnly + vbExclamation
     Else
-        MsgBox operationDetail & "に失敗しました。" & vbNewLine & vbNewLine & Err.Description, vbOKOnly + vbCritical
+        MsgBox operationContens & "に失敗しました。" & vbNewLine & vbNewLine & Err.Description, vbOKOnly + vbCritical
     End If
 End Sub
 

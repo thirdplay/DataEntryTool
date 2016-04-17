@@ -18,15 +18,16 @@ Option Explicit
 '====================================================================================================
 ' 定数
 '====================================================================================================
-Private Const cstProcessName = "テーブルシートの作成"
+Private Const cstMainLabel = "テーブルシート作成"
+Private Const cstOperationContens = "テーブルシートの作成"
 
 
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
 Private mDataEntrySheet As DataEntrySheet       ' データ投入シート
 Private mTableSheet As TableSheet               ' テーブルシート
+Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
 
 
 '====================================================================================================
@@ -47,37 +48,29 @@ On Error GoTo Finally
     End If
 
     ' プログレスバー表示
-    Call ProgressBarForm.ResetProgress
-    Call ProgressBarForm.SetMainLabelText(cstProcessName)
-    Call ProgressBarForm.AddMessageToDetailsBox(cstProcessName & "開始")
-    Call ProgressBarForm.Show
+    'Call ProgressBar.ShowProgressByPercent
 
     ' テーブル定義の取得
-    Call ProgressBarForm.AddMessageToDetailsBox("テーブル定義の取得")
+    Application.StatusBar = "テーブルシート作成中 10%：■□□□□□□□□□"
     Set tableDefinitions = mTableSheetLogic.GetColumnDefinitions(tableSettings)
-    Call ProgressBarForm.IncreaseProgressByPercent(50)
+    'Call ProgressBar.IncreaseProgressByPercent(50)
+    Application.StatusBar = "テーブルシート作成中 60%：■■■■■■□□□□"
 
     ' テーブルシートの作成
-    Call ProgressBarForm.AddMessageToDetailsBox("テーブルシートの作成")
     Call mTableSheet.CreateTableSheet(tableSettings, tableDefinitions)
-    Call ProgressBarForm.IncreaseProgressByPercent(40)
+    'Call ProgressBar.IncreaseProgressByPercent(40)
+    Application.StatusBar = "テーブルシート作成中 90%：■■■■■■■■■□"
 
     ' ハイパーリンクの設定
-    Call ProgressBarForm.AddMessageToDetailsBox("ハイパーリンクの設定")
     Call mDataEntrySheet.SetHyperlink(tableSettings)
-    Call ProgressBarForm.IncreaseProgressByPercent(10)
-    Call ProgressBarForm.AddMessageToDetailsBox("正常終了")
+    'Call ProgressBar.IncreaseProgressByPercent(10)
+    'Call ProgressBar.Hide
 
 Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstProcessName)
-
-    ' プログレスバー非表示
-    If Err.Number = 0 Then
-        Unload ProgressBarForm
-    End If
+    Call ApplicationEx.ShowExecutionResult(cstOperationContens)
 End Sub
 
 
@@ -89,9 +82,9 @@ Private Sub Initialize()
     Call ApplicationEx.StartupMacro(SettingType.Database)
 
     ' インスタンス生成
-    Set mTableSheetLogic = New TableSheetLogic
     Set mDataEntrySheet = New DataEntrySheet
     Set mTableSheet = New TableSheet
+    Set mTableSheetLogic = New TableSheetLogic
 End Sub
 
 
@@ -100,10 +93,13 @@ End Sub
 '====================================================================================================
 Private Sub Finalize()
     ' インスタンス解放
-    Set mTableSheetLogic = Nothing
     Set mDataEntrySheet = Nothing
     Set mTableSheet = Nothing
+    Set mTableSheetLogic = Nothing
 
     ' マクロ停止
     Call ApplicationEx.ShutdownMacro
+
+    ' ステータスバー非表示
+    Application.StatusBar = False
 End Sub
