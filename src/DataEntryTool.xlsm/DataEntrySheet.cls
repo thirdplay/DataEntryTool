@@ -29,7 +29,6 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
     Dim dataCnt As Long
     Dim tableRange As Range
     Dim tr As Range
-    Dim dataCnt As Long
     Dim dic As Dictionary
     Set dic = New Dictionary
 

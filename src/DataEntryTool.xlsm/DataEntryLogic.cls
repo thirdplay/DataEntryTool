@@ -77,7 +77,7 @@ On Error GoTo ErrHandler
     For i = 1 To queries.Count
         Call ApplicationEx.CheckEvents
         procCnt = procCnt + mDataEntryDao.ExecuteUpdate(queries(i))
-        'Call ProgressBar.IncreaseProgressInsideLoop
+        Call StatusBar.IncreaseProgress
     Next
 
     ' コミット

@@ -18,7 +18,7 @@ Option Explicit
 '====================================================================================================
 ' 定数
 '====================================================================================================
-Private Const cstMainLabel = "データ"
+Private Const cstProcessName = "データ"
 Private Const cstOperationContens = "データの"
 
 
@@ -60,12 +60,11 @@ On Error GoTo Finally
     End If
 
     ' プログレスバー表示
-    'Call ProgressBarForm.SetLoopsParameters(100, GetRecordTotal(tableSettings))
+    Call StatusBar.ShowProgress(cstProcessName & mEntryTypeName, GetRecordTotal(tableSettings), 0)
 
     ' 対象テーブル設定を全て処理
     For Each xKey In tableSettings
         Call ApplicationEx.CheckEvents
-        'Call ProgressBarForm.AddMessageToDetailsBox(">> " & xKey)
 
         ' 対象テーブルのテーブルデータの取得
         Set ts = tableSettings(xKey)
@@ -77,13 +76,14 @@ On Error GoTo Finally
         ' 処理件数の書き込み
         Call mDataEntrySheet.WriteProcessingCount(ts, procCnt)
     Next
-    'Call ProgressBarForm.AddMessageToDetailsBox("終了")
 
 Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
     Call ApplicationEx.ShowExecutionResult(cstOperationContens & mEntryTypeName)
+    ' ステータスバー非表示
+    Call StatusBar.Hide
 End Sub
 
 

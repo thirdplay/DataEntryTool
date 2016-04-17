@@ -18,7 +18,7 @@ Option Explicit
 '====================================================================================================
 ' 定数
 '====================================================================================================
-Private Const cstMainLabel = "テーブルシート作成"
+Private Const cstProcessName = "テーブルシート作成"
 Private Const cstOperationContens = "テーブルシートの作成"
 
 
@@ -48,29 +48,27 @@ On Error GoTo Finally
     End If
 
     ' プログレスバー表示
-    'Call ProgressBar.ShowProgressByPercent
+    Call StatusBar.ShowProgress(cstProcessName, 100, 10)
 
     ' テーブル定義の取得
-    Application.StatusBar = "テーブルシート作成中 10%：■□□□□□□□□□"
     Set tableDefinitions = mTableSheetLogic.GetColumnDefinitions(tableSettings)
-    'Call ProgressBar.IncreaseProgressByPercent(50)
-    Application.StatusBar = "テーブルシート作成中 60%：■■■■■■□□□□"
+    Call StatusBar.IncreaseProgress(50)
 
     ' テーブルシートの作成
     Call mTableSheet.CreateTableSheet(tableSettings, tableDefinitions)
-    'Call ProgressBar.IncreaseProgressByPercent(40)
-    Application.StatusBar = "テーブルシート作成中 90%：■■■■■■■■■□"
+    Call StatusBar.IncreaseProgress(40)
 
     ' ハイパーリンクの設定
     Call mDataEntrySheet.SetHyperlink(tableSettings)
-    'Call ProgressBar.IncreaseProgressByPercent(10)
-    'Call ProgressBar.Hide
+    Call StatusBar.IncreaseProgress(10)
 
 Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
     Call ApplicationEx.ShowExecutionResult(cstOperationContens)
+    ' ステータスバー非表示
+    Call StatusBar.Hide
 End Sub
 
 
@@ -99,7 +97,4 @@ Private Sub Finalize()
 
     ' マクロ停止
     Call ApplicationEx.ShutdownMacro
-
-    ' ステータスバー非表示
-    Application.StatusBar = False
 End Sub
