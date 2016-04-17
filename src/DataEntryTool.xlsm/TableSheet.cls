@@ -89,7 +89,7 @@ Public Function GetEntryData(xTableName As String) As EntryData
     Dim ed As EntryData
     Dim cd As ColumnDefinition
     Dim rowIndex As Long
-    Dim dataCount As Long
+    Dim dataCnt As Long
     Dim columnRange As Range
     Dim cr As Range
 
@@ -99,8 +99,8 @@ Public Function GetEntryData(xTableName As String) As EntryData
 
         ' カラム定義リストの作成
         ed.ColumnDefinitions = New Collection
-        dataCount = WorkSheetEx.GetColDataCount(xTableName, ColumnDefinitionRow.ColumnName, 1)
-        Set columnRange = .Range(.Cells(1, 1), .Cells(ColumnDefinitionRow.Max, dataCount))
+        dataCnt = WorkSheetEx.GetColDataCount(xTableName, ColumnDefinitionRow.ColumnName, 1)
+        Set columnRange = .Range(.Cells(1, 1), .Cells(ColumnDefinitionRow.Max, dataCnt))
         For Each cr In columnRange.Columns
             Set cd = New ColumnDefinition
             cd.ColumnName = cr.Cells(ColumnDefinitionRow.ColumnName, 1)
@@ -110,8 +110,8 @@ Public Function GetEntryData(xTableName As String) As EntryData
         Next
 
         ' レコード範囲の設定
-        dataCount = WorkSheetEx.GetRowDataCount(xTableName, cstTableRecordBase, 1)
-        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCount - 1, ed.ColumnDefinitions.Count))
+        dataCnt = WorkSheetEx.GetRowDataCount(xTableName, cstTableRecordBase, 1)
+        ed.RecordRange = .Range(.Cells(cstTableRecordBase, 1), .Cells(cstTableRecordBase + dataCnt - 1, ed.ColumnDefinitions.Count))
 
         Set GetEntryData = ed
     End With

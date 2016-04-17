@@ -26,7 +26,7 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
     Dim ts As TableSetting
     Dim isTarget As Boolean
     Dim xTableName As String
-    Dim dataCount As Long
+    Dim dataCnt As Long
     Dim tableRange As Range
     Dim tr As Range
     Dim dataCnt As Long
@@ -35,9 +35,9 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
 
     With ThisWorkbook.Worksheets(cstSheetMain)
         rowIndex = .Range(cstTableBase).Row + 1
-        dataCount = WorkSheetEx.GetRowDataCount(cstSheetMain, rowIndex, TableSettingCol.PhysicsName)
-        If dataCount > 0 Then
-            Set tableRange = .Range(.Cells(rowIndex, TableSettingCol.PhysicsName), .Cells(rowIndex + dataCount - 1, TableSettingCol.Max))
+        dataCnt = WorkSheetEx.GetRowDataCount(cstSheetMain, rowIndex, TableSettingCol.PhysicsName)
+        If dataCnt > 0 Then
+            Set tableRange = .Range(.Cells(rowIndex, TableSettingCol.PhysicsName), .Cells(rowIndex + dataCnt - 1, TableSettingCol.Max))
 
             dataCnt = 0
             For Each tr In tableRange.Rows
@@ -101,15 +101,15 @@ End Sub
 '====================================================================================================
 Public Sub ClearProcessingCount()
     Dim baseRowIndex As Long
-    Dim dataCount As Long
+    Dim dataCnt As Long
 
     With ThisWorkbook.Worksheets(cstSheetMain)
         ' テーブル設定数の取得
         baseRowIndex = .Range(cstTableBase).Row + 1
-        dataCount = WorkSheetEx.GetRowDataCount(cstSheetMain, baseRowIndex, TableSettingCol.PhysicsName)
+        dataCnt = WorkSheetEx.GetRowDataCount(cstSheetMain, baseRowIndex, TableSettingCol.PhysicsName)
 
         ' 処理件数のクリア
-        Call .Range(.Cells(baseRowIndex, TableSettingCol.ProcessCount), .Cells(baseRowIndex + dataCount, TableSettingCol.ProcessCount)).ClearContents
+        Call .Range(.Cells(baseRowIndex, TableSettingCol.ProcessCount), .Cells(baseRowIndex + dataCnt, TableSettingCol.ProcessCount)).ClearContents
     End With
 End Sub
 
