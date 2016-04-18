@@ -24,6 +24,7 @@ Private Const cstProcessName = "データ"
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
+Private mBaseController As BaseController       ' 基本コントローラ
 Private mDataEntrySheet As DataEntrySheet       ' データ投入シート
 Private mTableSheet As TableSheet               ' テーブルシート
 Private mDataEntryLogic As DataEntryLogic       ' データ投入ロジック
@@ -74,8 +75,6 @@ On Error GoTo Finally
 Finally:
     ' 終了化
     Call Finalize
-    ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstProcessName & mEntryTypeName)
 End Sub
 
 
@@ -85,8 +84,9 @@ End Sub
 ' IN : xEntryType 投入種別
 '====================================================================================================
 Private Sub Initialize(xEntryType As EntryType)
-    ' マクロ起動
-    Call ApplicationEx.StartupMacro(SettingType.DataEntry)
+    ' 起動
+    Set mBaseController = New BaseController
+    Call mBaseController.Startup(SettingType.DataEntry)
 
     ' インスタンス生成
     Set mDataEntrySheet = New DataEntrySheet
@@ -105,8 +105,12 @@ Private Sub Finalize()
     Set mTableSheet = Nothing
     Set mDataEntryLogic = Nothing
 
-    ' マクロ停止
-    Call ApplicationEx.ShutdownMacro
+    ' 停止
+    Call mBaseController.Shutdown
+
+    ' 実行結果の表示
+    Call mBaseController.ShowExecutionResult(cstProcessName & mEntryTypeName)
+    Set mBaseController = Nothing
 End Sub
 
 
@@ -126,5 +130,3 @@ Private Function GetEntryTypeName(xEntryType As EntryType)
             GetEntryTypeName = "削除"
     End Select
 End Function
-
-

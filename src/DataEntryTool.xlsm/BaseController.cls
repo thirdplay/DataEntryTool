@@ -1,10 +1,17 @@
-Attribute VB_Name = "ApplicationEx"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "BaseController"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
-Option Private Module
 
 '====================================================================================================
 '
-' アプリケーションの拡張モジュール
+' 基本コントローラ
 '
 '====================================================================================================
 
@@ -15,11 +22,11 @@ Private mCalculation As Long            ' 自動計算方法(退避用)
 
 
 '====================================================================================================
-' マクロ起動
+' 起動
 ' ---------------------------------------------------------------------------------------------------
 ' IN : xSettingType 設定種別
 '====================================================================================================
-Public Sub StartupMacro(xSettingType As SettingType)
+Public Sub Startup(xSettingType As SettingType)
     ' 描画/計算抑制
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
@@ -39,9 +46,9 @@ End Sub
 
 
 '====================================================================================================
-' マクロ停止
+' 停止
 '====================================================================================================
-Public Sub ShutdownMacro()
+Public Sub Shutdown()
     ' データ投入Daoファクトリの終了化
     Call DataEntryDaoFactory.Finalize
 
@@ -68,5 +75,3 @@ Public Sub ShowExecutionResult(operationContens As String)
         MsgBox operationContens & "に失敗しました。" & vbNewLine & vbNewLine & Err.Description, vbOKOnly + vbCritical
     End If
 End Sub
-
-

@@ -24,6 +24,7 @@ Private Const cstProcessName = "テーブルシート作成"
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
+Private mBaseController As BaseController       ' 基本コントローラ
 Private mDataEntrySheet As DataEntrySheet       ' データ投入シート
 Private mTableSheet As TableSheet               ' テーブルシート
 Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
@@ -58,8 +59,6 @@ On Error GoTo Finally
 Finally:
     ' 終了化
     Call Finalize
-    ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstProcessName)
 End Sub
 
 
@@ -67,8 +66,9 @@ End Sub
 ' 初期化
 '====================================================================================================
 Private Sub Initialize()
-    ' マクロ起動
-    Call ApplicationEx.StartupMacro(SettingType.Database)
+    ' 起動
+    Set mBaseController = New BaseController
+    Call mBaseController.Startup(SettingType.Database)
 
     ' インスタンス生成
     Set mDataEntrySheet = New DataEntrySheet
@@ -86,6 +86,10 @@ Private Sub Finalize()
     Set mTableSheet = Nothing
     Set mTableSheetLogic = Nothing
 
-    ' マクロ停止
-    Call ApplicationEx.ShutdownMacro
+    ' 停止
+    Call mBaseController.Shutdown
+
+    ' 実行結果の表示
+    Call mBaseController.ShowExecutionResult(cstProcessName)
+    Set mBaseController = Nothing
 End Sub
