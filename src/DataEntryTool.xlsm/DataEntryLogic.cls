@@ -75,9 +75,7 @@ On Error GoTo ErrHandler
     Set queries = MakeQueries(xEntryType, xEntryData)
     ' データ投入
     For i = 1 To queries.Count
-        Call ApplicationEx.CheckEvents
         procCnt = procCnt + mDataEntryDao.ExecuteUpdate(queries(i))
-        Call StatusBar.IncreaseProgress
     Next
 
     ' コミット

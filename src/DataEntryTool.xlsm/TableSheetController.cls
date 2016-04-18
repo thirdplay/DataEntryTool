@@ -24,6 +24,7 @@ Private Const cstProcessName = "テーブルシート作成"
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
+Private mBaseController As BaseController       ' 基本コントローラ
 Private mDataEntrySheet As DataEntrySheet       ' データ投入シート
 Private mTableSheet As TableSheet               ' テーブルシート
 Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
@@ -34,8 +35,8 @@ Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
 '====================================================================================================
 Public Sub Execute()
 On Error GoTo Finally
-    Dim tableSettings As Dictionary
-    Dim tableDefinitions As Dictionary
+    Dim tableSettings As Object
+    Dim tableDefinitions As Object
 
     ' 初期化
     Call Initialize
@@ -46,28 +47,18 @@ On Error GoTo Finally
         Err.Raise ErrNumber.Warning, , "作成対象のテーブルがありません。" & vbNewLine & "テーブル一覧にテーブル物理名を入力してください。"
     End If
 
-    ' プログレスバー表示
-    Call StatusBar.ShowProgress(cstProcessName, 100, 10)
-
     ' テーブル定義の取得
     Set tableDefinitions = mTableSheetLogic.GetColumnDefinitions(tableSettings)
-    Call StatusBar.IncreaseProgress(50)
 
     ' テーブルシートの作成
     Call mTableSheet.CreateTableSheet(tableSettings, tableDefinitions)
-    Call StatusBar.IncreaseProgress(40)
 
     ' ハイパーリンクの設定
     Call mDataEntrySheet.SetHyperlink(tableSettings)
-    Call StatusBar.IncreaseProgress(10)
 
 Finally:
     ' 終了化
     Call Finalize
-    ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstProcessName)
-    ' ステータスバー非表示
-    Call StatusBar.Hide
 End Sub
 
 
@@ -75,8 +66,9 @@ End Sub
 ' 初期化
 '====================================================================================================
 Private Sub Initialize()
-    ' マクロ起動
-    Call ApplicationEx.StartupMacro(SettingType.Database)
+    ' 起動
+    Set mBaseController = New BaseController
+    Call mBaseController.Startup(SettingType.Database)
 
     ' インスタンス生成
     Set mDataEntrySheet = New DataEntrySheet
@@ -94,6 +86,10 @@ Private Sub Finalize()
     Set mTableSheet = Nothing
     Set mTableSheetLogic = Nothing
 
-    ' マクロ停止
-    Call ApplicationEx.ShutdownMacro
+    ' 停止
+    Call mBaseController.Shutdown
+
+    ' 実行結果の表示
+    Call mBaseController.ShowExecutionResult(cstProcessName)
+    Set mBaseController = Nothing
 End Sub

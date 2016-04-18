@@ -24,6 +24,7 @@ Private Const cstProcessName = "データ"
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
+Private mBaseController As BaseController       ' 基本コントローラ
 Private mDataEntrySheet As DataEntrySheet       ' データ投入シート
 Private mTableSheet As TableSheet               ' テーブルシート
 Private mDataEntryLogic As DataEntryLogic       ' データ投入ロジック
@@ -37,7 +38,7 @@ Private mEntryTypeName As String                ' 投入種別名
 '====================================================================================================
 Public Sub Execute(xEntryType As EntryType)
 On Error GoTo Finally
-    Dim tableSettings As Dictionary
+    Dim tableSettings As Object
     Dim xKey As Variant
     Dim ts As TableSetting
     Dim ed As EntryData
@@ -58,13 +59,8 @@ On Error GoTo Finally
             "  ・データ投入対象のテーブルシートにデータを入力する。"
     End If
 
-    ' プログレスバー表示
-    Call StatusBar.ShowProgress(cstProcessName & mEntryTypeName, GetRecordTotal(tableSettings), 0)
-
     ' 対象テーブル設定を全て処理
     For Each xKey In tableSettings
-        Call ApplicationEx.CheckEvents
-
         ' 対象テーブルのテーブルデータの取得
         Set ts = tableSettings(xKey)
         Set ed = mTableSheet.GetEntryData(ts.PhysicsName)
@@ -79,10 +75,6 @@ On Error GoTo Finally
 Finally:
     ' 終了化
     Call Finalize
-    ' 実行結果の表示
-    Call ApplicationEx.ShowExecutionResult(cstProcessName & mEntryTypeName)
-    ' ステータスバー非表示
-    Call StatusBar.Hide
 End Sub
 
 
@@ -92,8 +84,9 @@ End Sub
 ' IN : xEntryType 投入種別
 '====================================================================================================
 Private Sub Initialize(xEntryType As EntryType)
-    ' マクロ起動
-    Call ApplicationEx.StartupMacro(SettingType.DataEntry)
+    ' 起動
+    Set mBaseController = New BaseController
+    Call mBaseController.Startup(SettingType.DataEntry)
 
     ' インスタンス生成
     Set mDataEntrySheet = New DataEntrySheet
@@ -112,8 +105,12 @@ Private Sub Finalize()
     Set mTableSheet = Nothing
     Set mDataEntryLogic = Nothing
 
-    ' マクロ停止
-    Call ApplicationEx.ShutdownMacro
+    ' 停止
+    Call mBaseController.Shutdown
+
+    ' 実行結果の表示
+    Call mBaseController.ShowExecutionResult(cstProcessName & mEntryTypeName)
+    Set mBaseController = Nothing
 End Sub
 
 
@@ -132,21 +129,4 @@ Private Function GetEntryTypeName(xEntryType As EntryType)
         Case EntryType.Delete
             GetEntryTypeName = "削除"
     End Select
-End Function
-
-
-'====================================================================================================
-' レコード総数を取得します
-'----------------------------------------------------------------------------------------------------
-' IN : tableSettings テーブル設定の連装配列
-' OUT: レコード総数
-'====================================================================================================
-Private Function GetRecordTotal(tableSettings As Dictionary)
-    Dim xKey As Variant
-    Dim result As Long
-
-    For Each xKey In tableSettings
-        result = result + tableSettings(xKey).DataCount
-    Next
-    GetRecordTotal = result
 End Function
