@@ -29,8 +29,7 @@ Excelに入力したデータをデータベースに投入するツールです
  * テーブルシートの作成  
 テーブルシート作成ボタンを押下してテーブルシートを作成します。
 <img src="https://cloud.githubusercontent.com/assets/14181039/14609591/74abceb8-05c5-11e6-8edd-996ec2f3d363.png" width="50%">  
-
-    ※作成結果  
+※作成結果  
 <img src="https://cloud.githubusercontent.com/assets/14181039/14609560/4a328e24-05c5-11e6-9b33-a62cfeb7ee15.png" width="50%">
 
 ### ライセンス
