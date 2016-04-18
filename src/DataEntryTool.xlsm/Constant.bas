@@ -7,10 +7,6 @@ Option Private Module
 ' 定数モジュール
 '
 '====================================================================================================
-' GUID
-Public Const cstGuidAdodb = "{B691E011-1797-432E-907A-4D8C69339129}"        ' ADODBのGUID
-Public Const cstGuidScripting = "{420B2830-E718-11CF-893D-00A0C9054228}"    ' ScriptingのGUID
-
 ' シート名
 Public Const cstSheetMain = "データ投入ツール"              ' メインシート
 Public Const cstSheetTemplate = "テンプレート"              ' テンプレートシート

@@ -34,8 +34,8 @@ Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
 '====================================================================================================
 Public Sub Execute()
 On Error GoTo Finally
-    Dim tableSettings As Dictionary
-    Dim tableDefinitions As Dictionary
+    Dim tableSettings As Object
+    Dim tableDefinitions As Object
 
     ' 初期化
     Call Initialize
@@ -46,28 +46,20 @@ On Error GoTo Finally
         Err.Raise ErrNumber.Warning, , "作成対象のテーブルがありません。" & vbNewLine & "テーブル一覧にテーブル物理名を入力してください。"
     End If
 
-    ' プログレスバー表示
-    Call StatusBar.ShowProgress(cstProcessName, 100, 10)
-
     ' テーブル定義の取得
     Set tableDefinitions = mTableSheetLogic.GetColumnDefinitions(tableSettings)
-    Call StatusBar.IncreaseProgress(50)
 
     ' テーブルシートの作成
     Call mTableSheet.CreateTableSheet(tableSettings, tableDefinitions)
-    Call StatusBar.IncreaseProgress(40)
 
     ' ハイパーリンクの設定
     Call mDataEntrySheet.SetHyperlink(tableSettings)
-    Call StatusBar.IncreaseProgress(10)
 
 Finally:
     ' 終了化
     Call Finalize
     ' 実行結果の表示
     Call ApplicationEx.ShowExecutionResult(cstProcessName)
-    ' ステータスバー非表示
-    Call StatusBar.Hide
 End Sub
 
 

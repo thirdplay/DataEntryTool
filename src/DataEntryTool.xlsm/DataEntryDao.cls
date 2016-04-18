@@ -18,12 +18,8 @@ Option Explicit
 '====================================================================================================
 ' メンバ変数
 '====================================================================================================
-Private mDatabaseCore As IDatabaseCore                  ' データベースコアインターフェース
-Private WithEvents mConnection As ADODB.Connection      ' 接続オブジェクト
-Attribute mConnection.VB_VarHelpID = -1
-Private mAsyncRecordset As ADODB.Recordset              ' 非同期処理のレコードセット
-Private mAsyncRecordsAffected As Long                   ' 非同期処理の更新件数
-Private mIsAsyncProc As Boolean                         ' 非同期処理フラグ
+Private mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
+Private mConnection As Object               ' 接続オブジェクト
 
 
 '====================================================================================================
@@ -55,7 +51,7 @@ On Error GoTo ErrHandler
         End If
 
         ' データベース接続
-        Set mConnection = New ADODB.Connection
+        Set mConnection = CreateObject("ADODB.Connection")
         Call mConnection.Open(mDatabaseCore.GetConnectStr(Setting.ServerName, Setting.UserId, Setting.Password, Setting.Port, Setting.DatabaseName))
         mConnection.CursorLocation = adUseClient
     End If
@@ -121,7 +117,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' OUT: テーブル名
 '====================================================================================================
-Public Function GetTableName() As ADODB.Recordset
+Public Function GetTableName() As Object
     Set GetTableName = mConnection.Execute(mDatabaseCore.GetTableNameQuery)
 End Function
 
@@ -132,10 +128,8 @@ End Function
 ' IN : tableSettings テーブル設定の連装配列
 ' OUT: カラム定義
 '====================================================================================================
-Public Function GetColumnDefinition(tableSettings As Object) As ADODB.Recordset
-    Call ExecuteAsync(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
-    Call WaitAsync
-    Set GetColumnDefinition = mAsyncRecordset
+Public Function GetColumnDefinition(tableSettings As Object) As Object
+    Set GetColumnDefinition = mConnection.Execute(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
 End Function
 
 
@@ -166,48 +160,3 @@ Public Function GetItemValue(ByVal dataValue As String, ByVal xDataType As Strin
     End If
     GetItemValue = itemValue
 End Function
-
-
-'====================================================================================================
-' クエリ実行(非同期)
-'----------------------------------------------------------------------------------------------------
-' IN : query クエリ文字列
-'====================================================================================================
-Private Sub ExecuteAsync(query As String)
-    mIsAsyncProc = True
-    Call mConnection.Execute(CommandText:=query, Options:=adAsyncExecute)
-End Sub
-
-
-'====================================================================================================
-' 非同期処理が終了するまで待つ
-'====================================================================================================
-Private Sub WaitAsync()
-    Do While mIsAsyncProc
-        Call ApplicationEx.CheckEvents
-    Loop
-End Sub
-
-
-'====================================================================================================
-' コネクションの実行完了イベント
-'----------------------------------------------------------------------------------------------------
-' IN : RecordsAffected 更新件数
-'    : pError ADODBエラー
-'    : adStatus イベントステータス
-'    : pCommand コマンド
-'    : pRecordset レコードセット
-'    : pConnection コネクション
-'====================================================================================================
-Private Sub mConnection_ExecuteComplete( _
-    ByVal RecordsAffected As Long, _
-    ByVal pError As ADODB.Error, _
-    ByRef adStatus As ADODB.EventStatusEnum, _
-    ByVal pCommand As ADODB.Command, _
-    ByVal pRecordset As ADODB.Recordset, _
-    ByVal pConnection As ADODB.Connection _
-)
-    Set mAsyncRecordset = pRecordset
-    mAsyncRecordsAffected = RecordsAffected
-    mIsAsyncProc = False
-End Sub
