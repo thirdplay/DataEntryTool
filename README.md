@@ -40,7 +40,7 @@ Excelに入力したデータをデータベースに投入するツールです
 <img src="https://cloud.githubusercontent.com/assets/14181039/14649024/29cdc28a-06a0-11e6-8887-a98e5404f2dd.png" width="50%">
 
  * データ登録  
-「データ登録」ボタンを押下してデータを登録します。
+「データ登録」ボタンを押下してデータを登録します。  
 <img src="https://cloud.githubusercontent.com/assets/14181039/14649023/29cc2dbc-06a0-11e6-97c5-c81d5f0c2e99.png" width="50%">  
 ＜登録結果＞  
 <img src="https://cloud.githubusercontent.com/assets/14181039/14649026/29cf783c-06a0-11e6-9c87-2d0e9c9f6801.png" width="50%">
