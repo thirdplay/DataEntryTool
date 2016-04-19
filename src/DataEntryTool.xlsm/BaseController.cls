@@ -11,7 +11,7 @@ Option Explicit
 
 '====================================================================================================
 '
-' 基本コントローラ
+' 基本コントローラー
 '
 '====================================================================================================
 
@@ -30,7 +30,7 @@ Public Sub Startup(xSettingType As SettingType)
     ' 描画/計算抑制
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
-    'Application.EnableEvents = False
+    Application.EnableEvents = False
     mCalculation = Application.Calculation
     Application.Calculation = xlCalculationManual
     Application.Cursor = xlWait
@@ -55,7 +55,7 @@ Public Sub Shutdown()
     ' 描画/計算抑制解除
     Application.ScreenUpdating = True
     Application.DisplayAlerts = True
-    'Application.EnableEvents = True
+    Application.EnableEvents = True
     Application.Calculation = mCalculation
     Application.Cursor = xlDefault
 End Sub

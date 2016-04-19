@@ -19,7 +19,7 @@ Option Explicit
 ' メンバ変数
 '====================================================================================================
 Private mDatabaseCore As IDatabaseCore      ' データベースコアインターフェース
-Private mConnection As Object               ' 接続オブジェクト
+Private mConnection As ADODB.Connection     ' ADODB接続オブジェクト
 
 
 '====================================================================================================
@@ -51,7 +51,7 @@ On Error GoTo ErrHandler
         End If
 
         ' データベース接続
-        Set mConnection = CreateObject("ADODB.Connection")
+        Set mConnection = New ADODB.Connection
         Call mConnection.Open(mDatabaseCore.GetConnectStr(Setting.ServerName, Setting.UserId, Setting.Password, Setting.Port, Setting.DatabaseName))
         mConnection.CursorLocation = adUseClient
     End If
@@ -117,7 +117,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' OUT: テーブル名
 '====================================================================================================
-Public Function GetTableName() As Object
+Public Function GetTableName() As ADODB.Recordset
     Set GetTableName = mConnection.Execute(mDatabaseCore.GetTableNameQuery)
 End Function
 
@@ -128,7 +128,7 @@ End Function
 ' IN : tableSettings テーブル設定の連装配列
 ' OUT: カラム定義
 '====================================================================================================
-Public Function GetColumnDefinition(tableSettings As Object) As Object
+Public Function GetColumnDefinition(tableSettings As Dictionary) As ADODB.Recordset
     Set GetColumnDefinition = mConnection.Execute(mDatabaseCore.GetColumnDefinitionQuery(tableSettings))
 End Function
 

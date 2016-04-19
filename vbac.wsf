@@ -250,39 +250,43 @@ VBAProjFile.prototype.read = function(is64BitOffice) {
     if (!fso.FileExists(this.path)) return;
     
     var fl = fso.OpenTextFile(this.path, forReading);
+    var section = '';
+    var isFirst = false;
     while (!fl.AtEndOfStream) {
-        var line    = fl.ReadLine();
-        var section = line;
-        
+        var line = fl.ReadLine();
+        if (isSection(line)) {
+            if (fl.AtEndOfStream) {
+                break;
+            }
+            section = line;
+            line = fl.ReadLine();
+            isFirst = true;
+        }
+
         switch (section) {
         case '[General]':
-            while (!fl.AtEndOfStream) {
-                line = fl.ReadLine();
-                if (isSection(line)) break;
-                
-                var p = getParam(line);
-                // quick-fix solution
-                if (is64BitOffice && p.key == "HelpContextID")
-                    println("! Warning: can not 'VBProject.HelpContextID = \"" + p.val + "\"'. probably 64-bit Office have a bug.");
-                else
-                    this.vbproj[p.key] = p.val;
+            var p = getParam(line);
+            // quick-fix solution
+            if (is64BitOffice && p.key == "HelpContextID") {
+                println("! Warning: can not 'VBProject.HelpContextID = \"" + p.val + "\"'. probably 64-bit Office have a bug.");
+            } else {
+                this.vbproj[p.key] = p.val;
             }
             break;
         case '[Reference]':
-            this.removeAllRefs();
-            
-            while (!fl.AtEndOfStream) {
-                line = fl.ReadLine();
-                if (isSection(line)) break;
-                
-                var p = getParam(line);
-                var refinf = p.key.split(" ");
-                this.vbproj.References.AddFromGuid(refinf[0], refinf[1], refinf[2]);
+            if (isFirst) {
+                this.removeAllRefs();
             }
+
+            var p = getParam(line);
+            var refinf = p.key.split(" ");
+            this.vbproj.References.AddFromGuid(refinf[0], refinf[1], refinf[2]);
             break;
         default:
             break;
         }
+
+        isFirst = false;
     }
 };
 VBAProjFile.prototype.write = function() {

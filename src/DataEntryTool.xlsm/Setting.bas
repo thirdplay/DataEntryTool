@@ -9,21 +9,6 @@ Option Private Module
 '====================================================================================================
 
 '====================================================================================================
-' 定数
-'====================================================================================================
-' 名前定義
-Private Const cstDatabaseType = "DatabaseType"              ' データベース種類
-Private Const cstServerName = "ServerName"                  ' サーバ名
-Private Const cstUserId = "UserId"                          ' ユーザID
-Private Const cstPassword = "Password"                      ' パスワード
-Private Const cstPort = "Port"                              ' ポート
-Private Const cstDatabaseName = "DatabaseName"              ' データベース名
-Private Const cstLinefeedCode = "LinefeedCode"              ' 改行コード
-Private Const cstDateFormat = "DateFormat"                  ' 日付書式
-Private Const cstTimestampFormat = "TimestampFormat"        ' タイムスタンプ書式
-
-
-'====================================================================================================
 ' メンバ変数
 '====================================================================================================
 Private mDatabaseType As String         ' データベース種別

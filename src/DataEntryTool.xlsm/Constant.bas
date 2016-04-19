@@ -12,11 +12,25 @@ Public Const cstSheetMain = "データ投入ツール"              ' メインシート
 Public Const cstSheetTemplate = "テンプレート"              ' テンプレートシート
 
 ' 名前定義
+Public Const cstDatabaseType = "DatabaseType"               ' データベース種類
+Public Const cstServerName = "ServerName"                   ' サーバ名
+Public Const cstServerNameLabel = "ServerNameLabel"         ' サーバ名ラベル
+Public Const cstUserId = "UserId"                           ' ユーザID
+Public Const cstPassword = "Password"                       ' パスワード
+Public Const cstPort = "Port"                               ' ポート
+Public Const cstDatabaseName = "DatabaseName"               ' データベース名
+Public Const cstLinefeedCode = "LinefeedCode"               ' 改行コード
+Public Const cstDateFormat = "DateFormat"                   ' 日付書式
+Public Const cstTimestampFormat = "TimestampFormat"         ' タイムスタンプ書式
 Public Const cstTableBase = "TableBase"                     ' テーブル一覧の基準セル
 
 ' データベース種別
 Public Const cstDatabaseTypeOracle = "Oracle"               ' Oracle
 Public Const cstDatabaseTypePostgreSQL = "PostgreSQL"       ' PostgreSQL
+
+' サーバ名ラベル
+Public Const cstServerNameLabelOracle = "接続識別子"
+Public Const cstServerNameLabelPostgreSQL = "ホスト名"
 
 ' 改行コード
 Public Const cstLinefeedCodeCRLF = "CRLF"                   ' CRLF

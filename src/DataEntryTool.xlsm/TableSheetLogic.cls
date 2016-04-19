@@ -43,18 +43,18 @@ End Sub
 ' IN : tableSettings テーブル設定の連想配列
 ' OUT: カラム定義リスト
 '====================================================================================================
-Public Function GetColumnDefinitions(tableSettings As Object) As Object
-    Dim rs As Object
+Public Function GetColumnDefinitions(tableSettings As Object) As Dictionary
+    Dim rs As ADODB.Recordset
     Dim tableNames As Object
     Dim tableNameInStr As String
     Dim xTableName As Variant
     Dim td As TableDefinition
     Dim cd As ColumnDefinition
-    Dim dic As Object
+    Dim dic As Dictionary
 
     ' テーブル名を取得し、連想配列を作成する
     Set rs = mDataEntryDao.GetTableName()
-    Set tableNames = CreateObject("Scripting.Dictionary")
+    Set tableNames = New Dictionary
     Do Until rs.EOF
         Call tableNames.Add(rs("table_name").Value, rs("table_name").Value)
         rs.MoveNext
@@ -71,7 +71,7 @@ Public Function GetColumnDefinitions(tableSettings As Object) As Object
     Set rs = mDataEntryDao.GetColumnDefinition(tableSettings)
 
     ' テーブル定義の連装配列を作成する
-    Set dic = CreateObject("Scripting.Dictionary")
+    Set dic = New Dictionary
     Do Until rs.EOF
         ' テーブル定義生成
         If Not dic.Exists(rs("table_name").Value) Then
