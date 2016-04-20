@@ -21,7 +21,7 @@ Option Explicit
 ' IN : tableSettings テーブル設定の連装配列
 '    : tableDefinitions テーブル定義の連装配列
 '====================================================================================================
-Public Sub CreateTableSheet(tableSettings As Object, tableDefinitions As Object)
+Public Sub CreateTableSheet(tableSettings As Dictionary, tableDefinitions As Dictionary)
 On Error GoTo Finally
     Dim td As TableDefinition
     Dim cd As ColumnDefinition
@@ -29,12 +29,12 @@ On Error GoTo Finally
     Dim ws As Worksheet
     Dim xKey As Variant
 
-    Dim requiredDic As Object
-    Set requiredDic = CreateObject("Scripting.Dictionary")
+    Dim requiredDic As Dictionary
+    Set requiredDic = New Dictionary
     Call requiredDic.Add("1", "必須")
 
-    Dim primaryKeyDic As Object
-    Set primaryKeyDic = CreateObject("Scripting.Dictionary")
+    Dim primaryKeyDic As Dictionary
+    Set primaryKeyDic = New Scripting.Dictionary
     Call primaryKeyDic.Add("1", "PK")
 
     Dim tmplSheet As Worksheet

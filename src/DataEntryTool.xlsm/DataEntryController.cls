@@ -38,7 +38,7 @@ Private mEntryTypeName As String                ' “Š“üŽí•Ê–¼
 '====================================================================================================
 Public Sub Execute(xEntryType As EntryType)
 On Error GoTo Finally
-    Dim tableSettings As Object
+    Dim tableSettings As Dictionary
     Dim xKey As Variant
     Dim ts As TableSetting
     Dim ed As EntryData

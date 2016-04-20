@@ -1,0 +1,10 @@
+[General]
+Name=VBAProject
+Description=
+HelpFile=
+HelpContextID=0
+[Reference]
+{00020430-0000-0000-C000-000000000046} 2 0=OLE Automation
+{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52} 2 4=Microsoft Office 12.0 Object Library
+{B691E011-1797-432E-907A-4D8C69339129} 6 1=Microsoft ActiveX Data Objects 6.1 Library
+{420B2830-E718-11CF-893D-00A0C9054228} 1 0=Microsoft Scripting Runtime

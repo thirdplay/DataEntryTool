@@ -35,8 +35,8 @@ Private mTableSheetLogic As TableSheetLogic     ' テーブルシートロジック
 '====================================================================================================
 Public Sub Execute()
 On Error GoTo Finally
-    Dim tableSettings As Object
-    Dim tableDefinitions As Object
+    Dim tableSettings As Dictionary
+    Dim tableDefinitions As Dictionary
 
     ' 初期化
     Call Initialize

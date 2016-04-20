@@ -21,7 +21,7 @@ Option Explicit
 ' IN : isEntryTarget 投入対象フラグ(True:投入対象のみ,False:全て)
 ' OUT: テーブル設定の連装配列
 '====================================================================================================
-Public Function GetTableSettings(isEntryTarget As Boolean) As Object
+Public Function GetTableSettings(isEntryTarget As Boolean) As Dictionary
     Dim rowIndex As Long
     Dim ts As TableSetting
     Dim isTarget As Boolean
@@ -29,8 +29,8 @@ Public Function GetTableSettings(isEntryTarget As Boolean) As Object
     Dim dataCnt As Long
     Dim tableRange As Range
     Dim tr As Range
-    Dim dic As Object
-    Set dic = CreateObject("Scripting.Dictionary")
+    Dim dic As Dictionary
+    Set dic = New Dictionary
 
     With ThisWorkbook.Worksheets(cstSheetMain)
         rowIndex = .Range(cstTableBase).Row + 1
@@ -80,7 +80,7 @@ End Function
 '----------------------------------------------------------------------------------------------------
 ' IN : tablSeetings テーブル設定の連装配列
 '====================================================================================================
-Public Sub SetHyperlink(tableSettings As Object)
+Public Sub SetHyperlink(tableSettings As Dictionary)
     Dim xKey As Variant
     Dim ts As TableSetting
 
