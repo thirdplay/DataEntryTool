@@ -158,7 +158,7 @@ End Sub
 '====================================================================================================
 Private Sub CheckDbSetting()
 On Error GoTo ErrHandler
-    Call CheckInputValue(Setting.DatabaseType, "データベース種類")
+    Call CheckInputValue(Setting.DatabaseType, "データベース種別")
     If Setting.DatabaseType = cstDatabaseTypeOracle Then
         Call CheckInputValue(Setting.ServerName, cstServerNameLabelOracle)
         Call CheckInputValue(Setting.UserId, "ユーザID")
