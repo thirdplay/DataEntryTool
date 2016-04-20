@@ -5,7 +5,7 @@ Excelに入力したデータをデータベースに投入するツールです
 * データ投入用のテーブルシートの作成
 * データベースへのデータ登録、更新、削除
 
-### 準備
+### 必須条件
 データベースにアクセスするため、対応したODBCドライバをインストールしてください。
 * [Oracle](http://www.oracle.com/technetwork/jp/topics/utilsoft-100274-ja.html)
 * [PostgreSQL](http://www.postgresql.org/ftp/odbc/versions/msi/)
