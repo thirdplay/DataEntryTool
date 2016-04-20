@@ -159,10 +159,14 @@ End Sub
 Private Sub CheckDbSetting()
 On Error GoTo ErrHandler
     Call CheckInputValue(Setting.DatabaseType, "データベース種類")
-    Call CheckInputValue(Setting.ServerName, "サーバ名")
-    Call CheckInputValue(Setting.UserId, "ユーザID")
-    Call CheckInputValue(Setting.Password, "パスワード")
-    If Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
+    If Setting.DatabaseType = cstDatabaseTypeOracle Then
+        Call CheckInputValue(Setting.ServerName, cstServerNameLabelOracle)
+        Call CheckInputValue(Setting.UserId, "ユーザID")
+        Call CheckInputValue(Setting.Password, "パスワード")
+    ElseIf Setting.DatabaseType = cstDatabaseTypePostgreSQL Then
+        Call CheckInputValue(Setting.ServerName, cstServerNameLabelPostgreSQL)
+        Call CheckInputValue(Setting.UserId, "ユーザID")
+        Call CheckInputValue(Setting.Password, "パスワード")
         Call CheckInputValue(Setting.Port, "ポート")
         Call CheckInputValue(Setting.DatabaseName, "データベース名")
     End If
