@@ -16,6 +16,15 @@ Option Explicit
 '====================================================================================================
 
 '====================================================================================================
+' 定数
+'====================================================================================================
+' クエリの接頭辞
+Private Const cstQuerySuffix = ";" & vbNewLine
+' DMLファイル拡張子
+Private Const cstFileExt = ".sql"
+
+
+'====================================================================================================
 ' メンバ変数
 '====================================================================================================
 Private mDataEntryLogic As DataEntryLogic
@@ -38,41 +47,38 @@ End Sub
 
 
 '====================================================================================================
-' 出力先を取得します
-'----------------------------------------------------------------------------------------------------
-' OUT: 出力先
-'====================================================================================================
-Public Function GetOutputDir()
-    Dim xOutputDir As String
-
-    xOutputDir = Setting.OutputDir
-    If xOutputDir = "" Then
-        With Application.FileDialog(msoFileDialogFolderPicker)
-            If .Show = True Then
-                xOutputDir = .SelectedItems(1)
-            Else
-                GetOutputDir = ""
-                Exit Function
-            End If
-        End With
-    End If
-
-    If Right(xOutputDir, 1) <> "\" Then
-        xOutputDir = xOutputDir & "\"
-    End If
-    GetOutputDir = xOutputDir
-End Function
-
-
-'====================================================================================================
 ' DMLを出力します
 '----------------------------------------------------------------------------------------------------
-' IN : xEntryType 投入種別
+' IN : xOutputDir 出力ディレクトリ
+'    : xEntryType 投入種別
 '    : xEntryData 投入データ
-' OUT: 処理件数
 '====================================================================================================
-Public Function OutputDml(xEntryType As EntryType, xEntryData As EntryData) As Long
-    ' データ投入クエリの生成
-    'queries = mDataEntryLogic.MakeQueries(xEntryType, ed)
+Public Sub OutputDml(xOutputDir As String, xEntryType As EntryType, xEntryData As EntryData)
+On Error GoTo Finally
+    Dim stream As ADODB.Stream
+    Dim queries As Collection
+    Dim query
 
-End Function
+    ' データ投入クエリの生成
+    Set queries = mDataEntryLogic.MakeQueries(xEntryType, xEntryData)
+
+    ' ストリームオープン
+    Set stream = New ADODB.Stream
+    stream.Mode = adModeReadWrite   ' 読み取り/書き込み権限
+    stream.Type = adTypeText        'テキストデータ
+    stream.Charset = "Shift_JIS"    '文字コード
+    stream.Open
+
+    For Each query In queries
+        Call stream.WriteText(query & cstQuerySuffix, adWriteChar)
+    Next
+    stream.SaveToFile xOutputDir & xEntryData.TableName & cstFileExt, adSaveCreateOverWrite
+Finally:
+    ' ストリームクローズ
+    stream.Close
+    Set stream = Nothing
+
+    If Err.Number <> 0 Then
+        Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
+    End If
+End Sub

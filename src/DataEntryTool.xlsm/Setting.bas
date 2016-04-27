@@ -131,7 +131,20 @@ End Property
 ' èoóÕêÊÇÃéÊìæ/ê›íË
 '====================================================================================================
 Public Property Get OutputDir() As String
-    OutputDir = mOutputDir
+    Dim xOutputDir As String
+
+    xOutputDir = mOutputDir
+    If xOutputDir = "" Then
+        With Application.FileDialog(msoFileDialogFolderPicker)
+            If .Show = True Then
+                xOutputDir = .SelectedItems(1)
+            Else
+                OutputDir = ""
+                Exit Property
+            End If
+        End With
+    End If
+    OutputDir = xOutputDir
 End Property
 Public Property Let OutputDir(OutputDir As String)
     mOutputDir = OutputDir

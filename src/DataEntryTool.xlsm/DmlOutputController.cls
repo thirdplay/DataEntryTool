@@ -41,6 +41,18 @@ On Error GoTo Finally
     ' 初期化
     Call Initialize(xEntryType)
 
+    ' 出力先の取得
+    xOutputDir = Setting.OutputDir
+    If xOutputDir = "" Then
+        Err.Raise ErrNumber.Abort
+    End If
+    If Dir(xOutputDir, vbDirectory) = "" Then
+        Err.Raise ErrNumber.Warning, , "出力先[" & xOutputDir & "]が存在しません。"
+    End If
+    If Right(xOutputDir, 1) <> "\" Then
+        xOutputDir = xOutputDir & "\"
+    End If
+
     ' 対象テーブル設定の取得
     Set tableSettings = mDataEntrySheet.GetTableSettings(True)
     If tableSettings.Count = 0 Then
@@ -50,12 +62,6 @@ On Error GoTo Finally
             "  ・データ投入対象のテーブルシートにデータを入力する。"
     End If
 
-    ' 出力先の取得
-    xOutputDir = mDmlOutputLogic.GetOutputDir
-    If xOutputDir = "" Then
-        Err.Raise ErrNumber.Abort
-    End If
-
     ' 対象テーブル設定を全て処理
     For Each xKey In tableSettings
         ' 対象テーブルのテーブルデータの取得
@@ -63,7 +69,7 @@ On Error GoTo Finally
         Set ed = mTableSheet.GetEntryData(ts.PhysicsName)
 
         ' DML出力
-        Call mDmlOutputLogic.OutputDml(xEntryType, ed)
+        Call mDmlOutputLogic.OutputDml(xOutputDir, xEntryType, ed)
     Next
 
 Finally:
