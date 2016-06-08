@@ -103,7 +103,7 @@ End Function
 '    : xEntryData 投入データ
 ' OUT: クエリリスト
 '====================================================================================================
-Private Function MakeQueries(xEntryType As EntryType, xEntryData As EntryData)
+Public Function MakeQueries(xEntryType As EntryType, xEntryData As EntryData)
     Select Case xEntryType
     Case EntryType.Register
         Set MakeQueries = MakeInsertQueries(xEntryData)

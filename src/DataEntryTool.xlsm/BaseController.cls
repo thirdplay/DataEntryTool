@@ -67,11 +67,13 @@ End Sub
 ' IN : operationContens 操作内容
 '====================================================================================================
 Public Sub ShowExecutionResult(operationContens As String)
-    If Err.Number = 0 Then
-        MsgBox operationContens & "が完了しました。", vbOKOnly + vbInformation
-    ElseIf Err.Number = ErrNumber.Warning Then
-        MsgBox Err.Description, vbOKOnly + vbExclamation
-    Else
-        MsgBox operationContens & "に失敗しました。" & vbNewLine & vbNewLine & Err.Description, vbOKOnly + vbCritical
-    End If
+    Select Case Err.Number
+        Case 0
+            MsgBox operationContens & "が完了しました。", vbOKOnly + vbInformation
+        Case ErrNumber.Warning
+            MsgBox Err.Description, vbOKOnly + vbExclamation
+        Case ErrNumber.Abort
+        Case Else
+            MsgBox operationContens & "に失敗しました。" & vbNewLine & vbNewLine & Err.Description, vbOKOnly + vbCritical
+    End Select
 End Sub

@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "DataEntryController"
+Attribute VB_Name = "DmlOutputController"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -11,7 +11,7 @@ Option Explicit
 
 '====================================================================================================
 '
-' データ投入のコントローラ
+' DML出力のコントローラー
 '
 '====================================================================================================
 
@@ -21,7 +21,7 @@ Option Explicit
 Private mBaseController As BaseController       ' 基本コントローラー
 Private mDataEntrySheet As DataEntrySheet       ' データ投入シート
 Private mTableSheet As TableSheet               ' テーブルシート
-Private mDataEntryLogic As DataEntryLogic       ' データ投入ロジック
+Private mDmlOutputLogic As DmlOutputLogic       ' DML出力ロジック
 Private mProcessName As String                  ' 処理名
 
 
@@ -33,16 +33,25 @@ Private mProcessName As String                  ' 処理名
 Public Sub Execute(xEntryType As EntryType)
 On Error GoTo Finally
     Dim tableSettings As Dictionary
+    Dim xOutputDir As String
     Dim xKey As Variant
     Dim ts As TableSetting
     Dim ed As EntryData
-    Dim procCnt As Long
 
     ' 初期化
     Call Initialize(xEntryType)
 
-    ' 処理件数のクリア
-    Call mDataEntrySheet.ClearProcessingCount
+    ' 出力先の取得
+    xOutputDir = Setting.OutputDir
+    If xOutputDir = "" Then
+        Err.Raise ErrNumber.Abort
+    End If
+    If Dir(xOutputDir, vbDirectory) = "" Then
+        Err.Raise ErrNumber.Warning, , "出力先[" & xOutputDir & "]が存在しません。"
+    End If
+    If Right(xOutputDir, 1) <> "\" Then
+        xOutputDir = xOutputDir & "\"
+    End If
 
     ' 対象テーブル設定の取得
     Set tableSettings = mDataEntrySheet.GetTableSettings(True)
@@ -59,11 +68,8 @@ On Error GoTo Finally
         Set ts = tableSettings(xKey)
         Set ed = mTableSheet.GetEntryData(ts.PhysicsName)
 
-        ' データ投入実行
-        procCnt = mDataEntryLogic.ExecuteDataEntry(xEntryType, ed)
-
-        ' 処理件数の書き込み
-        Call mDataEntrySheet.WriteProcessingCount(ts, procCnt)
+        ' DML出力
+        Call mDmlOutputLogic.OutputDml(xOutputDir, xEntryType, ed)
     Next
 
 Finally:
@@ -85,7 +91,7 @@ Private Sub Initialize(xEntryType As EntryType)
     ' インスタンス生成
     Set mDataEntrySheet = New DataEntrySheet
     Set mTableSheet = New TableSheet
-    Set mDataEntryLogic = New DataEntryLogic
+    Set mDmlOutputLogic = New DmlOutputLogic
     mProcessName = GetProcessName(xEntryType)
 End Sub
 
@@ -97,7 +103,7 @@ Private Sub Finalize()
     ' インスタンス解放
     Set mDataEntrySheet = Nothing
     Set mTableSheet = Nothing
-    Set mDataEntryLogic = Nothing
+    Set mDmlOutputLogic = Nothing
 
     ' 停止
     Call mBaseController.Shutdown
@@ -117,10 +123,10 @@ End Sub
 Private Function GetProcessName(xEntryType As EntryType)
     Select Case xEntryType
         Case EntryType.Register
-            GetProcessName = "データ登録"
+            GetProcessName = "登録DML出力"
         Case EntryType.Update
-            GetProcessName = "データ更新"
+            GetProcessName = "更新DML出力"
         Case EntryType.Delete
-            GetProcessName = "データ削除"
+            GetProcessName = "削除DML出力"
     End Select
 End Function

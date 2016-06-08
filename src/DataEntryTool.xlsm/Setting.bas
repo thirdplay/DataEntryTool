@@ -20,6 +20,7 @@ Private mDatabaseName As String         ' データベース名
 Private mLinefeedCode As String         ' 改行コード
 Private mDateFormat As String           ' 日付書式
 Private mTimestampFormat As String      ' タイムスタンプ書式
+Private mOutputDir As String            ' 出力先
 
 
 '====================================================================================================
@@ -127,6 +128,30 @@ End Property
 
 
 '====================================================================================================
+' 出力先の取得/設定
+'====================================================================================================
+Public Property Get OutputDir() As String
+    Dim xOutputDir As String
+
+    xOutputDir = mOutputDir
+    If xOutputDir = "" Then
+        With Application.FileDialog(msoFileDialogFolderPicker)
+            If .Show = True Then
+                xOutputDir = .SelectedItems(1)
+            Else
+                OutputDir = ""
+                Exit Property
+            End If
+        End With
+    End If
+    OutputDir = xOutputDir
+End Property
+Public Property Let OutputDir(OutputDir As String)
+    mOutputDir = OutputDir
+End Property
+
+
+'====================================================================================================
 ' 設定モジュールを構成します
 '----------------------------------------------------------------------------------------------------
 ' IN : xSettingType 設定種別
@@ -142,6 +167,7 @@ Public Sub Setup(xSettingType As SettingType)
         Setting.LinefeedCode = .Range(cstLinefeedCode).Value
         Setting.DateFormat = .Range(cstDateFormat).Value
         Setting.TimestampFormat = .Range(cstTimestampFormat).Value
+        Setting.OutputDir = .Range(cstOutputDir).Value
     End With
 
     ' 設定モジュールのチェック

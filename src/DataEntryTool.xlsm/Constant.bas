@@ -12,7 +12,7 @@ Public Const cstSheetMain = "データ投入ツール"              ' メインシート
 Public Const cstSheetTemplate = "テンプレート"              ' テンプレートシート
 
 ' 名前定義
-Public Const cstDatabaseType = "DatabaseType"               ' データベース種類
+Public Const cstDatabaseType = "DatabaseType"               ' データベース種別
 Public Const cstServerName = "ServerName"                   ' サーバ名
 Public Const cstServerNameLabel = "ServerNameLabel"         ' サーバ名ラベル
 Public Const cstUserId = "UserId"                           ' ユーザID
@@ -22,6 +22,7 @@ Public Const cstDatabaseName = "DatabaseName"               ' データベース名
 Public Const cstLinefeedCode = "LinefeedCode"               ' 改行コード
 Public Const cstDateFormat = "DateFormat"                   ' 日付書式
 Public Const cstTimestampFormat = "TimestampFormat"         ' タイムスタンプ書式
+Public Const cstOutputDir = "OutputDir"                     ' 出力先
 Public Const cstTableBase = "TableBase"                     ' テーブル一覧の基準セル
 
 ' データベース種別
@@ -38,9 +39,9 @@ Public Const cstLinefeedCodeLF = "LF"                       ' LF
 
 ' エラー番号
 Public Enum ErrNumber
-    Error = 1000                            ' ユーザ定義のエラー
-    Warning = 2000                          ' ユーザ定義の警告
-    AlreadyReferenceConfigured = 32813      ' 既に参照設定されている
+    Error = 1000        ' ユーザ定義のエラー
+    Warning = 2000      ' ユーザ定義の警告
+    Abort = 3000        ' ユーザ定義の中断
 End Enum
 
 ' 設定種別
