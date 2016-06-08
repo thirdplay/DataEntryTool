@@ -66,7 +66,7 @@ DMLを出力するディレクトリを設定します。
 <img src="https://cloud.githubusercontent.com/assets/14181039/15900193/877767aa-2dd9-11e6-9195-b3c21910eeb0.png" width="50%">  
 
 * 登録DML出力  
-「登録DML出力」ボタンを押下して登録DMLを出力します。
+「登録DML出力」ボタンを押下して登録DMLを出力します。  
 <img src="https://cloud.githubusercontent.com/assets/14181039/15900192/877740cc-2dd9-11e6-8087-f867c8a13453.png" width="50%">  
 ＜出力結果＞  
 <img src="https://cloud.githubusercontent.com/assets/14181039/15900191/87763e0c-2dd9-11e6-8e2b-7c44914d8349.png" width="50%">
