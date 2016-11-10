@@ -11,7 +11,7 @@ Excelに入力したデータをデータベースに投入するツールです
 * [PostgreSQL](http://www.postgresql.org/ftp/odbc/versions/msi/)
 
 ### 使い方
-* [wikiを参照](https://github.com/thirdplay/DataEntryTool/wiki)
+* [wiki参照](https://github.com/thirdplay/DataEntryTool/wiki)
 
 ### ライセンス
 
