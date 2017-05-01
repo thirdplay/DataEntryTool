@@ -11,32 +11,32 @@ Option Explicit
 
 '====================================================================================================
 '
-' Oracle‚ÌCoreˆ—
+' Oracleã®Coreå‡¦ç†
 '
 '====================================================================================================
 Implements IDatabaseCore
 
 
 '====================================================================================================
-' ’è”
+' å®šæ•°
 '====================================================================================================
-' ƒJƒ‰ƒ€’è‹`æ“¾ƒNƒGƒŠ
+' ã‚«ãƒ©ãƒ å®šç¾©å–å¾—ã‚¯ã‚¨ãƒª
 Private Const cstColumnDefinitionQuery = "SELECT utc.table_name,utc.column_id,utc.column_name,NVL(ucc.comments, ' ') AS comments,utc.data_type,CASE utc.data_type WHEN 'CHAR' THEN TO_CHAR(utc.data_length) WHEN 'VARCHAR2' THEN TO_CHAR(utc.data_length) WHEN 'NUMBER' THEN utc.data_precision || ',' || utc.data_scale ELSE ' ' END AS data_length,DECODE(utc.nullable,'N','1','0') AS is_required,DECODE(pkc.table_name,NULL,'0','1') AS is_primary_key FROM user_tab_columns utc LEFT JOIN user_col_comments ucc ON(ucc.table_name = utc.table_name AND ucc.column_name = utc.column_name) LEFT JOIN (SELECT cc.table_name,cc.column_name FROM user_cons_columns cc INNER JOIN user_constraints cons ON(cons.constraint_name = cc.constraint_name AND cons.constraint_type = 'P')) pkc ON (pkc.table_name = utc.table_name AND pkc.column_name = utc.column_name) WHERE utc.table_name IN(${tableNameIn}) ORDER BY table_name, column_id"
-' ƒe[ƒuƒ‹–¼æ“¾ƒNƒGƒŠ
+' ãƒ†ãƒ¼ãƒ–ãƒ«åå–å¾—ã‚¯ã‚¨ãƒª
 Private Const cstTableNameQuery = "SELECT table_name from user_tables"
-' ‹æØ‚è•¶š
+' åŒºåˆ‡ã‚Šæ–‡å­—
 Private Const cstDelimiter = ","
 
 
 '====================================================================================================
-' ƒf[ƒ^ƒx[ƒX‚ÌÚ‘±•¶š—ñ‚ğæ“¾‚µ‚Ü‚·
+' ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã®æ¥ç¶šæ–‡å­—åˆ—ã‚’å–å¾—ã—ã¾ã™
 '----------------------------------------------------------------------------------------------------
-' IN : xServerName ƒT[ƒo–¼
-'    : xUserId ƒ†[ƒUID
-'    : xPassword ƒpƒXƒ[ƒh
-'    : xPort ƒ|[ƒg
-'    : xDatabaseName ƒf[ƒ^ƒx[ƒX–¼
-' OUT: Ú‘±•¶š—ñ
+' IN : xServerName ã‚µãƒ¼ãƒå
+'    : xUserId ãƒ¦ãƒ¼ã‚¶ID
+'    : xPassword ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰
+'    : xPort ãƒãƒ¼ãƒˆ
+'    : xDatabaseName ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹å
+' OUT: æ¥ç¶šæ–‡å­—åˆ—
 '====================================================================================================
 Public Function IDatabaseCore_GetConnectStr( _
     xServerName As String, _
@@ -45,17 +45,21 @@ Public Function IDatabaseCore_GetConnectStr( _
     xPort As String, _
     xDatabaseName As String _
 ) As String
-    IDatabaseCore_GetConnectStr = "Driver={Microsoft ODBC for Oracle};" _
-        & "Server=" & xServerName & ";" _
-        & "UID=" & xUserId & ";" _
-        & "PWD=" & xPassword & ";"
+    IDatabaseCore_GetConnectStr = "Provider=OraOLEDB.Oracle;" _
+        & "Data Source=" & xServerName & ";" _
+        & "User ID=" & xUserId & ";" _
+        & "Password=" & xPassword & ";"
+'    IDatabaseCore_GetConnectStr = "Driver={Microsoft ODBC for Oracle};" _
+'        & "Server=" & xServerName & ";" _
+'        & "UID=" & xUserId & ";" _
+'        & "PWD=" & xPassword & ";"
 End Function
 
 
 '====================================================================================================
-' ƒe[ƒuƒ‹–¼æ“¾ƒNƒGƒŠ‚ğæ“¾‚µ‚Ü‚·
+' ãƒ†ãƒ¼ãƒ–ãƒ«åå–å¾—ã‚¯ã‚¨ãƒªã‚’å–å¾—ã—ã¾ã™
 '----------------------------------------------------------------------------------------------------
-' OUT: ƒe[ƒuƒ‹–¼æ“¾ƒNƒGƒŠ
+' OUT: ãƒ†ãƒ¼ãƒ–ãƒ«åå–å¾—ã‚¯ã‚¨ãƒª
 '====================================================================================================
 Public Function IDatabaseCore_GetTableNameQuery() As String
     IDatabaseCore_GetTableNameQuery = cstTableNameQuery
@@ -63,10 +67,10 @@ End Function
 
 
 '====================================================================================================
-' ƒJƒ‰ƒ€’è‹`æ“¾ƒNƒGƒŠ‚ğæ“¾‚µ‚Ü‚·
+' ã‚«ãƒ©ãƒ å®šç¾©å–å¾—ã‚¯ã‚¨ãƒªã‚’å–å¾—ã—ã¾ã™
 '----------------------------------------------------------------------------------------------------
-' IN : tableSettings ƒe[ƒuƒ‹İ’è‚Ì˜A‘•”z—ñ
-' OUT: ƒJƒ‰ƒ€’è‹`æ“¾ƒNƒGƒŠ
+' IN : tableSettings ãƒ†ãƒ¼ãƒ–ãƒ«è¨­å®šã®é€£è£…é…åˆ—
+' OUT: ã‚«ãƒ©ãƒ å®šç¾©å–å¾—ã‚¯ã‚¨ãƒª
 '====================================================================================================
 Public Function IDatabaseCore_GetColumnDefinitionQuery(tableSettings As Object) As String
     Dim query As String
@@ -84,10 +88,10 @@ End Function
 
 
 '====================================================================================================
-' ƒf[ƒ^í•Ê‚ª•¶š—ñ‚©‚Ç‚¤‚©”»’è‚·‚é
+' ãƒ‡ãƒ¼ã‚¿ç¨®åˆ¥ãŒæ–‡å­—åˆ—ã‹ã©ã†ã‹åˆ¤å®šã™ã‚‹
 '----------------------------------------------------------------------------------------------------
-' IN : xDataType ƒf[ƒ^Œ^
-' OUT: True:•¶š—ñAFalse:•¶š—ñˆÈŠO
+' IN : xDataType ãƒ‡ãƒ¼ã‚¿å‹
+' OUT: True:æ–‡å­—åˆ—ã€False:æ–‡å­—åˆ—ä»¥å¤–
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeString(ByVal xDataType As String) As Boolean
     If InStr(UCase(xDataType), "CHAR") Then
@@ -99,10 +103,10 @@ End Function
 
 
 '====================================================================================================
-' ƒf[ƒ^í•Ê‚ª“ú•t‚©‚Ç‚¤‚©”»’è‚·‚é
+' ãƒ‡ãƒ¼ã‚¿ç¨®åˆ¥ãŒæ—¥ä»˜ã‹ã©ã†ã‹åˆ¤å®šã™ã‚‹
 '----------------------------------------------------------------------------------------------------
-' IN : xDataType ƒf[ƒ^Œ^
-' OUT: True:“ú•tAFalse:“ú•tˆÈŠO
+' IN : xDataType ãƒ‡ãƒ¼ã‚¿å‹
+' OUT: True:æ—¥ä»˜ã€False:æ—¥ä»˜ä»¥å¤–
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeDate(ByVal xDataType As String) As Boolean
     xDataType = UCase(xDataType)
@@ -115,10 +119,10 @@ End Function
 
 
 '====================================================================================================
-' ƒf[ƒ^Œ^‚ªƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚©‚Ç‚¤‚©”»’è‚·‚é
+' ãƒ‡ãƒ¼ã‚¿å‹ãŒã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã‹ã©ã†ã‹åˆ¤å®šã™ã‚‹
 '----------------------------------------------------------------------------------------------------
-' IN : xDataType ƒf[ƒ^Œ^
-' OUT: True:ƒ^ƒCƒ€ƒXƒ^ƒ“ƒvAFalse:ƒ^ƒCƒ€ƒXƒ^ƒ“ƒvˆÈŠO
+' IN : xDataType ãƒ‡ãƒ¼ã‚¿å‹
+' OUT: True:ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã€False:ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ä»¥å¤–
 '====================================================================================================
 Public Function IDatabaseCore_IsDataTypeTimestamp(ByVal xDataType As String) As Boolean
     xDataType = UCase(xDataType)
